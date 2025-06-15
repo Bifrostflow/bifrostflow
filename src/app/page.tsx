@@ -1,103 +1,347 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import '@xyflow/react/dist/style.css';
+import {
+  addEdge,
+  Background,
+  Connection,
+  Controls,
+  Edge,
+  MiniMap,
+  Node,
+  ReactFlow,
+  ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react';
+
+import { DefaultNode } from '@/components/ui/nodes/default';
+import { NodeCategory, SystemNode } from '@/backend/getSystemNodes';
+import { Menu, Trash2 } from 'lucide-react';
+import { mapTypesToDeleteButtonColor } from '@/lib/utils';
+import { EndNode } from '@/components/ui/nodes/end';
+import { RoutingNode } from '@/components/ui/nodes/routing';
+import { StartNode } from '@/components/ui/nodes/start';
+import { StartPointNode } from '@/components/ui/nodes/start-point';
+import SideDrawer from '@/components/ui/side-drawer';
+import ExecuteFlow from '@/components/ui/execute-flow';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { OnPrompt } from '@/components/ui/initiator/on_prompt';
+
+const start_point = {
+  id: '0-start_point',
+  type: 'start_point',
+  data: {
+    label: '',
+  },
+  position: { x: 250, y: 250 },
+  draggable: false,
+};
+
+const initialNodes: Node[] = [start_point];
+const initialEdges: Edge[] = [];
+
+const FlowCanvas: React.FC = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [idCounter, setIdCounter] = useState<number>(1);
+  const [tabsToSelect, setTabsToSelect] = useState<NodeCategory[]>([
+    'initiate',
+  ]);
+  const [showActionPanel, setShowActionPanel] = useState(false);
+  const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
+  const isStartSelected = useMemo(
+    () =>
+      nodes.find(n => {
+        const data: SystemNode = n.data as unknown as SystemNode;
+        return data.category === 'initiate';
+      }),
+    [nodes],
+  );
+  const isMainNodesSelected = useMemo(() => {
+    const { length } = nodes.filter(n => {
+      const data: SystemNode = n.data as unknown as SystemNode;
+      return ['action', 'generate'].includes(data.category) ? true : false;
+    });
+    return length > 0;
+  }, [nodes]);
+
+  const onConnect = useCallback(
+    (params: Edge | Connection) => {
+      const sourceNode = nodes.find(n => n.id === params.source);
+      if (!sourceNode) return;
+      setEdges(eds => addEdge(params, eds));
+    },
+    [edges, nodes, setEdges],
+  );
+  useEffect(() => {
+    if (isMainNodesSelected) {
+      setTabsToSelect(['conditional', 'action', 'generate', 'close']);
+    } else if (isStartSelected) {
+      setNodes(nds => nds.filter(nd => nd.type !== 'start_point'));
+      setTabsToSelect(['conditional', 'action', 'generate']);
+    } else {
+      setNodes([start_point]);
+      setTabsToSelect(['initiate']);
+    }
+  }, [isMainNodesSelected, isStartSelected, setNodes]);
+
+  const handleAddNode = (node: SystemNode) => {
+    const id = `${idCounter}-${node._id}`;
+    if (node.category === 'initiate') {
+      setInitiatorType(node.type);
+    }
+    const newNode: Node = {
+      id,
+      type: node.category || 'default',
+      data: {
+        ...node,
+        onClick: (id: string) => {
+          console.log(id);
+          setDrawerOpen(true);
+        },
+        delete: (
+          <Trash2
+            size={10}
+            color={mapTypesToDeleteButtonColor[node.category]}
+            onClick={() => {
+              handleRemoveNode(id);
+            }}
+          />
+        ),
+        executeFlow: <ExecuteFlow onExecuteFlow={onExecuteFlow} />,
+      } as unknown as Record<string, unknown>,
+      position: { x: Math.random() * 250, y: Math.random() * 250 },
+    };
+    setIdCounter(id => id + 1);
+    console.log(newNode);
+    setNodes(nds => [...nds, newNode]);
+  };
+
+  const handleRemoveNode = (id: string) => {
+    setNodes(nds => nds.filter(node => node.id !== id));
+    setEdges(eds =>
+      eds.filter(edge => edge.source !== id && edge.target !== id),
+    );
+  };
+  console.log(nodes);
+  const onExecuteFlow = () => {
+    setShowActionPanel(true);
+  };
+  const hasEndConnected = useMemo(
+    () => true,
+    // edges.filter(
+    //   edge => edge.target.split('-')[1] === '684e733dc2b59ec01fb72c77',
+    // ).length === 1,
+    [edges],
+  );
+  const hasStartConnected = useMemo(
+    () => true,
+    // edges.filter(edge => edge.source.split('-')[1] === '684d858808dca10a34a65a53').length === 1,
+    [edges],
+  );
+  const hasAnEnd = useMemo(
+    () =>
+      hasEndConnected &&
+      nodes.filter(node => node.data.category === 'close').length === 1,
+    [nodes, hasEndConnected],
+  );
+  const hasOneInitiator = useMemo(
+    () =>
+      hasStartConnected &&
+      nodes.filter(node => node.data.category == 'initiate').length == 1,
+    [nodes, hasStartConnected],
+  );
+  const hasValidEdges = useMemo(() => edges.length > 1, [edges]);
+
+  const runFlowIsValid = useMemo(
+    () => hasAnEnd && hasValidEdges && hasOneInitiator,
+    [hasAnEnd, hasOneInitiator, hasValidEdges],
+  );
+  console.log({ hasAnEnd, hasOneInitiator, hasValidEdges });
+  console.log(edges);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+    <div className="flex h-screen">
+      <div className="flex-1">
+        <ReactFlow
+          draggable={false}
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={{
+            custom: DefaultNode,
+            default: DefaultNode,
+            start_point: props => (
+              <StartPointNode
+                {...props}
+                onPress={() => {
+                  setDrawerOpen(true);
+                }}
+              />
+            ),
+            conditional: RoutingNode,
+            action: DefaultNode,
+            generate: DefaultNode,
+            initiate: StartNode,
+            close: EndNode,
+          }}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView>
+          <Background
+            color="var(--color-zinc-500)"
+            size={1}
+            gap={16}
+            bgColor="var(--color-zinc-900)"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <MiniMap
+            maskColor="var(--color-zinc-800)"
+            bgColor="var(--color-zinc-700)"
+            nodeColor={(node: Node) => {
+              if (node.data.category === 'initiate')
+                return 'var(--color-emerald-400)';
+              if (node.data.category === 'start_point')
+                return 'var(--color-zinc-700)';
+              if (node.data.category === 'close') return 'var(--color-red-400)';
+              if (node.data.category === 'conditional')
+                return 'var(--color-lime-400)';
+              return 'var(--color-cyan-400)';
+            }}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <div className="p-2 m-1 bg-zinc-700 w-[50%] flex justify-between items-center gap-1 absolute right-0 z-1000">
+            <div className="flex gap-1">
+              {/* Menu */}
+              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+                Menu
+              </div> */}
+              {/* Save Paid*/}
+              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+                Save
+              </div>
+              {/* Run */}
+              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+                Run
+              </div>
+              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+                Load
+              </div>
+            </div>
+            <div className="flex justify-start items-center">
+              <button
+                onClick={() => {
+                  setDrawerOpen(true);
+                }}
+                className="text-zinc-200 hover:text-zinc-400">
+                <Menu />
+              </button>
+            </div>
+          </div>
+          <button
+            disabled={!runFlowIsValid}
+            onClick={onExecuteFlow}
+            className="
+            disabled:from-zinc-800
+            disabled:to-zinc-700
+            disabled:active:scale-[1]
+            absolute bottom-[130px]
+            right-[220px]
+            z-10 
+            width-[100px]
+                        bg-gradient-to-tl from-yellow-800 to-orange-400
+                        hover:from-yellow-800
+                        hover:to-orange-700
+                        active:from-yellow-800
+                        active:to-orange-500
+                        text-white
+                        rounded-full
+                        px-4 py-2
+                        shadow-lg
+                        border-0 
+                        active:scale-[1.03]
+                        text-sm font-semibold
+                        transition-all duration-100 ease-[cubic-bezier(0.34, 1.56, 0.64, 1)]
+            ">
+            Run Flow
+          </button>
+          <div
+            className="
+          absolute bottom-[12px]
+            right-[220px]
+            z-10 
+            bg-zinc-700
+            p-2
+            rounded-xs
+            flex flex-col
+            items-start
+            gap-2
+          ">
+            <div className="flex items-start gap-1 text-white ">
+              <Checkbox checked={hasOneInitiator} id="toggle" disabled />
+              <Label
+                className={hasOneInitiator ? 'text-green-400' : 'text-white'}
+                htmlFor="toggle">
+                Has Initiator
+              </Label>
+            </div>
+            <div className="flex items-start gap-1 text-white ">
+              <Checkbox checked={hasValidEdges} id="toggle" disabled />
+              <Label
+                className={hasValidEdges ? 'text-green-400' : 'text-white'}
+                htmlFor="toggle">
+                Has valid edges.
+              </Label>
+            </div>
+            <div className="flex items-start gap-1 text-white ">
+              <Checkbox checked={hasAnEnd} id="toggle" disabled />
+              <Label
+                className={hasAnEnd ? 'text-green-400' : 'text-white'}
+                htmlFor="toggle">
+                Has an End
+              </Label>
+            </div>
+          </div>
+          {showActionPanel && runFlowIsValid && (
+            <div
+              className="p-3 bg-zinc-700 rounded-xs m-1
+              border-2
+              border-zinc-400
+            w-[300px]
+            absolute
+            bottom-0
+          left-10
+          z-10000
+            ">
+              {initiatorType === 'on_prompt' && (
+                <OnPrompt
+                  onClose={() => setShowActionPanel(false)}
+                  edges={edges}
+                />
+              )}
+            </div>
+          )}
+          <Controls position="bottom-right" orientation="horizontal" />
+        </ReactFlow>
+      </div>
+      <SideDrawer
+        activeTabs={tabsToSelect}
+        onAddNode={handleAddNode}
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+      />
     </div>
   );
-}
+};
+
+const App: React.FC = () => {
+  return (
+    <ReactFlowProvider>
+      <FlowCanvas />
+    </ReactFlowProvider>
+  );
+};
+
+export default App;
