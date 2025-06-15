@@ -85,14 +85,12 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
   // w-full
 
   const classes = clsx(
-    'w-auto h-[70px] flex items-center gap-2',
+    'min-w-[calc(100%-14px)] w-auto h-[70px] flex items-center gap-2',
     `text-left border-0 border-zinc-400 rounded-sm m-2 px-3`,
     'p-2 text-xs transition-all duration-100 ease-in-out active:scale-[0.95]',
     typeToBGColor(node.category),
     typeToTextColor(node.category),
-    node.state === 'inactive'
-      ? 'disabled:from-zinc-700 disabled:to-zinc-800 disabled:scale-[1] disabled:text-zinc-400'
-      : '',
+    'disabled:from-zinc-700 disabled:to-zinc-800 disabled:scale-[1] disabled:text-zinc-400',
   );
 
   const descriptionTextClass = clsx(

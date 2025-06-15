@@ -12,6 +12,7 @@ import {
   runFlowWithInput,
 } from '@/backend/runFlow';
 import { CodeEvaluateResponse } from '../responses/code_evaluate';
+import { TextGenerateEffect } from '../text-generate-effect';
 
 type Props = {
   edges: Edge[];
@@ -26,6 +27,7 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
 
   const runFlow = async () => {
     if (!message.trim().length) return;
+    setResponse(undefined);
     setLoading(true);
     console.log(edges, message);
     try {
@@ -60,7 +62,7 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
               />
             ) : null
           ) : (
-            <p className="text-white text-sm p-2">{response?.message}</p>
+            <TextGenerateEffect words={response?.message} />
           ))}
       </div>
       <div className="w-full max-w-3xl flex gap-2 items-center">

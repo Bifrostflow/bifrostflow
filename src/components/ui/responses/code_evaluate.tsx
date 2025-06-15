@@ -9,7 +9,9 @@ export const CodeEvaluateResponse = ({ response }: Props) => {
   return (
     <div className="bg-zinc-900 border border-emerald-600 rounded-md shadow-lg p-4 space-y-2 w-full max-w-md text-sm text-emerald-100">
       <p className="flex items-start gap-1">
-        <span className="font-semibold text-emerald-400">Code:</span>
+        <span className="font-semibold text-emerald-400">
+          {response.meta.is_code ? 'Code :' : ''}
+        </span>
         <code className="bg-emerald-950 px-2 py-1 rounded text-emerald-300 font-mono text-xs">
           {response.message}
         </code>

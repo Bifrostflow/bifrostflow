@@ -36,6 +36,7 @@ import ExecuteFlow from '@/components/ui/execute-flow';
 import { OnPrompt } from '@/components/ui/initiator/on_prompt';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
+import { DraggablePanel } from '@/components/ui/draggable-panel';
 
 const start_point = {
   id: '0-start_point',
@@ -141,7 +142,7 @@ const FlowCanvas: React.FC = () => {
     if (isValid) {
       setShowActionPanel(true);
     } else {
-      toast('Invalid Flow.');
+      toast('Incomplete flow for graph.');
     }
   };
   const onReconnectStart = useCallback(() => {
@@ -266,25 +267,14 @@ const FlowCanvas: React.FC = () => {
             ">
             Run Flow
           </button>
-          {showActionPanel && (
-            <div
-              className="p-3 bg-zinc-700 rounded-xs m-1
-              border-2
-              border-zinc-400
-            w-[300px]
-            absolute
-            bottom-0
-          left-10
-          z-10000
-            ">
-              {initiatorType === 'on_prompt' && (
-                <OnPrompt
-                  onClose={() => setShowActionPanel(false)}
-                  edges={edges}
-                />
-              )}
-            </div>
-          )}
+
+          <DraggablePanel
+            onClose={() => setShowActionPanel(false)}
+            edges={edges}
+            visible={showActionPanel}
+            initiatorType={initiatorType}
+          />
+
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
       </div>
