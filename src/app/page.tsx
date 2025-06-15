@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import '@xyflow/react/dist/style.css';
 import {
   addEdge,
@@ -12,6 +18,7 @@ import {
   Node,
   ReactFlow,
   ReactFlowProvider,
+  reconnectEdge,
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
@@ -26,9 +33,9 @@ import { StartNode } from '@/components/ui/nodes/start';
 import { StartPointNode } from '@/components/ui/nodes/start-point';
 import SideDrawer from '@/components/ui/side-drawer';
 import ExecuteFlow from '@/components/ui/execute-flow';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { OnPrompt } from '@/components/ui/initiator/on_prompt';
+import { validateIndirectFlow } from '@/lib/validation';
+import { toast } from 'sonner';
 
 const start_point = {
   id: '0-start_point',
@@ -53,6 +60,7 @@ const FlowCanvas: React.FC = () => {
   ]);
   const [showActionPanel, setShowActionPanel] = useState(false);
   const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
+  const edgeReconnectSuccessful = useRef(true);
   const isStartSelected = useMemo(
     () =>
       nodes.find(n => {
@@ -75,7 +83,7 @@ const FlowCanvas: React.FC = () => {
       if (!sourceNode) return;
       setEdges(eds => addEdge(params, eds));
     },
-    [edges, nodes, setEdges],
+    [nodes, setEdges],
   );
   useEffect(() => {
     if (isMainNodesSelected) {
@@ -114,7 +122,7 @@ const FlowCanvas: React.FC = () => {
         ),
         executeFlow: <ExecuteFlow onExecuteFlow={onExecuteFlow} />,
       } as unknown as Record<string, unknown>,
-      position: { x: Math.random() * 250, y: Math.random() * 250 },
+      position: { x: 250, y: 250 },
     };
     setIdCounter(id => id + 1);
     console.log(newNode);
@@ -127,47 +135,44 @@ const FlowCanvas: React.FC = () => {
       eds.filter(edge => edge.source !== id && edge.target !== id),
     );
   };
-  console.log(nodes);
-  const onExecuteFlow = () => {
-    setShowActionPanel(true);
-  };
-  const hasEndConnected = useMemo(
-    () => true,
-    // edges.filter(
-    //   edge => edge.target.split('-')[1] === '684e733dc2b59ec01fb72c77',
-    // ).length === 1,
-    [edges],
-  );
-  const hasStartConnected = useMemo(
-    () => true,
-    // edges.filter(edge => edge.source.split('-')[1] === '684d858808dca10a34a65a53').length === 1,
-    [edges],
-  );
-  const hasAnEnd = useMemo(
-    () =>
-      hasEndConnected &&
-      nodes.filter(node => node.data.category === 'close').length === 1,
-    [nodes, hasEndConnected],
-  );
-  const hasOneInitiator = useMemo(
-    () =>
-      hasStartConnected &&
-      nodes.filter(node => node.data.category == 'initiate').length == 1,
-    [nodes, hasStartConnected],
-  );
-  const hasValidEdges = useMemo(() => edges.length > 1, [edges]);
-
-  const runFlowIsValid = useMemo(
-    () => hasAnEnd && hasValidEdges && hasOneInitiator,
-    [hasAnEnd, hasOneInitiator, hasValidEdges],
-  );
-  console.log({ hasAnEnd, hasOneInitiator, hasValidEdges });
   console.log(edges);
+  const onExecuteFlow = () => {
+    const isValid = validateIndirectFlow(edges);
+    if (isValid) {
+      setShowActionPanel(true);
+    } else {
+      toast('Invalid Flow.');
+    }
+  };
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
 
+  const onReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      edgeReconnectSuccessful.current = true;
+      setEdges(els => reconnectEdge(oldEdge, newConnection, els));
+    },
+    [],
+  );
+
+  const onReconnectEnd = useCallback(
+    (_noe: MouseEvent | TouchEvent, edge: Edge) => {
+      if (!edgeReconnectSuccessful.current) {
+        setEdges(eds => eds.filter(e => e.id !== edge.id));
+      }
+
+      edgeReconnectSuccessful.current = true;
+    },
+    [],
+  );
   return (
     <div className="flex h-screen">
       <div className="flex-1">
         <ReactFlow
+          onReconnect={onReconnect}
+          onReconnectStart={onReconnectStart}
+          onReconnectEnd={onReconnectEnd}
           draggable={false}
           nodes={nodes}
           edges={edges}
@@ -212,24 +217,19 @@ const FlowCanvas: React.FC = () => {
               return 'var(--color-cyan-400)';
             }}
           />
-          <div className="p-2 m-1 bg-zinc-700 w-[50%] flex justify-between items-center gap-1 absolute right-0 z-1000">
-            <div className="flex gap-1">
-              {/* Menu */}
-              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
-                Menu
-              </div> */}
-              {/* Save Paid*/}
+          {/* <div className="p-2 m-1 bg-zinc-700 w-[50%] flex justify-between items-center gap-1 absolute right-0 z-1000"> */}
+          <div className="p-2 m-4 bg-zinc-700 w-[40px] flex justify-center items-center gap-1 absolute right-0 z-1000">
+            {/* <div className="flex gap-1">
               <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Save
               </div>
-              {/* Run */}
               <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Run
               </div>
               <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Load
               </div>
-            </div>
+            </div> */}
             <div className="flex justify-start items-center">
               <button
                 onClick={() => {
@@ -241,14 +241,13 @@ const FlowCanvas: React.FC = () => {
             </div>
           </div>
           <button
-            disabled={!runFlowIsValid}
             onClick={onExecuteFlow}
             className="
             disabled:from-zinc-800
             disabled:to-zinc-700
             disabled:active:scale-[1]
-            absolute bottom-[130px]
-            right-[220px]
+            absolute bottom-[20px]
+            right-[230px]
             z-10 
             width-[100px]
                         bg-gradient-to-tl from-yellow-800 to-orange-400
@@ -257,7 +256,7 @@ const FlowCanvas: React.FC = () => {
                         active:from-yellow-800
                         active:to-orange-500
                         text-white
-                        rounded-full
+                        rounded-sm
                         px-4 py-2
                         shadow-lg
                         border-0 
@@ -267,44 +266,7 @@ const FlowCanvas: React.FC = () => {
             ">
             Run Flow
           </button>
-          <div
-            className="
-          absolute bottom-[12px]
-            right-[220px]
-            z-10 
-            bg-zinc-700
-            p-2
-            rounded-xs
-            flex flex-col
-            items-start
-            gap-2
-          ">
-            <div className="flex items-start gap-1 text-white ">
-              <Checkbox checked={hasOneInitiator} id="toggle" disabled />
-              <Label
-                className={hasOneInitiator ? 'text-green-400' : 'text-white'}
-                htmlFor="toggle">
-                Has Initiator
-              </Label>
-            </div>
-            <div className="flex items-start gap-1 text-white ">
-              <Checkbox checked={hasValidEdges} id="toggle" disabled />
-              <Label
-                className={hasValidEdges ? 'text-green-400' : 'text-white'}
-                htmlFor="toggle">
-                Has valid edges.
-              </Label>
-            </div>
-            <div className="flex items-start gap-1 text-white ">
-              <Checkbox checked={hasAnEnd} id="toggle" disabled />
-              <Label
-                className={hasAnEnd ? 'text-green-400' : 'text-white'}
-                htmlFor="toggle">
-                Has an End
-              </Label>
-            </div>
-          </div>
-          {showActionPanel && runFlowIsValid && (
+          {showActionPanel && (
             <div
               className="p-3 bg-zinc-700 rounded-xs m-1
               border-2

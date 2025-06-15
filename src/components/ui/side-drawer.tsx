@@ -226,12 +226,6 @@ export default function SideDrawer({
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
-          onClick={onCloseHandler}></div>
-      )}
-
       <div
         className={`fixed top-0 right-0 h-full w-80 bg-zinc-800 shadow-lg transform transition-transform duration-300 z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'

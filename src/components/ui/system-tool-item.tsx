@@ -85,19 +85,24 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
   // w-full
 
   const classes = clsx(
-    'w-[100%] h-[70px]  flex items-center gap-2',
-    `text-left border-0 border-zinc-400`,
-    'p-2 text-xs transition-all duration-100 ease-in-out',
+    'w-auto h-[70px] flex items-center gap-2',
+    `text-left border-0 border-zinc-400 rounded-sm m-2 px-3`,
+    'p-2 text-xs transition-all duration-100 ease-in-out active:scale-[0.95]',
     typeToBGColor(node.category),
     typeToTextColor(node.category),
+    node.state === 'inactive'
+      ? 'disabled:from-zinc-700 disabled:to-zinc-800 disabled:scale-[1] disabled:text-zinc-400'
+      : '',
   );
 
   const descriptionTextClass = clsx(
     'font-xs',
     typeToDescTextColor(node.category),
+    node.state === 'inactive' ? 'text-zinc-500' : '',
   );
   return (
-    <motion.div
+    <motion.button
+      disabled={node.state === 'inactive'}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -108,6 +113,6 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
         <p className={'text-sm font-medium'}>{node.name}</p>
         <p className={descriptionTextClass}>{node.description}</p>
       </div>
-    </motion.div>
+    </motion.button>
   );
 };

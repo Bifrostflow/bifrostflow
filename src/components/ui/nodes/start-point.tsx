@@ -12,7 +12,7 @@ const SPNode: React.FC<NodeProps & { onPress: () => void }> = ({ onPress }) => {
                         active:from-cyan-600
                         active:to-blue-600
                         text-blue-100
-                        rounded-full
+                        rounded-sm
                         px-2 py-1
                         shadow-lg
                         border-0 

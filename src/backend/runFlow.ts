@@ -13,7 +13,6 @@ export interface EnhancedResponse<T> {
   type: null;
   metaType?: MetaTypes;
   message: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   meta: T;
 }
 

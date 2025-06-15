@@ -17,6 +17,7 @@ export type NodeCategory =
   | 'generate'
   | 'initiate'
   | 'close';
+
 export interface SystemNode {
   _id: string;
   name: string;
@@ -26,6 +27,7 @@ export interface SystemNode {
   description: string;
   what_i_do: string;
   category: NodeCategory;
+  state: 'active' | 'inactive';
 }
 
 export type SystemNodes = SystemNode[];
@@ -38,7 +40,6 @@ export const getSystemNodes = async (): Promise<SystemNodes> => {
     if (!res.ok) {
       throw new Error('Failed to fetch project files');
     }
-
     const json: SystemNodes = await res.json();
     console.log(json);
     return json;

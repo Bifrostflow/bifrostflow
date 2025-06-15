@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Send, X } from 'lucide-react';
+import { Loader2, Send, X } from 'lucide-react';
 import { useState } from 'react';
 import { Edge } from '@xyflow/react';
 import { Textarea } from '../textarea';
@@ -75,7 +75,11 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
           onClick={runFlow}
           variant="default"
           className="flex gap-1 bg-emerald-500">
-          <Send className="w-4 h-4 text-emerald-900 " />
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-emerald-900" />
+          ) : (
+            <Send className="w-4 h-4 text-emerald-900" />
+          )}
         </Button>
       </div>
     </div>
