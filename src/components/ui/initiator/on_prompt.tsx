@@ -1,6 +1,4 @@
 'use client';
-
-import { Button } from '@/components/ui/button';
 import { Loader2, Send, X } from 'lucide-react';
 import { useState } from 'react';
 import { Edge } from '@xyflow/react';
@@ -44,14 +42,15 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
   };
 
   return (
-    <div className="w-full flex-col justify-center items-center">
-      <div className="w-full mb-2 rounded-sm flex justify-end">
-        <X
-          className="w-4 h-4 text-zinc-400"
+    <div className="w-full flex-col justify-center items-center rounded-2xl">
+      <div className="flex justify-end">
+        <button
           onClick={loading ? () => {} : onClose}
-        />
+          className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-emerald-500 to-emerald-800 p-1 rounded-full mb-2">
+          <X />
+        </button>
       </div>
-      <div className="w-full min-h-[200px] max-h-[300px] mb-2 rounded-sm border-2 border-zinc-600 overflow-y-scroll h-64 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-zinc-800">
+      <div className="w-full min-h-[200px] max-h-[300px] mb-2 rounded-2xl border-2 border-zinc-600 overflow-y-scroll h-64 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-zinc-800">
         {response &&
           (metaResponse ? (
             metaResponse === 'evaluate_code' ? (
@@ -70,17 +69,16 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
           placeholder="Type your message..."
           className="flex-1 min-h-[40px] max-h-[100px] resize-y border-emerald-500 placeholder:text-emerald-500 text-emerald-200"
         />
-        <Button
+        <button
           disabled={loading || !message}
           onClick={runFlow}
-          variant="default"
-          className="flex gap-1 bg-emerald-500">
+          className="bg-gradient-to-br from-emerald-500 to-emerald-800 rounded-full p-2">
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin text-emerald-900" />
+            <Loader2 className="animate-spin text-white h-[18px] w-[18px]" />
           ) : (
-            <Send className="w-4 h-4 text-emerald-900" />
+            <Send className="text-white h-[18px] w-[18px]" />
           )}
-        </Button>
+        </button>
       </div>
     </div>
   );

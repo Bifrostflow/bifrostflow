@@ -1,150 +1,3 @@
-// import {
-//   getSystemNodes,
-//   NodeCategory,
-//   SystemNode,
-// } from '@/backend/getSystemNodes';
-// import { useEffect, useState } from 'react';
-// import { SystemToolItem } from './system-tool-item';
-// import clsx from 'clsx';
-
-// interface ISideDrawer {
-//   open: boolean;
-//   onClose: () => void;
-//   onAddNode: (node: SystemNode) => void;
-//   activeTabs: NodeCategory[];
-// }
-// const nodesClassification: NodeCategory[] = [
-//   'initiate',
-//   'conditional',
-//   'action',
-//   'generate',
-//   'close',
-// ];
-
-// const typeToActiveColor = (category: NodeCategory) => {
-//   switch (category) {
-//     case 'action':
-//       return 'text-cyan-500';
-//     case 'close':
-//       return 'text-pink-500';
-//     case 'conditional':
-//       return 'text-lime-500';
-//     case 'generate':
-//       return 'text-cyan-500';
-//     case 'initiate':
-//       return 'text-emerald-500';
-//     default:
-//       return 'text-zinc-500';
-//   }
-// };
-
-// export default function SideDrawer({
-//   open,
-//   onClose,
-//   onAddNode,
-//   activeTabs,
-// }: ISideDrawer) {
-//   const [isOpen, setIsOpen] = useState(open);
-//   const [systemNodes, setSystemNodes] = useState<SystemNode[]>();
-//   const [loading, setLoading] = useState(true);
-//   const [selectedCategory, setSelectedCategory] = useState<NodeCategory>()
-//   useEffect(() => {
-//     setIsOpen(open);
-//   }, [open]);
-
-//   const onCloseHandler = () => {
-//     onClose();
-//     setIsOpen(false);
-//   };
-
-//   useEffect(() => {
-//     setLoading(true);
-//     getSystemNodes()
-//       .then(nodes => setSystemNodes(nodes))
-//       .catch(error => console.error('Failed to fetch system nodes:', error))
-//       .finally(() => setLoading(false));
-//   }, []);
-
-//   return (
-//     <>
-//       {isOpen && (
-//         <div
-//           className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
-//           onClick={onCloseHandler}></div>
-//       )}
-
-//       {/* Drawer Panel */}
-//       <div
-//         className={`fixed top-0 right-0 h-full w-80
-//                         bg-zinc-800
-//             shadow-lg transform transition-transform duration-300 z-50 ${
-//               isOpen ? 'translate-x-0' : 'translate-x-full'
-//             }`}>
-//         <div className="p-4 flex justify-between items-center">
-//           <h2
-//             className="text-lg font-semibold
-//           bg-gradient-to-tl from-blue-400 to-blue-500
-//                         bg-clip-text text-transparent
-//           ">
-//             Travel Realms
-//           </h2>
-//           <button
-//             onClick={onCloseHandler}
-//             className="
-//             bg-gradient-to-tl from-blue-400 to-blue-500
-//                         hover:from-blue-200
-//                         hover:to-blue-300
-//                         active:from-blue-200
-//                         active:to-blue-500
-//                         bg-clip-text text-transparent
-//             ">
-//             ✕
-//           </button>
-//         </div>
-//         <div className="h-[0.5px] rounded-lg bg-gradient-to-r from-blue-400 to-blue-500" />
-
-//         <div
-//           className="flex flex-row bg-zinc-700 p-2 flex-wrap gap-2"
-//           style={{
-//             scrollBehavior: 'smooth',
-//             overflow: 'visible',
-//           }}>
-//           {nodesClassification.map(category => {
-//             const categoryClass = clsx(
-//               'disabled:text-zinc-400 capitalize font-xs text-blue-100 bg-zinc-800 py-1 px-3 rounded-sm shadow-md disabled:shadow-none',
-//               typeToActiveColor(category),
-//             );
-//             return (
-//               <button
-//                 disabled={!activeTabs.includes(category)}
-//                 key={category}
-//                 className={categoryClass}>
-//                 {category}
-//               </button>
-//             );
-//           })}
-//         </div>
-//         <div className="">
-//           {systemNodes &&
-//             systemNodes
-//               .filter(node => {
-//                 return activeTabs.includes(node.category);
-//               })
-//               .map(node => {
-//                 return node.type === 'classify_message' ? null : (
-//                   <SystemToolItem
-//                     onAddNode={onAddNode}
-//                     node={node}
-//                     key={node._id}
-//                   />
-//                 );
-//               })}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
 import {
   getSystemNodes,
   NodeCategory,
@@ -153,6 +6,7 @@ import {
 import { useEffect, useState } from 'react';
 import { SystemToolItem } from './system-tool-item';
 import clsx from 'clsx';
+import { X } from 'lucide-react';
 
 interface ISideDrawer {
   open: boolean;
@@ -236,8 +90,8 @@ export default function SideDrawer({
           </h2>
           <button
             onClick={onCloseHandler}
-            className="bg-gradient-to-tl from-blue-400 to-blue-500 hover:from-blue-200 hover:to-blue-300 bg-clip-text text-transparent">
-            ✕
+            className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-red-500 to-indigo-800 p-2 rounded-full">
+            <X />
           </button>
         </div>
         <div className="h-[0.5px] rounded-lg bg-gradient-to-r from-blue-400 to-blue-500" />
