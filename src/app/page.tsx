@@ -36,6 +36,7 @@ import ExecuteFlow from '@/components/ui/execute-flow';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
 import { DraggablePanel } from '@/components/ui/draggable-panel';
+import { HeaderName } from '@/components/ui/header-name';
 
 const start_point = {
   id: '0-start_point',
@@ -91,6 +92,9 @@ const FlowCanvas: React.FC = () => {
       setTabsToSelect(['conditional', 'action', 'generate']);
     }
   }, [nodes, isMainNodesSelected]);
+  const isStarted = useMemo(() => {
+    return nodes.filter(n => n.data.category === 'start-point').length === 0;
+  }, [nodes]);
 
   const handleAddNode = (node: SystemNode) => {
     const id = `${idCounter}-${node._id}`;
@@ -202,6 +206,7 @@ const FlowCanvas: React.FC = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView>
+          <HeaderName isStart={isStarted} />
           <Background
             color="var(--color-zinc-500)"
             size={1}
