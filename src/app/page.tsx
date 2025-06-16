@@ -95,6 +95,7 @@ const FlowCanvas: React.FC = () => {
   const isStarted = useMemo(() => {
     return nodes.filter(n => n.data.category === 'start-point').length === 0;
   }, [nodes]);
+
   const handleAddNode = (node: SystemNode) => {
     const id = `${idCounter}-${node._id}`;
     if (node.category === 'initiate') {
