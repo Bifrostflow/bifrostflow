@@ -16,10 +16,9 @@ const SNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
   }, [data]);
 
   return (
-    <div className="p-2 flex justify-center items-center w-[50px] ">
-      <div
-        onClick={() => nodeData?.onClick(nodeData._id)}
-        className={`
+    <div
+      onClick={() => nodeData?.onClick(nodeData._id)}
+      className={`
           rounded-tl-lg
           rounded-tr-lg
               rounded-0
@@ -30,27 +29,22 @@ const SNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
             border-emerald-400
             bg-zinc-900
             active:bg-zinc-800
-           absolute
-           z-1
-           top-3
-           -left-2
         `}>
-        <div className="flex justify-between items-center gap-2">
-          <p className="text-[10px] text-emerald-400  whitespace-nowrap overflow-hidden text-ellipsis">
-            {nodeData?.name}
-          </p>
-          {nodeData?.delete}
-        </div>
-        <CustomHandle
-          connectionCount={1}
-          style={{
-            backgroundColor: 'var(--color-emerald-400)',
-          }}
-          type="source"
-          position={Position.Bottom}
-          isConnectable={isConnectable}
-        />
+      <div className="flex justify-between items-center gap-2">
+        <p className="text-[10px] text-emerald-400  whitespace-nowrap overflow-hidden text-ellipsis">
+          {nodeData?.name}
+        </p>
+        {nodeData?.delete}
       </div>
+      <CustomHandle
+        connectionCount={1}
+        style={{
+          backgroundColor: 'var(--color-emerald-400)',
+        }}
+        type="source"
+        position={Position.Bottom}
+        isConnectable={isConnectable}
+      />
     </div>
   );
 };

@@ -1,0 +1,13 @@
+🧠 LLM Tool Ideas for Conditional Flows
+Tool Name	Description	Suggested Use Case
+summarize_text	Long user input ka short summary nikaalna	After classify_message
+translate_message	Input ko different language mein convert karna	Based on language intent
+generate_image_prompt	Text ko image generation prompt mein convert karo	Useful for creative_prompt branches
+analyze_sentiment	Message ka emotion check karo (positive/negative/neutral)	Can route to write_mail if negative
+generate_tweet	Concise content create for X/Twitter	After write_message
+search_google	Use Serper/Google tool to fetch live data	Conditional after classify_message
+extract_key_points	Extract bullet points from large text	After user uploads long PDF/doc
+generate_code_doc	Generate documentation from a code snippet	After evaluate_code
+fetch_github_data	Pull GitHub PR/issues info from repo	Good for developer flows
+save_to_db	Store final result in DB	Useful after code gen or message sending
+summon_agent	Spin off a small agent to handle subtask	For multi-step complex flows
