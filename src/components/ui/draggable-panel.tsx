@@ -20,7 +20,7 @@ export const DraggablePanel = ({
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`p-3 bg-zinc-700 rounded m-1 border-2 border-zinc-400 w-[300px] z-[10000]
+      className={`p-3 bg-zinc-700 rounded-2xl m-1 border-2 border-zinc-400 w-[300px] z-[10000]
             absolute
             bottom-5
           left-5

@@ -25,7 +25,7 @@ import {
 
 import { DefaultNode } from '@/components/ui/nodes/default';
 import { NodeCategory, SystemNode } from '@/backend/getSystemNodes';
-import { Menu, Trash2 } from 'lucide-react';
+import { Menu, Play, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
@@ -42,6 +42,7 @@ const start_point = {
   type: 'start_point',
   data: {
     label: '',
+    category: 'start-point',
   },
   position: { x: 250, y: 250 },
   draggable: false,
@@ -61,14 +62,7 @@ const FlowCanvas: React.FC = () => {
   const [showActionPanel, setShowActionPanel] = useState(false);
   const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
   const edgeReconnectSuccessful = useRef(true);
-  const isStartSelected = useMemo(
-    () =>
-      nodes.find(n => {
-        const data: SystemNode = n.data as unknown as SystemNode;
-        return data.category === 'initiate';
-      }),
-    [nodes],
-  );
+
   const isMainNodesSelected = useMemo(() => {
     const { length } = nodes.filter(n => {
       const data: SystemNode = n.data as unknown as SystemNode;
@@ -86,22 +80,24 @@ const FlowCanvas: React.FC = () => {
     [nodes, setEdges],
   );
   useEffect(() => {
-    if (isMainNodesSelected) {
-      setTabsToSelect(['conditional', 'action', 'generate', 'close']);
-    } else if (isStartSelected) {
-      setNodes(nds => nds.filter(nd => nd.type !== 'start_point'));
-      setTabsToSelect(['conditional', 'action', 'generate']);
-    } else {
-      setNodes([start_point]);
+    const initiateNodes = nodes.filter(
+      node => node.data.category === 'initiate',
+    );
+    if (initiateNodes.length === 0) {
       setTabsToSelect(['initiate']);
+    } else if (isMainNodesSelected) {
+      setTabsToSelect(['conditional', 'action', 'generate', 'close']);
+    } else {
+      setTabsToSelect(['conditional', 'action', 'generate']);
     }
-  }, [isMainNodesSelected, isStartSelected, setNodes]);
+  }, [nodes, isMainNodesSelected]);
 
   const handleAddNode = (node: SystemNode) => {
     const id = `${idCounter}-${node._id}`;
     if (node.category === 'initiate') {
       setInitiatorType(node.type);
     }
+
     const newNode: Node = {
       id,
       type: node.category || 'default',
@@ -126,7 +122,16 @@ const FlowCanvas: React.FC = () => {
     };
     setIdCounter(id => id + 1);
     console.log(newNode);
-    setNodes(nds => [...nds, newNode]);
+    setNodes(nds => {
+      if (newNode.data.category === 'initiate') {
+        const filterStartPoint = nds.filter(
+          n => n.data.category !== 'start-point',
+        );
+        return [...filterStartPoint, newNode];
+      } else {
+        return [...nds, newNode];
+      }
+    });
   };
 
   const handleRemoveNode = (id: string) => {
@@ -217,56 +222,40 @@ const FlowCanvas: React.FC = () => {
               return 'var(--color-cyan-400)';
             }}
           />
-          {/* <div className="p-2 m-1 bg-zinc-700 w-[50%] flex justify-between items-center gap-1 absolute right-0 z-1000"> */}
-          <div className="p-2 m-4 bg-zinc-700 w-[40px] flex justify-center items-center gap-1 absolute right-0 z-1000">
-            {/* <div className="flex gap-1">
-              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+          <div className="pr-2 m-4 bg-zinc-700/00 w-[10%] flex justify-between items-center gap-1 absolute right-0 z-1000">
+            <div className="flex gap-3">
+              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Save
-              </div>
-              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+              </div> */}
+              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-blue-400 to-indigo-800 hover:text-blue-100 transition-all duration-50 ease-linear">
+                Save
+              </div> */}
+              <div
+                onClick={onExecuteFlow}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Play className="h-[16px] w-[16px]" />
                 Run
               </div>
-              <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-fuchsia-400 to-indigo-800 hover:text-teal-100 transition-all duration-50 ease-linear">
                 Load
-              </div>
-            </div> */}
+              </div> */}
+              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-stone-500 to-indigo-800 hover:text-purple-100 transition-all duration-50 ease-linear">
+                Settings
+              </div> */}
+              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
+                Load
+              </div> */}
+            </div>
             <div className="flex justify-start items-center">
               <button
                 onClick={() => {
                   setDrawerOpen(true);
                 }}
-                className="text-zinc-200 hover:text-zinc-400">
+                className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-green-600 to-indigo-800 p-2 rounded-full">
                 <Menu />
               </button>
             </div>
           </div>
-          <button
-            onClick={onExecuteFlow}
-            className="
-            disabled:from-zinc-800
-            disabled:to-zinc-700
-            disabled:active:scale-[1]
-            absolute bottom-[20px]
-            right-[230px]
-            z-10 
-            width-[100px]
-                        bg-gradient-to-tl from-yellow-800 to-orange-400
-                        hover:from-yellow-800
-                        hover:to-orange-700
-                        active:from-yellow-800
-                        active:to-orange-500
-                        text-white
-                        rounded-sm
-                        px-4 py-2
-                        shadow-lg
-                        border-0 
-                        active:scale-[1.03]
-                        text-sm font-semibold
-                        transition-all duration-100 ease-[cubic-bezier(0.34, 1.56, 0.64, 1)]
-            ">
-            Run Flow
-          </button>
-
           <DraggablePanel
             onClose={() => setShowActionPanel(false)}
             edges={edges}
