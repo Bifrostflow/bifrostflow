@@ -12,7 +12,7 @@ import {
   runFlowWithInput,
 } from '@/backend/runFlow';
 import { CodeEvaluateResponse } from '../responses/code_evaluate';
-import { TextGenerateEffect } from '../text-generate-effect';
+import { MarkdownTextResponse } from '../responses/markdown-text';
 
 type Props = {
   edges: Edge[];
@@ -34,9 +34,7 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
       const response = await runFlowWithInput({ data: edges, input: message });
       console.log(response);
 
-      if (response.metaType) {
-        setMetaResponse(response.metaType);
-      }
+      setMetaResponse(response.metaType);
       setResponse(response as EnhancedResponse<T>);
     } catch (error) {
       console.log(error);
@@ -62,7 +60,7 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
               />
             ) : null
           ) : (
-            <TextGenerateEffect words={response?.message} />
+            <MarkdownTextResponse response={response} />
           ))}
       </div>
       <div className="w-full max-w-3xl flex gap-2 items-center">

@@ -24,7 +24,7 @@ export interface CodeEvaluate {
 }
 
 const responseHandler = <T>(response: ResponseFlow): EnhancedResponse<T> => {
-  if (!!response.meta.length) {
+  if (response.meta.length > 1) {
     const metaData = JSON.parse(response.meta);
     return {
       message: response.message,
@@ -37,6 +37,7 @@ const responseHandler = <T>(response: ResponseFlow): EnhancedResponse<T> => {
       message: response.message,
       meta: response.meta as T,
       type: response.type,
+      metaType: undefined,
     };
   }
 };

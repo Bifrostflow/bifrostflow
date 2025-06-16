@@ -33,7 +33,6 @@ import { StartNode } from '@/components/ui/nodes/start';
 import { StartPointNode } from '@/components/ui/nodes/start-point';
 import SideDrawer from '@/components/ui/side-drawer';
 import ExecuteFlow from '@/components/ui/execute-flow';
-import { OnPrompt } from '@/components/ui/initiator/on_prompt';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
 import { DraggablePanel } from '@/components/ui/draggable-panel';
@@ -154,7 +153,7 @@ const FlowCanvas: React.FC = () => {
       edgeReconnectSuccessful.current = true;
       setEdges(els => reconnectEdge(oldEdge, newConnection, els));
     },
-    [],
+    [setEdges],
   );
 
   const onReconnectEnd = useCallback(
@@ -165,7 +164,7 @@ const FlowCanvas: React.FC = () => {
 
       edgeReconnectSuccessful.current = true;
     },
-    [],
+    [setEdges],
   );
   return (
     <div className="flex h-screen">
