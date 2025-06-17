@@ -37,6 +37,7 @@ import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
 import { DraggablePanel } from '@/components/ui/draggable-panel';
 import { HeaderName } from '@/components/ui/header-name';
+import { StickyBanner } from '@/components/ui/sticky-banner';
 
 const start_point = {
   id: '0-start_point',
@@ -206,6 +207,12 @@ const FlowCanvas: React.FC = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView>
+          <StickyBanner className="bg-gradient-to-b from-emerald-700 to-emerald-900">
+            <p className="mx-0 max-w-[90%] text-white drop-shadow-md">
+              Under Construction till new features,{' '}
+              <b>Deadline is 30th June 2025</b>
+            </p>
+          </StickyBanner>
           <HeaderName isStart={isStarted} />
           <Background
             color="var(--color-zinc-500)"
