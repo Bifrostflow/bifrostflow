@@ -3,7 +3,7 @@ import { Edge } from '@xyflow/react';
 
 interface ResponseFlow {
   type: null;
-  message: string;
+  messages: string[];
   meta: string;
 }
 
@@ -12,7 +12,7 @@ export type MetaTypes = 'evaluate_code' | 'other';
 export interface EnhancedResponse<T> {
   type: null;
   metaType?: MetaTypes;
-  message: string;
+  messages: string[];
   meta: T;
 }
 
@@ -27,14 +27,14 @@ const responseHandler = <T>(response: ResponseFlow): EnhancedResponse<T> => {
   if (response.meta.length > 1) {
     const metaData = JSON.parse(response.meta);
     return {
-      message: response.message,
+      messages: response.messages,
       meta: metaData as T,
       type: null,
       metaType: metaData.type,
     };
   } else {
     return {
-      message: response.message,
+      messages: response.messages,
       meta: response.meta as T,
       type: response.type,
       metaType: undefined,

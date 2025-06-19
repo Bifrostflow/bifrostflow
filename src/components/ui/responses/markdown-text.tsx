@@ -22,7 +22,9 @@ export const MarkdownTextResponse = <T,>({ response }: Props<T>) => {
             );
           },
         }}>
-        {response.message}
+        {response.messages.reduce((p, c) => {
+          return p + '\n\n\n\n' + c;
+        }, '')}
       </ReactMarkdown>
     </div>
   );
