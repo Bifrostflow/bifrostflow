@@ -76,6 +76,15 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --zaffre: #0021A3ff;
+--blue-munsell: #0C9AA7ff;
+--chrysler-blue: #5A16B7ff;
+--medium-blue: #2919BBff;
+--blue-crayola: #1B73F9ff;
+--rich-black: #0A161Fff;
+--blue-ncs: #078CBBff;
+--cobalt-blue: #024AB1ff;
+--fluorescent-cyan: #00F9F0ff;
 }
 
 .dark {
@@ -119,4 +128,30 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Neon glow utility */
+@layer utilities {
+  .neon-glow {
+    @apply relative text-white;
+  }
+  .neon-glow::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-500 to-indigo-600 opacity-50 rounded-xl blur-2xl;
+    z-index: -1;
+  }
+}
+
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 50% 100%;
+  }
+}
+
+.animate-gradient-flow {
+  animation: gradient-flow 12s ease-in-out infinite alternate;
 }
