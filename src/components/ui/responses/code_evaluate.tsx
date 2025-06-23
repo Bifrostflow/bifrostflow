@@ -13,7 +13,7 @@ export const CodeEvaluateResponse = ({ response }: Props) => {
           {response.meta.is_code ? 'Code :' : ''}
         </span>
         <code className="bg-emerald-950 px-2 py-1 rounded text-emerald-300 font-mono text-xs">
-          {response.message}
+          {response.messages}
         </code>
       </p>
       <p>

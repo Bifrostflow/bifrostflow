@@ -2,19 +2,13 @@
 import React from 'react';
 import { motion } from 'motion/react';
 
-export default function ColourfulText({ text }: { text: string }) {
-  const colors = [
-    'oklch(62.3% 0.214 259.815)',
-    'oklch(58.5% 0.233 277.117)',
-    'oklch(62.3% 0.214 259.815)',
-    'oklch(58.5% 0.233 277.117)',
-    'oklch(62.3% 0.214 259.815)',
-    'oklch(58.5% 0.233 277.117)',
-    'oklch(62.3% 0.214 259.815)',
-    'oklch(58.5% 0.233 277.117)',
-    'oklch(69.6% 0.17 162.48)',
-  ];
-
+export default function ColourfulText({
+  text,
+  colors = ['#00FFFF', '#008FFF', '#00FFFF', '#00BFFF', '#008FFF', '#00BFFF'],
+}: {
+  text: string;
+  colors?: string[];
+}) {
   const [currentColors, setCurrentColors] = React.useState(colors);
   const [count, setCount] = React.useState(0);
 
@@ -26,7 +20,7 @@ export default function ColourfulText({ text }: { text: string }) {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [colors]);
 
   return text.split('').map((char, index) => (
     <motion.span
@@ -45,7 +39,7 @@ export default function ColourfulText({ text }: { text: string }) {
         duration: 1,
         delay: index * 0.05,
       }}
-      className="text-6xl inline-block whitespace-pre font-sans tracking-tight ">
+      className="lg:text-7xl md:text-6xl sm:text-5xl inline-block whitespace-pre font-sans tracking-tight  ">
       {char}
     </motion.span>
   ));
