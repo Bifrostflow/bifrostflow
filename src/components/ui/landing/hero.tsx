@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import { AuroraBackground } from '../aurora-background';
 import { motion } from 'framer-motion';
