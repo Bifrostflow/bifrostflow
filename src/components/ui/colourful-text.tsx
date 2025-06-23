@@ -20,7 +20,7 @@ export default function ColourfulText({
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [colors]);
 
   return text.split('').map((char, index) => (
     <motion.span

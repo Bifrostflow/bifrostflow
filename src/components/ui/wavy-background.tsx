@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { cn } from '@/lib/utils';
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,7 +12,6 @@ export const WavyBackground = ({
   blur = 10,
   speed = 'fast',
   waveOpacity = 0.5,
-  ...props
 }: {
   // children?: any;
   className?: string;
@@ -96,6 +96,7 @@ export const WavyBackground = ({
     return () => {
       cancelAnimationFrame(animationId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [isSafari, setIsSafari] = useState(false);

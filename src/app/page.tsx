@@ -1,9 +1,6 @@
 // components/HeroSection.tsx
 'use client';
 import React from 'react';
-import { motion } from 'framer-motion';
-import { AuroraBackground } from '@/components/ui/aurora-background';
-import ColourfulText from '@/components/ui/colourful-text';
 import { HeroNav } from '@/components/ui/hero-nav';
 import Hero from '@/components/ui/landing/hero';
 import Features from '@/components/ui/landing/features';
