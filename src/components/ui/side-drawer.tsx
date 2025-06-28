@@ -2,7 +2,7 @@ import {
   getSystemNodes,
   NodeCategory,
   SystemNode,
-} from '@/backend/getSystemNodes';
+} from '@/_backend/getSystemNodes';
 import { useEffect, useState } from 'react';
 import { SystemToolItem } from './system-tool-item';
 import clsx from 'clsx';

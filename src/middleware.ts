@@ -1,6 +1,24 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export default clerkMiddleware();
+const isPrivateRoute = createRouteMatcher([
+  '/dashboard',
+  '/dashboard/(.*)',
+  '/dashboard(.*)',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isPrivateRoute(req)) {
+    try {
+      await auth.protect();
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_e) {
+      // 🔁 Redirect to custom sign-in page
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+  }
+});
 
 export const config = {
   matcher: [
