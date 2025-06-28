@@ -1,6 +1,6 @@
 import React, { memo, ReactNode, useEffect, useState } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
-import { SystemNode } from '@/backend/getSystemNodes';
+import { SystemNode } from '@/_backend/getSystemNodes';
 import CustomHandle from '../handles/custom-handle';
 
 type UnionType = SystemNode & { delete: ReactNode };

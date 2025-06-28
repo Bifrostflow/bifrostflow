@@ -1,4 +1,4 @@
-import { NodeCategory, SystemNode } from '@/backend/getSystemNodes';
+import { NodeCategory, SystemNode } from '@/_backend/getSystemNodes';
 
 import clsx from 'clsx';
 import {

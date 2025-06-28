@@ -24,7 +24,7 @@ import {
 } from '@xyflow/react';
 
 import { DefaultNode } from '@/components/ui/nodes/default';
-import { NodeCategory, SystemNode } from '@/backend/getSystemNodes';
+import { NodeCategory, SystemNode } from '@/_backend/getSystemNodes';
 import { Menu, Play, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';

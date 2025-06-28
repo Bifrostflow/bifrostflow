@@ -1,4 +1,4 @@
-import { EnhancedResponse } from '@/backend/runFlow';
+import { EnhancedResponse } from '@/_backend/runFlow';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 type Props<T> = {
