@@ -1,3 +1,3 @@
-export default function Dashboard({}: { children: React.ReactNode }) {
+export default function Page() {
   return <div>Dashboard</div>;
 }
