@@ -1,6 +1,7 @@
+'use server';
 import { url } from '@/lib/path';
 
-export type SystemNodeType =
+export type SystemToolType =
   | 'start'
   | 'end'
   | 'classify_message'
@@ -11,40 +12,40 @@ export type SystemNodeType =
   | 'route_query'
   | string;
 
-export type NodeCategory =
+export type ToolCategory =
   | 'conditional'
   | 'action'
   | 'generate'
   | 'initiate'
   | 'close';
 
-export interface SystemNode {
+export interface SystemTool {
   _id: string;
   name: string;
-  type: SystemNodeType;
+  type: SystemToolType;
   gpt_model: string;
   llm: string;
   description: string;
   what_i_do: string;
-  category: NodeCategory;
+  category: ToolCategory;
   state: 'active' | 'inactive';
 }
 
-export type SystemNodes = SystemNode[];
+export type SystemTools = SystemTool[];
 
-export const getSystemNodes = async (): Promise<SystemNodes> => {
-  const endpoint = `${url}/system-nodes`;
+export const getSystemTools = async (): Promise<SystemTools> => {
+  const endpoint = `${url}/system-tools`;
 
   try {
     const res = await fetch(endpoint);
     if (!res.ok) {
-      throw new Error('Failed to fetch project files');
+      return [];
     }
-    const json: SystemNodes = await res.json();
+    const json: SystemTools = await res.json();
     console.log(json);
     return json;
   } catch (error) {
     console.error('Error fetching project files:', error);
-    throw new Error('Failed to load project files');
+    return [];
   }
 };

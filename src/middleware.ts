@@ -5,6 +5,9 @@ const isPrivateRoute = createRouteMatcher([
   '/dashboard',
   '/dashboard/(.*)',
   '/dashboard(.*)',
+  '/home',
+  '/home/(.*)',
+  '/home(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

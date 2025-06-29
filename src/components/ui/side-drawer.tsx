@@ -1,8 +1,8 @@
 import {
-  getSystemNodes,
-  NodeCategory,
-  SystemNode,
-} from '@/_backend/getSystemNodes';
+  getSystemTools,
+  ToolCategory,
+  SystemTool,
+} from '@/_backend/getSystemTools';
 import { useEffect, useState } from 'react';
 import { SystemToolItem } from './system-tool-item';
 import clsx from 'clsx';
@@ -11,11 +11,11 @@ import { X } from 'lucide-react';
 interface ISideDrawer {
   open: boolean;
   onClose: () => void;
-  onAddNode: (node: SystemNode) => void;
-  activeTabs: NodeCategory[];
+  onAddNode: (node: SystemTool) => void;
+  activeTabs: ToolCategory[];
 }
 
-const nodesClassification: NodeCategory[] = [
+const nodesClassification: ToolCategory[] = [
   'initiate',
   'conditional',
   'action',
@@ -23,7 +23,7 @@ const nodesClassification: NodeCategory[] = [
   'close',
 ];
 
-const typeToActiveColor = (category: NodeCategory) => {
+const typeToActiveColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
       return 'text-cyan-500';
@@ -47,9 +47,9 @@ export default function SideDrawer({
   activeTabs,
 }: ISideDrawer) {
   const [isOpen, setIsOpen] = useState(open);
-  const [systemNodes, setSystemNodes] = useState<SystemNode[]>();
+  const [systemNodes, setSystemNodes] = useState<SystemTool[]>();
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<NodeCategory | null>(
+  const [selectedCategory, setSelectedCategory] = useState<ToolCategory | null>(
     null,
   );
 
@@ -64,7 +64,7 @@ export default function SideDrawer({
 
   useEffect(() => {
     setLoading(true);
-    getSystemNodes()
+    getSystemTools()
       .then(nodes => setSystemNodes(nodes))
       .catch(error => console.error('Failed to fetch system nodes:', error))
       .finally(() => setLoading(false));

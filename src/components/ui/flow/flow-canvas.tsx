@@ -1,13 +1,4 @@
 'use client';
-
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import '@xyflow/react/dist/style.css';
 import {
   addEdge,
   Background,
@@ -17,15 +8,14 @@ import {
   MiniMap,
   Node,
   ReactFlow,
-  ReactFlowProvider,
   reconnectEdge,
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
 
 import { DefaultNode } from '@/components/ui/nodes/default';
-import { NodeCategory, SystemNode } from '@/_backend/getSystemNodes';
-import { Menu, Play, Trash2 } from 'lucide-react';
+import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
+import { Menu, Play, Save, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
@@ -36,8 +26,8 @@ import ExecuteFlow from '@/components/ui/execute-flow';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
 import { DraggablePanel } from '@/components/ui/draggable-panel';
-import { HeaderName } from '@/components/ui/header-name';
-import { StickyBanner } from '@/components/ui/sticky-banner';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const start_point = {
   id: '0-start_point',
@@ -53,12 +43,12 @@ const start_point = {
 const initialNodes: Node[] = [start_point];
 const initialEdges: Edge[] = [];
 
-const FlowCanvas: React.FC = () => {
+export default function FlowCanvas({ slug }: { slug: string }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [idCounter, setIdCounter] = useState<number>(1);
-  const [tabsToSelect, setTabsToSelect] = useState<NodeCategory[]>([
+  const [tabsToSelect, setTabsToSelect] = useState<ToolCategory[]>([
     'initiate',
   ]);
   const [showActionPanel, setShowActionPanel] = useState(false);
@@ -67,7 +57,7 @@ const FlowCanvas: React.FC = () => {
 
   const isMainNodesSelected = useMemo(() => {
     const { length } = nodes.filter(n => {
-      const data: SystemNode = n.data as unknown as SystemNode;
+      const data: SystemTool = n.data as unknown as SystemTool;
       return ['action', 'generate'].includes(data.category) ? true : false;
     });
     return length > 0;
@@ -93,11 +83,11 @@ const FlowCanvas: React.FC = () => {
       setTabsToSelect(['conditional', 'action', 'generate']);
     }
   }, [nodes, isMainNodesSelected]);
-  const isStarted = useMemo(() => {
-    return nodes.filter(n => n.data.category === 'start-point').length === 0;
-  }, [nodes]);
+  //   const isStarted = useMemo(() => {
+  //     return nodes.filter(n => n.data.category === 'start-point').length === 0;
+  //   }, [nodes]);
 
-  const handleAddNode = (node: SystemNode) => {
+  const handleAddNode = (node: SystemTool) => {
     const id = `${idCounter}-${node._id}`;
     if (node.category === 'initiate') {
       setInitiatorType(node.type);
@@ -150,6 +140,15 @@ const FlowCanvas: React.FC = () => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
       setShowActionPanel(true);
+    } else {
+      toast('Incomplete flow for graph.');
+    }
+  };
+  const saveFlowHandler = () => {};
+  const onSaveFlow = () => {
+    const isValid = validateIndirectFlow(edges);
+    if (isValid) {
+      saveFlowHandler();
     } else {
       toast('Incomplete flow for graph.');
     }
@@ -207,13 +206,13 @@ const FlowCanvas: React.FC = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView>
-          <StickyBanner className="bg-gradient-to-b from-emerald-700 to-emerald-900">
+          {/* <StickyBanner className="bg-gradient-to-b from-emerald-700 to-emerald-900">
             <p className="mx-0 max-w-[90%] text-white drop-shadow-md">
               Under Construction till new features,{' '}
               <b>Deadline is 30th June 2025</b>
             </p>
-          </StickyBanner>
-          <HeaderName isStart={isStarted} />
+          </StickyBanner> */}
+          {/* <HeaderName isStart={isStarted} /> */}
           <Background
             color="var(--color-zinc-500)"
             size={1}
@@ -234,7 +233,7 @@ const FlowCanvas: React.FC = () => {
               return 'var(--color-cyan-400)';
             }}
           />
-          <div className="pr-2 m-4 bg-zinc-700/00 w-[10%] flex justify-between items-center gap-1 absolute right-0 z-1000">
+          <div className="pr-2 m-4 bg-zinc-700/00 w-[20%] flex justify-between items-center gap-1 absolute right-0 z-1000">
             <div className="flex gap-3">
               {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Save
@@ -248,6 +247,18 @@ const FlowCanvas: React.FC = () => {
                 <Play className="h-[16px] w-[16px]" />
                 Run
               </div>
+              <div
+                onClick={onSaveFlow}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Save className="h-[16px] w-[16px]" />
+                Save
+              </div>
+              <Link
+                href={`/flow/edit/${slug}`}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Save className="h-[16px] w-[16px]" />
+                Edit
+              </Link>
               {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-fuchsia-400 to-indigo-800 hover:text-teal-100 transition-all duration-50 ease-linear">
                 Load
               </div> */}
@@ -274,7 +285,6 @@ const FlowCanvas: React.FC = () => {
             visible={showActionPanel}
             initiatorType={initiatorType}
           />
-
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
       </div>
@@ -286,14 +296,4 @@ const FlowCanvas: React.FC = () => {
       />
     </div>
   );
-};
-
-const Arena: React.FC = () => {
-  return (
-    <ReactFlowProvider>
-      <FlowCanvas />
-    </ReactFlowProvider>
-  );
-};
-
-export default Arena;
+}

@@ -1,9 +1,9 @@
 import React, { memo, ReactNode, useEffect, useState } from 'react';
 import { NodeProps, Position } from '@xyflow/react';
-import { SystemNode } from '@/_backend/getSystemNodes';
+import { SystemTool } from '@/_backend/getSystemTools';
 import CustomHandle from '../handles/custom-handle';
 
-type UnionType = SystemNode & { delete: ReactNode };
+type UnionType = SystemTool & { delete: ReactNode };
 
 const RNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
   const [nodeData, setNodeData] = useState<UnionType>();
