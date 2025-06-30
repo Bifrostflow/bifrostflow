@@ -24,6 +24,10 @@ const FormSchema = z.object({
     message: 'name length should be 3 characters.',
   }),
   description: z.string(),
+  users: z.string(),
+  edges: z.string(),
+  nodes: z.string(),
+  api_keys: z.string(),
 });
 
 export default function Page() {
@@ -32,6 +36,10 @@ export default function Page() {
     defaultValues: {
       name: '',
       description: '',
+      users: '',
+      edges: '',
+      nodes: '',
+      api_keys: '',
     },
   });
   async function onSubmit(data: z.infer<typeof FormSchema>) {

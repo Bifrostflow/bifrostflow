@@ -5,11 +5,9 @@ import { auth } from '@clerk/nextjs/server';
 import { APIResponse } from '@/_backend/models/response';
 
 interface GraphResponse {
-  node_id: string;
-  nodes_data: string;
-  edge_id: string;
-  edges_data: string;
-  edges_api_keys: string;
+  nodes: string;
+  edges: string;
+  api_keys: string;
 }
 
 export const getNodesForFlow = async (

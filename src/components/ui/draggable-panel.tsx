@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { OnPrompt } from './initiator/on_prompt';
 import { Edge } from '@xyflow/react';
-import print from '@/lib/print';
 
 interface IProps {
   onClose: () => void;
@@ -18,7 +17,6 @@ export const DraggablePanel = ({
   visible,
   flow_id,
 }: IProps) => {
-  print({ initiatorType });
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
