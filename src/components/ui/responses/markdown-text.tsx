@@ -1,11 +1,10 @@
-import { EnhancedResponse } from '@/_backend/runFlow';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-type Props<T> = {
-  response: EnhancedResponse<T>;
+type Props = {
+  response: string;
 };
 
-export const MarkdownTextResponse = <T,>({ response }: Props<T>) => {
+export const MarkdownTextResponse = ({ response }: Props) => {
   return (
     <div className="bg-zinc-900 border-0 rounded-md shadow-lg p-4 space-y-2 w-full max-w-md text-sm text-zinc-200">
       <ReactMarkdown
@@ -22,9 +21,7 @@ export const MarkdownTextResponse = <T,>({ response }: Props<T>) => {
             );
           },
         }}>
-        {response.messages.reduce((p, c) => {
-          return p + '\n\n\n\n' + c;
-        }, '')}
+        {response}
       </ReactMarkdown>
     </div>
   );

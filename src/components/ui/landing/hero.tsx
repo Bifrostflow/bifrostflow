@@ -66,7 +66,7 @@ function Hero() {
               delay: 1,
             }}
             className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link href={'/dashboard'}>
+            <Link href={'/home'}>
               <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
                 Start Building
               </button>

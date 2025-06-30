@@ -38,9 +38,9 @@ export function HeroNav() {
           <div className="flex items-center gap-4">
             <SignedOut>
               <SignInButton
-                forceRedirectUrl={'/dashboard'}
+                forceRedirectUrl={'/home'}
                 mode="modal"
-                signUpFallbackRedirectUrl={'/dashboard'}>
+                signUpFallbackRedirectUrl={'/home'}>
                 <NavbarButton variant="primary">{'Sign In'}</NavbarButton>
               </SignInButton>
             </SignedOut>
@@ -75,9 +75,9 @@ export function HeroNav() {
             <div className="flex w-full flex-col gap-4">
               <SignedOut>
                 <SignInButton
-                  forceRedirectUrl={'/dashboard'}
+                  forceRedirectUrl={'/home'}
                   mode="modal"
-                  signUpFallbackRedirectUrl={'/dashboard'}>
+                  signUpFallbackRedirectUrl={'/home'}>
                   <NavbarButton variant="primary">{'Sign In'}</NavbarButton>
                 </SignInButton>
               </SignedOut>

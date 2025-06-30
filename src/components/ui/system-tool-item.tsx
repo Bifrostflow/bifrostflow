@@ -1,4 +1,4 @@
-import { NodeCategory, SystemNode } from '@/_backend/getSystemNodes';
+import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
 
 import clsx from 'clsx';
 import {
@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 type SystemToolItemProps = {
-  onAddNode: (node: SystemNode) => void;
-  node: SystemNode;
+  onAddNode: (node: SystemTool) => void;
+  node: SystemTool;
 };
 
-const typeToBGColor = (category: NodeCategory) => {
+const typeToBGColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
       return 'bg-gradient-to-tl from-cyan-950 to-cyan-900';
@@ -32,7 +32,7 @@ const typeToBGColor = (category: NodeCategory) => {
   }
 };
 
-const typeToIcon = (category: NodeCategory) => {
+const typeToIcon = (category: ToolCategory) => {
   switch (category) {
     case 'action':
       return <Pickaxe className="h-[22px] w-[22px]" />;
@@ -48,7 +48,7 @@ const typeToIcon = (category: NodeCategory) => {
       return <Wrench className="h-[22px] w-[22px]" />;
   }
 };
-const typeToTextColor = (category: NodeCategory) => {
+const typeToTextColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
       return 'text-cyan-300';
@@ -64,7 +64,7 @@ const typeToTextColor = (category: NodeCategory) => {
       return 'text-zinc-300';
   }
 };
-const typeToDescTextColor = (category: NodeCategory) => {
+const typeToDescTextColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
       return 'text-cyan-500';

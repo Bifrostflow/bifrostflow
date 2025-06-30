@@ -3,44 +3,79 @@ import { Loader2, Send, X } from 'lucide-react';
 import { useState } from 'react';
 import { Edge } from '@xyflow/react';
 import { Textarea } from '../textarea';
-import {
-  CodeEvaluate,
-  EnhancedResponse,
-  MetaTypes,
-  runFlowWithInput,
-} from '@/_backend/runFlow';
+import { ChunkResponse, ChunkResponseData } from '@/_backend/runFlow';
 import { CodeEvaluateResponse } from '../responses/code_evaluate';
 import { MarkdownTextResponse } from '../responses/markdown-text';
+import print from '@/lib/print';
 
 type Props = {
   edges: Edge[];
   onClose: () => void;
+  flow_id: string;
 };
 
-export const OnPrompt = <T,>({ edges, onClose }: Props) => {
+export const OnPrompt = ({ edges, onClose, flow_id }: Props) => {
   const [message, setMessage] = useState('');
-  const [response, setResponse] = useState<EnhancedResponse<T>>();
+  const [response, setResponse] = useState<ChunkResponse>();
   const [loading, setLoading] = useState(false);
-  const [metaResponse, setMetaResponse] = useState<MetaTypes>();
-
+  const [loaderText, setLoaderText] = useState('');
   const runFlow = async () => {
-    if (!message.trim().length) return;
-    setResponse(undefined);
     setLoading(true);
-    console.log(edges, message);
+    setLoaderText(() => 'Running prompt');
     try {
-      const response = await runFlowWithInput({ data: edges, input: message });
-      console.log(response);
+      const res = await fetch('/api/run-flow', {
+        method: 'POST',
+        body: JSON.stringify({ input: message, data: edges, flow_id }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.body) {
+        console.error('No response body');
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      const responseArray: ChunkResponse[] = [];
+      setLoaderText(() => 'getting data');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      setMetaResponse(response.metaType);
-      setResponse(response as EnhancedResponse<T>);
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data:')) {
+            try {
+              const json: ChunkResponseData = JSON.parse(
+                line.replace('data: ', ''),
+              );
+              responseArray.push(json.response);
+              setLoaderText(() => json.ui_response);
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (err) {
+              console.error('Error parsing JSON', err);
+            }
+          }
+        }
+      }
+      print('LAST RES: ', responseArray[responseArray.length - 1]);
+      setResponse(responseArray[responseArray.length - 1]);
     } catch (error) {
-      console.log(error);
+      print(error);
+      setLoaderText('');
+      setLoading(false);
     } finally {
+      setLoaderText(() => '');
       setLoading(false);
     }
   };
-
+  print({ loaderText });
   return (
     <div className="w-full flex-col justify-center items-center rounded-2xl">
       <div className="flex justify-end">
@@ -51,22 +86,24 @@ export const OnPrompt = <T,>({ edges, onClose }: Props) => {
         </button>
       </div>
       <div className="w-full min-h-[200px] max-h-[300px] mb-2 rounded-2xl border-2 border-zinc-600 overflow-y-scroll h-64 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-zinc-800">
-        {response &&
-          (metaResponse ? (
-            metaResponse === 'evaluate_code' ? (
-              <CodeEvaluateResponse
-                response={response as EnhancedResponse<CodeEvaluate>}
-              />
-            ) : null
-          ) : (
-            <MarkdownTextResponse response={response} />
-          ))}
+        {response && (
+          <>
+            {response.meta.type === 'evaluate_code' && (
+              <CodeEvaluateResponse response={response} />
+            )}
+            {(!response.meta.type || response.meta.type === 'other') && (
+              <MarkdownTextResponse response={response.messages.content} />
+            )}
+          </>
+        )}
       </div>
+      <p className="italic p-2 text-sm text-white"> {loaderText}</p>
       <div className="w-full max-w-3xl flex gap-2 items-center">
         <Textarea
+          disabled={loading}
           value={message}
           onChange={e => setMessage(e.target.value)}
-          placeholder="Type your message..."
+          placeholder={'Type your message...'}
           className="flex-1 min-h-[40px] max-h-[100px] resize-y border-emerald-500 placeholder:text-emerald-500 text-emerald-200"
         />
         <button

@@ -1,13 +1,4 @@
 'use client';
-
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import '@xyflow/react/dist/style.css';
 import {
   addEdge,
   Background,
@@ -17,15 +8,14 @@ import {
   MiniMap,
   Node,
   ReactFlow,
-  ReactFlowProvider,
   reconnectEdge,
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
 
 import { DefaultNode } from '@/components/ui/nodes/default';
-import { NodeCategory, SystemNode } from '@/_backend/getSystemNodes';
-import { Menu, Play, Trash2 } from 'lucide-react';
+import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
+import { Menu, Play, Save, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
@@ -36,38 +26,34 @@ import ExecuteFlow from '@/components/ui/execute-flow';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
 import { DraggablePanel } from '@/components/ui/draggable-panel';
-import { HeaderName } from '@/components/ui/header-name';
-import { StickyBanner } from '@/components/ui/sticky-banner';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 
-const start_point = {
-  id: '0-start_point',
-  type: 'start_point',
-  data: {
-    label: '',
-    category: 'start-point',
-  },
-  position: { x: 250, y: 250 },
-  draggable: false,
-};
-
-const initialNodes: Node[] = [start_point];
-const initialEdges: Edge[] = [];
-
-const FlowCanvas: React.FC = () => {
+export default function FlowCanvas({
+  slug,
+  initialEdges,
+  initialNodes,
+}: {
+  slug: string;
+  initialNodes: Node[];
+  initialEdges: Edge[];
+}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [idCounter, setIdCounter] = useState<number>(1);
-  const [tabsToSelect, setTabsToSelect] = useState<NodeCategory[]>([
+  const [tabsToSelect, setTabsToSelect] = useState<ToolCategory[]>([
     'initiate',
   ]);
   const [showActionPanel, setShowActionPanel] = useState(false);
   const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
+  const [updatingNodes, setUpdatingNodes] = useState(false);
   const edgeReconnectSuccessful = useRef(true);
 
   const isMainNodesSelected = useMemo(() => {
     const { length } = nodes.filter(n => {
-      const data: SystemNode = n.data as unknown as SystemNode;
+      const data: SystemTool = n.data as unknown as SystemTool;
       return ['action', 'generate'].includes(data.category) ? true : false;
     });
     return length > 0;
@@ -77,7 +63,9 @@ const FlowCanvas: React.FC = () => {
     (params: Edge | Connection) => {
       const sourceNode = nodes.find(n => n.id === params.source);
       if (!sourceNode) return;
-      setEdges(eds => addEdge(params, eds));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      setEdges(eds => addEdge({ ...params, tool_input: '' }, eds));
     },
     [nodes, setEdges],
   );
@@ -93,11 +81,50 @@ const FlowCanvas: React.FC = () => {
       setTabsToSelect(['conditional', 'action', 'generate']);
     }
   }, [nodes, isMainNodesSelected]);
-  const isStarted = useMemo(() => {
-    return nodes.filter(n => n.data.category === 'start-point').length === 0;
-  }, [nodes]);
+  useEffect(() => {
+    const sanitizedNodes = initialNodes.map(node => mapNodesDataToNodes(node));
+    setNodes(sanitizedNodes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialNodes]);
 
-  const handleAddNode = (node: SystemNode) => {
+  const mapNodesDataToNodes = (node: Node) => {
+    if (node.data.category === 'initiate') {
+      if (!!node?.data?.type) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        setInitiatorType(node.data.type);
+      }
+    }
+    const newNode: Node = {
+      ...node,
+      id: node.id,
+      type: node.type,
+      data: {
+        ...node.data,
+        onClick: () => {
+          setDrawerOpen(true);
+        },
+        delete: (
+          <Trash2
+            size={10}
+            color={
+              mapTypesToDeleteButtonColor[
+                node.data.category as unknown as ToolCategory
+              ]
+            }
+            onClick={() => {
+              handleRemoveNode(node.id);
+            }}
+          />
+        ),
+        executeFlow: <ExecuteFlow onExecuteFlow={onExecuteFlow} />,
+      } as unknown as Record<string, unknown>,
+      position: node.position,
+    };
+    return newNode;
+  };
+
+  const handleAddNode = (node: SystemTool) => {
     const id = `${idCounter}-${node._id}`;
     if (node.category === 'initiate') {
       setInitiatorType(node.type);
@@ -108,8 +135,7 @@ const FlowCanvas: React.FC = () => {
       type: node.category || 'default',
       data: {
         ...node,
-        onClick: (id: string) => {
-          console.log(id);
+        onClick: () => {
           setDrawerOpen(true);
         },
         delete: (
@@ -126,7 +152,6 @@ const FlowCanvas: React.FC = () => {
       position: { x: 250, y: 250 },
     };
     setIdCounter(id => id + 1);
-    console.log(newNode);
     setNodes(nds => {
       if (newNode.data.category === 'initiate') {
         const filterStartPoint = nds.filter(
@@ -145,11 +170,28 @@ const FlowCanvas: React.FC = () => {
       eds.filter(edge => edge.source !== id && edge.target !== id),
     );
   };
-  console.log(edges);
   const onExecuteFlow = () => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
       setShowActionPanel(true);
+    } else {
+      toast('Incomplete flow for graph.');
+    }
+  };
+  const saveFlowHandler = () => {
+    setUpdatingNodes(true);
+    updateFlowGraph({
+      flow_id: slug,
+      nodes: JSON.stringify({ data: nodes }),
+      edges: JSON.stringify({ data: edges }),
+    }).finally(() => {
+      setUpdatingNodes(false);
+    });
+  };
+  const onSaveFlow = () => {
+    const isValid = validateIndirectFlow(edges);
+    if (isValid) {
+      saveFlowHandler();
     } else {
       toast('Incomplete flow for graph.');
     }
@@ -207,13 +249,6 @@ const FlowCanvas: React.FC = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           fitView>
-          <StickyBanner className="bg-gradient-to-b from-emerald-700 to-emerald-900">
-            <p className="mx-0 max-w-[90%] text-white drop-shadow-md">
-              Under Construction till new features,{' '}
-              <b>Deadline is 30th June 2025</b>
-            </p>
-          </StickyBanner>
-          <HeaderName isStart={isStarted} />
           <Background
             color="var(--color-zinc-500)"
             size={1}
@@ -234,7 +269,7 @@ const FlowCanvas: React.FC = () => {
               return 'var(--color-cyan-400)';
             }}
           />
-          <div className="pr-2 m-4 bg-zinc-700/00 w-[10%] flex justify-between items-center gap-1 absolute right-0 z-1000">
+          <div className="pr-2 m-4 bg-zinc-700/00 w-[20%] flex justify-between items-center gap-1 absolute right-0 z-1000">
             <div className="flex gap-3">
               {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Save
@@ -248,6 +283,19 @@ const FlowCanvas: React.FC = () => {
                 <Play className="h-[16px] w-[16px]" />
                 Run
               </div>
+              <button
+                disabled={updatingNodes}
+                onClick={onSaveFlow}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Save className="h-[16px] w-[16px]" />
+                {updatingNodes ? 'Saving..' : 'Save'}
+              </button>
+              <Link
+                href={`/flow/edit/${slug}`}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Save className="h-[16px] w-[16px]" />
+                Edit
+              </Link>
               {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-fuchsia-400 to-indigo-800 hover:text-teal-100 transition-all duration-50 ease-linear">
                 Load
               </div> */}
@@ -269,12 +317,12 @@ const FlowCanvas: React.FC = () => {
             </div>
           </div>
           <DraggablePanel
+            flow_id={slug}
             onClose={() => setShowActionPanel(false)}
             edges={edges}
             visible={showActionPanel}
             initiatorType={initiatorType}
           />
-
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
       </div>
@@ -286,14 +334,4 @@ const FlowCanvas: React.FC = () => {
       />
     </div>
   );
-};
-
-const Arena: React.FC = () => {
-  return (
-    <ReactFlowProvider>
-      <FlowCanvas />
-    </ReactFlowProvider>
-  );
-};
-
-export default Arena;
+}
