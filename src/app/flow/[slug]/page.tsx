@@ -29,20 +29,22 @@ export default async function Flow({
           return { nodes: [start_point], edges: [] };
         }
         let serverNodes = JSON.parse(response.data.nodes_data);
-        serverNodes = serverNodes ? JSON.parse(serverNodes) : [];
+        serverNodes = JSON.parse(serverNodes);
+        serverNodes = serverNodes.data || [start_point];
 
         let serverEdges = JSON.parse(response.data.edges_data);
         serverEdges = serverEdges ? JSON.parse(serverEdges) : [];
-        serverEdges = serverEdges.map((edge: Edge) => ({
-          tool_inout: null,
+        serverEdges = serverEdges.data.map((edge: Edge) => ({
+          tool_input: null,
           ...edge,
         }));
+
         return {
-          nodes: serverNodes.data || [start_point],
-          edges: serverEdges.data || [],
+          nodes: serverNodes || [start_point],
+          edges: serverEdges || [],
         };
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
+        console.log('ERROR ONE: ', error);
         return { nodes: [start_point], edges: [] };
       }
     };
@@ -53,8 +55,8 @@ export default async function Flow({
         <FlowCanvas initialEdges={edges} initialNodes={nodes} slug={slug} />
       </ReactFlowProvider>
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_e) {
+    console.log('ERROR: ', _e);
     return (
       <ReactFlowProvider>
         <FlowCanvas

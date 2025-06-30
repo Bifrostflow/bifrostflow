@@ -88,6 +88,13 @@ export default function FlowCanvas({
   }, [initialNodes]);
 
   const mapNodesDataToNodes = (node: Node) => {
+    if (node.data.category === 'initiate') {
+      if (!!node?.data?.type) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        setInitiatorType(node.data.type);
+      }
+    }
     const newNode: Node = {
       ...node,
       id: node.id,
@@ -310,6 +317,7 @@ export default function FlowCanvas({
             </div>
           </div>
           <DraggablePanel
+            flow_id={slug}
             onClose={() => setShowActionPanel(false)}
             edges={edges}
             visible={showActionPanel}
