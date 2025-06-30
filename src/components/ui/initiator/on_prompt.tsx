@@ -75,7 +75,6 @@ export const OnPrompt = ({ edges, onClose, flow_id }: Props) => {
       setLoading(false);
     }
   };
-  print({ loaderText });
   return (
     <div className="w-full flex-col justify-center items-center rounded-2xl">
       <div className="flex justify-end">

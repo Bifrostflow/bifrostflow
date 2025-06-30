@@ -28,12 +28,11 @@ export default async function Flow({
         if (!response.data) {
           return { nodes: [start_point], edges: [] };
         }
-        let serverNodes = JSON.parse(response.data.nodes_data);
-        serverNodes = JSON.parse(serverNodes);
+
+        let serverNodes = JSON.parse(response.data.nodes);
         serverNodes = serverNodes.data || [start_point];
 
-        let serverEdges = JSON.parse(response.data.edges_data);
-        serverEdges = serverEdges ? JSON.parse(serverEdges) : [];
+        let serverEdges = JSON.parse(response.data.edges);
         serverEdges = serverEdges.data.map((edge: Edge) => ({
           tool_input: null,
           ...edge,

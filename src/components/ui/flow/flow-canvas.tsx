@@ -70,6 +70,10 @@ export default function FlowCanvas({
     [nodes, setEdges],
   );
   useEffect(() => {
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
+
+  useEffect(() => {
     const initiateNodes = nodes.filter(
       node => node.data.category === 'initiate',
     );
