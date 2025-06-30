@@ -4,9 +4,8 @@ import { auth } from '@clerk/nextjs/server';
 export const createUser = async () => {
   const endpoint = `${url}/create-user`;
   try {
-    const { getToken } = await auth(); // 👈 SSR-safe
+    const { getToken } = await auth();
     const token = await getToken();
-    console.log(token);
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {

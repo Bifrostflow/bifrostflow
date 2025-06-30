@@ -35,7 +35,6 @@ export default function Page({
   useEffect(() => {
     const getSlug = async () => {
       const { slug } = await params;
-      console.log({ slug });
       getProject(slug)
         .then(res => {
           if (res?.isSuccess && res.data?.length) {
@@ -69,7 +68,7 @@ export default function Page({
       id: slug,
     });
     if (response?.data) {
-      redirect('/home');
+      redirect('/flow/' + slug);
     } else {
       toast(response?.message || response?.error || 'Update app failed');
     }

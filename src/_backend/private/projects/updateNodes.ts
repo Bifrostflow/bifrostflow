@@ -2,21 +2,24 @@
 
 import { url } from '@/lib/path';
 import { auth } from '@clerk/nextjs/server';
-import { CreateProjectInput } from '@/lib/zod/createProjectSchemas';
 import { APIResponse } from '@/_backend/models/response';
-import { ProjectWithStatus } from './getProjects';
 
-export const createProject = async (
-  body: CreateProjectInput,
-): Promise<APIResponse<ProjectWithStatus[]> | null> => {
-  const endpoint = `${url}/create-flow`;
+interface UpdateFlowGraph {
+  nodes: string;
+  edges: string;
+  flow_id: string;
+}
+
+export const updateFlowGraph = async (
+  data: UpdateFlowGraph,
+): Promise<APIResponse<null> | null> => {
+  const endpoint = `${url}/update-flow-graph`;
   try {
     const { getToken } = await auth();
     const token = await getToken();
-
     const res = await fetch(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(data),
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -30,7 +33,7 @@ export const createProject = async (
 
     return json;
   } catch (error) {
-    console.error('Error creating project', error);
+    console.error('Error Updated Nodes', error);
     return null;
   }
 };

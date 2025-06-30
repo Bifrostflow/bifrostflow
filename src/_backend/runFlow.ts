@@ -1,4 +1,6 @@
+'use server';
 import { url } from '@/lib/path';
+import { auth } from '@clerk/nextjs/server';
 import { Edge } from '@xyflow/react';
 
 interface ResponseFlow {
@@ -49,17 +51,21 @@ export const runFlowWithInput = async <T>(request: {
   const endpoint = `${url}/run-flow`;
 
   try {
+    const { getToken } = await auth();
+    const token = await getToken();
     const res = await fetch(endpoint, {
-      body: JSON.stringify(request),
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
     if (!res.ok) {
       throw new Error('Failed to fetch project files');
     }
 
     const json: ResponseFlow = await res.json();
-    console.log(json);
     return responseHandler(json);
   } catch (error) {
     console.error('Error fetching project files:', error);

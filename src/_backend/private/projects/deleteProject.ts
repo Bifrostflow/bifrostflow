@@ -9,7 +9,7 @@ export const deleteProject = async (
   const endpoint = `${url}/delete-flow?flow_id=${id}`;
 
   try {
-    const { getToken } = await auth(); // 👈 SSR-safe
+    const { getToken } = await auth();
     const token = await getToken();
 
     const res = await fetch(endpoint, {

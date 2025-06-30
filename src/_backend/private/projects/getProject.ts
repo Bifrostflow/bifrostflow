@@ -18,7 +18,7 @@ export const getProject = async (
   console.log(endpoint);
 
   try {
-    const { getToken } = await auth(); // 👈 SSR-safe
+    const { getToken } = await auth();
     const token = await getToken();
 
     const res = await fetch(endpoint, {
