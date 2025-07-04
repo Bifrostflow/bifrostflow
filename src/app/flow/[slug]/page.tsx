@@ -1,8 +1,8 @@
 import React from 'react';
 import '@xyflow/react/dist/style.css';
 import { Edge, Node, ReactFlowProvider } from '@xyflow/react';
-import FlowCanvas from '@/components/ui/flow/flow-canvas';
 import { getNodesForFlow } from '@/_backend/private/projects/getNodesForFlow';
+import FlowContextWrapper from './flow-context-wrapper';
 const start_point: Node = {
   id: '0-start_point',
   type: 'start_point',
@@ -37,28 +37,36 @@ export default async function Flow({
           tool_input: null,
           ...edge,
         }));
+        const apiKeys = JSON.parse(response.data.api_keys) || {};
 
         return {
           nodes: serverNodes || [start_point],
           edges: serverEdges || [],
+          apiKeys,
         };
       } catch (error) {
         console.log('ERROR ONE: ', error);
-        return { nodes: [start_point], edges: [] };
+        return { nodes: [start_point], edges: [], apiKeys: {} };
       }
     };
-    const { edges, nodes } = await loadGraph();
+    const { edges, nodes, apiKeys } = await loadGraph();
 
     return (
       <ReactFlowProvider>
-        <FlowCanvas initialEdges={edges} initialNodes={nodes} slug={slug} />
+        <FlowContextWrapper
+          apiKeys={apiKeys || {}}
+          initialEdges={edges}
+          initialNodes={nodes}
+          slug={slug}
+        />
       </ReactFlowProvider>
     );
   } catch (_e) {
     console.log('ERROR: ', _e);
     return (
       <ReactFlowProvider>
-        <FlowCanvas
+        <FlowContextWrapper
+          apiKeys={{}}
           slug={slug}
           initialEdges={[]}
           initialNodes={[start_point]}

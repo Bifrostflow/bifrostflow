@@ -20,7 +20,7 @@ export type ToolCategory =
   | 'close';
 
 export interface SystemTool {
-  _id: string;
+  id: string;
   name: string;
   type: SystemToolType;
   gpt_model: string;
@@ -29,6 +29,10 @@ export interface SystemTool {
   what_i_do: string;
   category: ToolCategory;
   state: 'active' | 'inactive';
+  require_key: boolean;
+  key_name: string | null;
+  input_type: 'none' | 'string' | 'url' | 'pdf' | 'image' | 'object';
+  object_schema: string | null;
 }
 
 export type SystemTools = SystemTool[];

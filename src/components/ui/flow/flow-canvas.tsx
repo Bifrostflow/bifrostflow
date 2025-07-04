@@ -29,16 +29,11 @@ import { DraggablePanel } from '@/components/ui/draggable-panel';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
+import { useFlow } from '@/app/flow/[slug]/flow-context';
+import EnterKeys, { APIData } from './enter-keys-area';
 
-export default function FlowCanvas({
-  slug,
-  initialEdges,
-  initialNodes,
-}: {
-  slug: string;
-  initialNodes: Node[];
-  initialEdges: Edge[];
-}) {
+export default function FlowCanvas() {
+  const { initialEdges, initialNodes, slug, apiKeys } = useFlow();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -49,6 +44,8 @@ export default function FlowCanvas({
   const [showActionPanel, setShowActionPanel] = useState(false);
   const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
   const [updatingNodes, setUpdatingNodes] = useState(false);
+  const [userKeys, setUserKeys] = useState<APIData>(apiKeys);
+  const [showKeysInputArea, setShowKeysInputArea] = useState(false);
   const edgeReconnectSuccessful = useRef(true);
 
   const isMainNodesSelected = useMemo(() => {
@@ -127,9 +124,22 @@ export default function FlowCanvas({
     };
     return newNode;
   };
-
+  const validateRequiredKeys = () => {
+    const { requiredKeys } = checkIfAPIKeyRequired();
+    let fieldCounter = 0;
+    for (let i = 0; i < Object.keys(requiredKeys).length; i++) {
+      const key = Object.keys(requiredKeys)[i];
+      const found = Object.keys(userKeys).find(
+        apiKeyLabel => apiKeyLabel === key,
+      );
+      if (found) {
+        fieldCounter++;
+      }
+    }
+    return fieldCounter === Object.keys(requiredKeys).length;
+  };
   const handleAddNode = (node: SystemTool) => {
-    const id = `${idCounter}-${node._id}`;
+    const id = `${idCounter}-${node.id}`;
     if (node.category === 'initiate') {
       setInitiatorType(node.type);
     }
@@ -174,14 +184,20 @@ export default function FlowCanvas({
       eds.filter(edge => edge.source !== id && edge.target !== id),
     );
   };
-  const onExecuteFlow = () => {
-    const isValid = validateIndirectFlow(edges);
-    if (isValid) {
-      setShowActionPanel(true);
+  const onExecuteFlow = async () => {
+    const { isKeyRequire } = checkIfAPIKeyRequired();
+    if (!isKeyRequire) {
+      runFlow();
     } else {
-      toast('Incomplete flow for graph.');
+      if (!validateRequiredKeys()) {
+        setShowKeysInputArea(true);
+      } else {
+        runFlow();
+      }
     }
   };
+
+  // FIXME: track saved or unsaved changes
   const saveFlowHandler = () => {
     setUpdatingNodes(true);
     updateFlowGraph({
@@ -191,6 +207,26 @@ export default function FlowCanvas({
     }).finally(() => {
       setUpdatingNodes(false);
     });
+  };
+  const runFlow = async () => {
+    const isValid = validateIndirectFlow(edges);
+    if (isValid) {
+      setUpdatingNodes(true);
+      try {
+        await updateFlowGraph({
+          flow_id: slug,
+          nodes: JSON.stringify({ data: nodes }),
+          edges: JSON.stringify({ data: edges }),
+        });
+        setShowActionPanel(true);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setUpdatingNodes(false);
+      }
+    } else {
+      toast('Incomplete flow for graph.');
+    }
   };
   const onSaveFlow = () => {
     const isValid = validateIndirectFlow(edges);
@@ -222,6 +258,19 @@ export default function FlowCanvas({
     },
     [setEdges],
   );
+  const checkIfAPIKeyRequired = () => {
+    const requiredKeys: Record<string, boolean> = {};
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      const nodeData = node.data as unknown as SystemTool;
+      if (nodeData.require_key) {
+        if (nodeData.key_name) {
+          requiredKeys[nodeData.key_name] = true;
+        }
+      }
+    }
+    return { isKeyRequire: Object.keys(requiredKeys).length > 0, requiredKeys };
+  };
   return (
     <div className="flex h-screen">
       <div className="flex-1">
@@ -281,6 +330,12 @@ export default function FlowCanvas({
               {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-blue-400 to-indigo-800 hover:text-blue-100 transition-all duration-50 ease-linear">
                 Save
               </div> */}
+              <button
+                onClick={() => setShowKeysInputArea(true)}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <Play className="h-[16px] w-[16px]" />
+                Manage Keys
+              </button>
               <div
                 onClick={onExecuteFlow}
                 className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
@@ -329,6 +384,15 @@ export default function FlowCanvas({
           />
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
+        <EnterKeys
+          onKeysSaved={resData => {
+            setShowKeysInputArea(false);
+            setUserKeys(resData);
+          }}
+          apiDataFields={checkIfAPIKeyRequired().requiredKeys}
+          onClose={() => setShowKeysInputArea(false)}
+          open={showKeysInputArea}
+        />
       </div>
       <SideDrawer
         activeTabs={tabsToSelect}

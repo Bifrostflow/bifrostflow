@@ -146,7 +146,7 @@ export default function SideDrawer({
                     onAddNode(node);
                   }}
                   node={node}
-                  key={node._id}
+                  key={node.id}
                 />
               ),
             )}
