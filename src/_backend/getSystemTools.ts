@@ -46,6 +46,7 @@ export const getSystemTools = async (): Promise<SystemTools> => {
       return [];
     }
     const json: SystemTools = await res.json();
+    console.log(json);
     return json;
   } catch (error) {
     console.error('Error fetching project files:', error);

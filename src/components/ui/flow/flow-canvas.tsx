@@ -15,7 +15,7 @@ import {
 
 import { DefaultNode } from '@/components/ui/nodes/default';
 import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
-import { Menu, Play, Save, Trash2 } from 'lucide-react';
+import { Home, Menu, Play, Save, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
@@ -330,7 +330,13 @@ export default function FlowCanvas() {
               return 'var(--color-cyan-400)';
             }}
           />
-          <div className="pr-2 m-4 bg-zinc-700/00 w-[20%] flex justify-between items-center gap-1 absolute right-0 z-1000">
+          <div className="px-4 my-4 bg-zinc-700/00 w-full flex justify-between items-center gap-1 absolute right-0 z-1000">
+            <Link
+              href={'/home'}
+              className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+              <Home className="h-[16px] w-[16px]" />
+              Home
+            </Link>
             <div className="flex gap-3">
               {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
                 Save
@@ -363,24 +369,15 @@ export default function FlowCanvas() {
                 <Save className="h-[16px] w-[16px]" />
                 Edit
               </Link>
-              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-fuchsia-400 to-indigo-800 hover:text-teal-100 transition-all duration-50 ease-linear">
-                Load
-              </div> */}
-              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-stone-500 to-indigo-800 hover:text-purple-100 transition-all duration-50 ease-linear">
-                Settings
-              </div> */}
-              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
-                Load
-              </div> */}
-            </div>
-            <div className="flex justify-start items-center">
-              <button
-                onClick={() => {
-                  setDrawerOpen(true);
-                }}
-                className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-green-600 to-indigo-800 p-2 rounded-full">
-                <Menu />
-              </button>
+              <div className="flex justify-start items-center">
+                <button
+                  onClick={() => {
+                    setDrawerOpen(true);
+                  }}
+                  className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-green-600 to-indigo-800 p-2 rounded-full">
+                  <Menu />
+                </button>
+              </div>
             </div>
           </div>
           <DraggablePanel
