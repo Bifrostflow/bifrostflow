@@ -38,6 +38,11 @@ const DNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
         <div>
           <p className="text-[10px] text-cyan-400">{nodeData?.name}</p>
           <p className="text-[6px] text-cyan-400">{nodeData?.description}</p>
+          {nodeData?.gpt_model && (
+            <p className="text-[6px] text-cyan-400">
+              {nodeData?.llm}:{nodeData?.gpt_model}
+            </p>
+          )}
         </div>
         {nodeData?.delete}
       </div>

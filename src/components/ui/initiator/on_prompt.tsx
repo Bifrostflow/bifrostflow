@@ -7,6 +7,7 @@ import { ChunkResponse, ChunkResponseData } from '@/_backend/runFlow';
 import { CodeEvaluateResponse } from '../responses/code_evaluate';
 import { MarkdownTextResponse } from '../responses/markdown-text';
 import print from '@/lib/print';
+import { toast } from 'sonner';
 
 type Props = {
   edges: Edge[];
@@ -56,6 +57,9 @@ export const OnPrompt = ({ edges, onClose, flow_id }: Props) => {
                 line.replace('data: ', ''),
               );
               responseArray.push(json.response);
+              if (json.error) {
+                toast(json.error || '');
+              }
               setLoaderText(() => json.ui_response);
               await new Promise(resolve => setTimeout(resolve, 500));
             } catch (err) {

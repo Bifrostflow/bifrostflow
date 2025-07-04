@@ -1,5 +1,6 @@
 'use server';
 import { url } from '@/lib/path';
+import print from '@/lib/print';
 import { auth } from '@clerk/nextjs/server';
 import { Edge } from '@xyflow/react';
 
@@ -60,6 +61,7 @@ export interface ChunkResponseData {
   node_data: ChunkNodeData;
   response: ChunkResponse;
   ui_response: string;
+  error?: string;
 }
 
 export async function* runFlowWithInput({
@@ -72,7 +74,7 @@ export async function* runFlowWithInput({
   try {
     const { getToken } = await auth();
     const token = await getToken();
-
+    print(JSON.stringify({ input, data, flow_id, input_type: 'none' }));
     const res = await fetch(endpoint, {
       method: 'POST',
       body: JSON.stringify({ input, data, flow_id }),
@@ -82,7 +84,7 @@ export async function* runFlowWithInput({
       },
     });
 
-    if (!res.ok) throw new Error('Failed to fetch project files');
+    if (!res.ok) throw new Error('Failed to run flow');
     if (!res.body) throw new Error('Empty response body');
 
     const reader = res.body.getReader();

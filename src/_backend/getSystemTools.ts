@@ -29,6 +29,10 @@ export interface SystemTool {
   what_i_do: string;
   category: ToolCategory;
   state: 'active' | 'inactive';
+  require_key: boolean;
+  key_name: string | null;
+  input_type: 'none' | 'string' | 'url' | 'pdf' | 'image' | 'object';
+  object_schema: string | null;
 }
 
 export type SystemTools = SystemTool[];
@@ -47,5 +51,23 @@ export const getSystemTools = async (): Promise<SystemTools> => {
   } catch (error) {
     console.error('Error fetching project files:', error);
     return [];
+  }
+};
+
+export const getSystemToolsByID = async (
+  id: string,
+): Promise<SystemTool | null> => {
+  const endpoint = `${url}/system-tools/${id}`;
+
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) {
+      return null;
+    }
+    const json: SystemTool = await res.json();
+    return json;
+  } catch (error) {
+    console.error('Error fetching project files:', error);
+    return null;
   }
 };
