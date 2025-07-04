@@ -4,7 +4,7 @@ import { Input } from '../input';
 import { Button } from '../button';
 import { Label } from '../label';
 import { updateFlowKeys } from '@/_backend/private/projects/updateFlowKeys';
-import { useFlow } from '@/app/flow/[slug]/flow-context';
+import { useFlow } from '@/context/flow-context';
 import { toast } from 'sonner';
 
 export type APIData = Record<string, string>;
@@ -23,11 +23,12 @@ export default function EnterKeys({
   apiDataFields,
   onKeysSaved,
 }: ISideDrawer) {
-  const { slug, apiKeys } = useFlow();
+  const { slug, apiKeys, setAPIKeys } = useFlow();
   const [isOpen, setIsOpen] = useState(open);
   const [APIKeyValues, setAPIKeyValues] = useState<APIData>(apiKeys);
   const [errors, setError] = useState<APIData>({});
   const [updating, setUpdating] = useState(false);
+  const [deletingKey, setDeletingKey] = useState<string>();
   useEffect(() => {
     setIsOpen(open);
   }, [open]);
@@ -56,17 +57,18 @@ export default function EnterKeys({
     return fieldCounter === Object.keys(apiDataFields).length;
   };
 
-  const onSaveHandler = async () => {
+  const onSaveHandler = async (keys: APIData) => {
     if (!validateRequiredKeys()) return;
     setUpdating(true);
     try {
       const response = await updateFlowKeys({
-        apiKeys: JSON.stringify(APIKeyValues),
+        apiKeys: JSON.stringify(keys),
         flow_id: slug,
       });
       toast(response?.message);
       if (response?.isSuccess) {
-        onKeysSaved(APIKeyValues);
+        onKeysSaved(keys);
+        setAPIKeys(keys);
       }
     } catch (error) {
       toast(`FAILED: ${error}`);
@@ -75,7 +77,14 @@ export default function EnterKeys({
       setUpdating(false);
     }
   };
-
+  const deleteKeyHandler = async (key: string) => {
+    setDeletingKey(key);
+    const newKeys = { ...APIKeyValues };
+    delete newKeys[key];
+    await onSaveHandler(newKeys);
+    setAPIKeyValues(newKeys);
+    setDeletingKey('');
+  };
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[300px] bg-zinc-800 shadow-lg transform transition-transform duration-300 z-50 ${
@@ -92,6 +101,20 @@ export default function EnterKeys({
         </button>
       </div>
       <div className="h-[0.5px] bg-gradient-to-r from-blue-400 to-blue-500" />
+      <p>Delete keys</p>
+      {Object.keys(apiKeys).map(key => {
+        return (
+          <Button
+            onClick={() => deleteKeyHandler(key)}
+            key={key}
+            disabled={!!deletingKey}>
+            {deletingKey === key ? 'Deleting ' : ''}
+            {key}
+          </Button>
+        );
+      })}
+
+      <p>Edit keys</p>
       {Object.keys(apiDataFields).map(key => {
         return (
           <div key={key}>
@@ -111,7 +134,7 @@ export default function EnterKeys({
           </div>
         );
       })}
-      <Button onClick={onSaveHandler} disabled={updating}>
+      <Button onClick={() => onSaveHandler(APIKeyValues)} disabled={updating}>
         {updating ? 'Saving' : 'Save'} Keys
       </Button>
     </div>

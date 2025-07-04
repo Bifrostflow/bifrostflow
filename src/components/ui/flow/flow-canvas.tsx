@@ -29,7 +29,7 @@ import { DraggablePanel } from '@/components/ui/draggable-panel';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
-import { useFlow } from '@/app/flow/[slug]/flow-context';
+import { useFlow } from '@/context/flow-context';
 import EnterKeys, { APIData } from './enter-keys-area';
 
 export default function FlowCanvas() {
@@ -200,9 +200,17 @@ export default function FlowCanvas() {
   // FIXME: track saved or unsaved changes
   const saveFlowHandler = () => {
     setUpdatingNodes(true);
+    const minimizedNodes = nodes.map((node: Node): Node => {
+      return {
+        ...node,
+        data: {
+          id: node.data.id,
+        },
+      };
+    });
     updateFlowGraph({
       flow_id: slug,
-      nodes: JSON.stringify({ data: nodes }),
+      nodes: JSON.stringify({ data: minimizedNodes }),
       edges: JSON.stringify({ data: edges }),
     }).finally(() => {
       setUpdatingNodes(false);

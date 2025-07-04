@@ -1,6 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
 import React from 'react';
-import { FlowProvider } from './flow-context';
+import { FlowProvider } from '../../../context/flow-context';
 import FlowCanvas from '@/components/ui/flow/flow-canvas';
 import { APIData } from '@/components/ui/flow/enter-keys-area';
 

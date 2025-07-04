@@ -1,7 +1,7 @@
 'use client';
 import { APIData } from '@/components/ui/flow/enter-keys-area';
 import { Edge, Node } from '@xyflow/react';
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 type FlowContextType = {
   slug: string;
@@ -9,7 +9,7 @@ type FlowContextType = {
   initialNodes: Node[];
   initialEdges: Edge[];
   // nodeValues: Record<string, string>;
-  // setNodeValues: (id: string, values: string) => void;
+  setAPIKeys: (data: APIData) => void;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
@@ -27,6 +27,7 @@ export const FlowProvider = ({
   defaultNodes: Node[];
   defaultEdges: Edge[];
 }) => {
+  const [APIKeys, setAPIKeys] = useState<APIData>(apiKeys);
   // const [nodeValues, setNodeValues] = useState<Record<string, string>>({});
 
   // const updateNodeValues = (id: string, values: string) => {
@@ -41,7 +42,10 @@ export const FlowProvider = ({
         slug,
         initialEdges: defaultEdges,
         initialNodes: defaultNodes,
-        apiKeys,
+        apiKeys: APIKeys,
+        setAPIKeys(data) {
+          setAPIKeys(data);
+        },
         // nodeValues,
         // setNodeValues: updateNodeValues,
       }}>

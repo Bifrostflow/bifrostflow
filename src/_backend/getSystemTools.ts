@@ -52,3 +52,21 @@ export const getSystemTools = async (): Promise<SystemTools> => {
     return [];
   }
 };
+
+export const getSystemToolsByID = async (
+  id: string,
+): Promise<SystemTool | null> => {
+  const endpoint = `${url}/system-tools/${id}`;
+
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) {
+      return null;
+    }
+    const json: SystemTool = await res.json();
+    return json;
+  } catch (error) {
+    console.error('Error fetching project files:', error);
+    return null;
+  }
+};
