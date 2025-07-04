@@ -17,7 +17,7 @@ const SNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
 
   return (
     <div
-      onClick={() => nodeData?.onClick(nodeData._id)}
+      onClick={() => nodeData?.onClick(nodeData.id)}
       className={`
           rounded-tl-lg
           rounded-tr-lg
