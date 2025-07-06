@@ -84,13 +84,6 @@ export function HeroNav() {
               <SignedIn>
                 <UserButton userProfileUrl="/profile" />
               </SignedIn>
-
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full">
-                Book a call
-              </NavbarButton>
             </div>
           </MobileNavMenu>
         </MobileNav>

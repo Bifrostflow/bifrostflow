@@ -26,7 +26,6 @@ import {
 } from '@tabler/icons-react';
 import ColourfulText from '../colourful-text';
 import { SparklesCore } from '../sparkles';
-import { WavyBackground } from '../wavy-background';
 
 const features = [
   {
@@ -113,7 +112,7 @@ export default function Features() {
           <Feature key={feature.title} {...feature} index={index} />
         ))}
       </div>
-      <WavyBackground className="max-w-4xl mx-auto pb-40 bg-transparent"></WavyBackground>
+      {/* <WavyBackground className="max-w-4xl mx-auto pb-40 bg-transparent"></WavyBackground> */}
     </div>
   );
 }

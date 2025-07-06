@@ -11,3 +11,45 @@ generate_code_doc	Generate documentation from a code snippet	After evaluate_code
 fetch_github_data	Pull GitHub PR/issues info from repo	Good for developer flows
 save_to_db	Store final result in DB	Useful after code gen or message sending
 summon_agent	Spin off a small agent to handle subtask	For multi-step complex flows
+
+
+action color
+secondary action color #1447e6
+primary action color #00d492
+
+
+primary #007bff
+primary variant #1447e6
+
+secondary #00d492
+secondary variant #02b880
+
+background #0a0b0e
+background surface #252934
+background text #e2e3e8
+surface text #e5e6eb
+
+
+| Role               | Color     | Notes                                                         |
+| ------------------ | --------- | ------------------------------------------------------------- |
+| Primary            | `#007bff` | Bright, vibrant blue – good for CTA. Stands out on dark bg. ✅ |
+| Primary Variant    | `#1447e6` | Deeper, calm blue – perfect for hover/focus states. ✅         |
+| Secondary          | `#00d492` | Vivid teal green – good contrast from primary. ✅              |
+| Secondary Variant  | `#02b880` | Slightly toned-down version – great for hover/focus. ✅        |
+| Background         | `#0a0b0e` | Very dark – looks premium and modern. ✅                       |
+| Background Surface | `#252934` | Great as card/panel surface – proper hierarchy. ✅             |
+| Background Text    | `#e2e3e8` | Light gray, readable over dark bg. ✅                          |
+| Surface Text       | `#e5e6eb` | Slightly lighter – works for headings/subtle highlights. ✅    |
+
+
+| Role               | Hex Value | Notes                                    |
+| ------------------ | --------- | ---------------------------------------- |
+| Primary            | `#0063d1` | Adjusted for brightness, accessibility ✅ |
+| Primary Variant    | `#0052b5` | Slightly deeper for hover ✅              |
+| Secondary          | `#00b482` | Softer teal for light bg ✅               |
+| Secondary Variant  | `#00996d` | Consistent depth ✅                       |
+| Background         | `#f9fafa` | Very light gray for comfort ✅            |
+| Background Surface | `#ffffff` | Pure white card bg ✅                     |
+| Background Text    | `#0a0b0e` | Very dark, readable text ✅               |
+| Surface Text       | `#252934` | Muted for subtext ✅                      |
+| Border             | `#dcdfe5` | Soft, visible on light bg ✅              |

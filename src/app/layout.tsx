@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ClerkProviderWrapper } from '@/components/clerk-provider';
 import { ReduxProvider } from '@/redux/redux-provider';
+import ThemeProvider from '@/context/theme-provider';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -27,11 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark `}>
-        <ClerkProviderWrapper>
-          <ReduxProvider>{children}</ReduxProvider>
-        </ClerkProviderWrapper>
-        <Toaster />
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}>
+        <ThemeProvider>
+          <ClerkProviderWrapper>
+            <ReduxProvider>{children}</ReduxProvider>
+          </ClerkProviderWrapper>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
