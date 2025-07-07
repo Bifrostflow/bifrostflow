@@ -12,28 +12,42 @@ import {
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
-
+import { motion } from 'framer-motion';
 import { DefaultNode } from '@/components/ui/nodes/default';
 import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
-import { Home, Menu, Play, Save, Trash2 } from 'lucide-react';
+import { BugIcon, Home, Key, Menu, Save, Trash2 } from 'lucide-react';
 import { mapTypesToDeleteButtonColor } from '@/lib/utils';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
 import { StartNode } from '@/components/ui/nodes/start';
 import { StartPointNode } from '@/components/ui/nodes/start-point';
 import SideDrawer from '@/components/ui/side-drawer';
-import ExecuteFlow from '@/components/ui/execute-flow';
 import { validateIndirectFlow } from '@/lib/validation';
 import { toast } from 'sonner';
-import { DraggablePanel } from '@/components/ui/draggable-panel';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 import { useFlow } from '@/context/flow-context';
-import EnterKeys, { APIData } from './enter-keys-area';
+import EnterKeys from './enter-keys-area';
+import { useRouter } from 'next/navigation';
+import { RunButton } from './run-flow-button';
+import { DraggablePanel } from '../draggable-panel';
+import { Button } from '../button';
+import ResponsePreview from './response-preview';
+
+export type InitiatorType = 'on_prompt' | 'on_start';
 
 export default function FlowCanvas() {
-  const { initialEdges, initialNodes, slug, apiKeys } = useFlow();
+  const {
+    initialEdges,
+    initialNodes,
+    slug,
+    setShowKeyInputArea,
+    showKeyInputArea,
+    setAPIKeys,
+    chunkResponse,
+    loaderUIText,
+  } = useFlow();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -41,13 +55,12 @@ export default function FlowCanvas() {
   const [tabsToSelect, setTabsToSelect] = useState<ToolCategory[]>([
     'initiate',
   ]);
-  const [showActionPanel, setShowActionPanel] = useState(false);
-  const [initiatorType, setInitiatorType] = useState<'on_prompt' | string>();
+  // const [showActionPanel, setShowActionPanel] = useState(false);
+  const [initiatorType, setInitiatorType] = useState<InitiatorType>();
   const [updatingNodes, setUpdatingNodes] = useState(false);
-  const [userKeys, setUserKeys] = useState<APIData>(apiKeys);
-  const [showKeysInputArea, setShowKeysInputArea] = useState(false);
-  const edgeReconnectSuccessful = useRef(true);
 
+  const edgeReconnectSuccessful = useRef(true);
+  const navigation = useRouter();
   const isMainNodesSelected = useMemo(() => {
     const { length } = nodes.filter(n => {
       const data: SystemTool = n.data as unknown as SystemTool;
@@ -118,30 +131,16 @@ export default function FlowCanvas() {
             }}
           />
         ),
-        executeFlow: <ExecuteFlow onExecuteFlow={onExecuteFlow} />,
       } as unknown as Record<string, unknown>,
       position: node.position,
     };
     return newNode;
   };
-  const validateRequiredKeys = () => {
-    const { requiredKeys } = checkIfAPIKeyRequired();
-    let fieldCounter = 0;
-    for (let i = 0; i < Object.keys(requiredKeys).length; i++) {
-      const key = Object.keys(requiredKeys)[i];
-      const found = Object.keys(userKeys).find(
-        apiKeyLabel => apiKeyLabel === key,
-      );
-      if (found) {
-        fieldCounter++;
-      }
-    }
-    return fieldCounter === Object.keys(requiredKeys).length;
-  };
+
   const handleAddNode = (node: SystemTool) => {
     const id = `${idCounter}-${node.id}`;
     if (node.category === 'initiate') {
-      setInitiatorType(node.type);
+      setInitiatorType(node.type as InitiatorType);
     }
 
     const newNode: Node = {
@@ -161,7 +160,6 @@ export default function FlowCanvas() {
             }}
           />
         ),
-        executeFlow: <ExecuteFlow onExecuteFlow={onExecuteFlow} />,
       } as unknown as Record<string, unknown>,
       position: { x: 250, y: 250 },
     };
@@ -184,18 +182,6 @@ export default function FlowCanvas() {
       eds.filter(edge => edge.source !== id && edge.target !== id),
     );
   };
-  const onExecuteFlow = async () => {
-    const { isKeyRequire } = checkIfAPIKeyRequired();
-    if (!isKeyRequire) {
-      runFlow();
-    } else {
-      if (!validateRequiredKeys()) {
-        setShowKeysInputArea(true);
-      } else {
-        runFlow();
-      }
-    }
-  };
 
   // FIXME: track saved or unsaved changes
   const saveFlowHandler = () => {
@@ -216,26 +202,7 @@ export default function FlowCanvas() {
       setUpdatingNodes(false);
     });
   };
-  const runFlow = async () => {
-    const isValid = validateIndirectFlow(edges);
-    if (isValid) {
-      setUpdatingNodes(true);
-      try {
-        await updateFlowGraph({
-          flow_id: slug,
-          nodes: JSON.stringify({ data: nodes }),
-          edges: JSON.stringify({ data: edges }),
-        });
-        setShowActionPanel(true);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setUpdatingNodes(false);
-      }
-    } else {
-      toast('Incomplete flow for graph.');
-    }
-  };
+
   const onSaveFlow = () => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
@@ -331,38 +298,40 @@ export default function FlowCanvas() {
             }}
           />
           <div className="px-4 my-4 bg-zinc-700/00 w-full flex justify-between items-center gap-1 absolute right-0 z-1000">
-            <Link
-              href={'/home'}
+            <Button
+              onClick={navigation.back}
               className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
               <Home className="h-[16px] w-[16px]" />
               Home
-            </Link>
+            </Button>
             <div className="flex gap-3">
-              {/* <div className="bg-zinc-700 px-3 py-1 text-zinc-200 text-sm rounded-xs hover:text-blue-100 hover:bg-gradient-to-b hover:from-zinc-700 hover:to-zinc-500/50">
-                Save
-              </div> */}
-              {/* <div className=" px-5 py-2 cursor-pointer rounded-full text-zinc-200 text-sm bg-gradient-to-br from-blue-400 to-indigo-800 hover:text-blue-100 transition-all duration-50 ease-linear">
-                Save
-              </div> */}
-              <button
-                onClick={() => setShowKeysInputArea(true)}
+              <Button
+                onClick={() => setShowKeyInputArea(true)}
                 className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
-                <Play className="h-[16px] w-[16px]" />
+                <Key className="h-[16px] w-[16px]" />
                 Manage Keys
-              </button>
-              <div
-                onClick={onExecuteFlow}
-                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
-                <Play className="h-[16px] w-[16px]" />
-                Run
-              </div>
-              <button
+              </Button>
+
+              <RunButton
+                initiatorType={initiatorType}
+                edges={edges}
+                nodes={nodes}
+              />
+
+              <Button
                 disabled={updatingNodes}
                 onClick={onSaveFlow}
                 className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
                 <Save className="h-[16px] w-[16px]" />
                 {updatingNodes ? 'Saving..' : 'Save'}
-              </button>
+              </Button>
+              <Button
+                disabled={updatingNodes}
+                onClick={onSaveFlow}
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                <BugIcon />
+                Report Bug
+              </Button>
               <Link
                 href={`/flow/edit/${slug}`}
                 className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
@@ -370,34 +339,50 @@ export default function FlowCanvas() {
                 Edit
               </Link>
               <div className="flex justify-start items-center">
-                <button
+                <Button
                   onClick={() => {
                     setDrawerOpen(true);
                   }}
                   className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-green-600 to-indigo-800 p-2 rounded-full">
                   <Menu />
-                </button>
+                </Button>
               </div>
             </div>
           </div>
-          <DraggablePanel
-            flow_id={slug}
-            onClose={() => setShowActionPanel(false)}
-            edges={edges}
-            visible={showActionPanel}
-            initiatorType={initiatorType}
-          />
+
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
         <EnterKeys
           onKeysSaved={resData => {
-            setShowKeysInputArea(false);
-            setUserKeys(resData);
+            setShowKeyInputArea(false);
+            setAPIKeys(resData);
           }}
           apiDataFields={checkIfAPIKeyRequired().requiredKeys}
-          onClose={() => setShowKeysInputArea(false)}
-          open={showKeysInputArea}
+          onClose={() => setShowKeyInputArea(false)}
+          open={showKeyInputArea}
         />
+        {!!chunkResponse && <ResponsePreview data={{ ...chunkResponse }} />}
+        <DraggablePanel edges={edges} initiatorType={initiatorType} />
+        {loaderUIText.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 0.2,
+              delay: 0.1,
+            }}
+            className="p-5 min-w-[200px] min-h-[200px] rounded-sm bg-white absolute bottom-10 left-10 transition-all ease-in duration-100">
+            {loaderUIText.map((text, i) => {
+              return (
+                <p
+                  key={`${text}-${i}`}
+                  className="italic text-md text-black font-semibold p-2 transition-all duration-200 ease-in-out tracking-tight">
+                  {text}
+                </p>
+              );
+            })}
+          </motion.div>
+        )}
       </div>
       <SideDrawer
         activeTabs={tabsToSelect}

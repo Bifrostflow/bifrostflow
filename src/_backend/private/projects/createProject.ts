@@ -26,7 +26,34 @@ export const createProject = async (
       throw new Error('Failed to create project');
     }
 
-    const json = await res.json();
+    const json: APIResponse<ProjectWithStatus[]> = await res.json();
+
+    return json;
+  } catch (error) {
+    console.error('Error creating project', error);
+    return null;
+  }
+};
+
+export const tryTemplate = async (
+  template_id: string,
+): Promise<APIResponse<ProjectWithStatus[]> | null> => {
+  const endpoint = `${url}/try-template?template_id=${template_id}`;
+  try {
+    const { getToken } = await auth();
+    const token = await getToken();
+
+    const res = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!res.ok) {
+      throw new Error('Failed to create project');
+    }
+
+    const json: APIResponse<ProjectWithStatus[]> = await res.json();
 
     return json;
   } catch (error) {

@@ -4,6 +4,8 @@ import { Edge, Node, ReactFlowProvider } from '@xyflow/react';
 import { getNodesForFlow } from '@/_backend/private/projects/getNodesForFlow';
 import FlowContextWrapper from './flow-context-wrapper';
 import { getSystemToolsByID } from '@/_backend/getSystemTools';
+import { redirect } from 'next/navigation';
+import print from '@/lib/print';
 const start_point: Node = {
   id: '0-start_point',
   type: 'start_point',
@@ -25,65 +27,96 @@ export default async function Flow({
     const loadGraph = async () => {
       try {
         const response = await getNodesForFlow(slug);
+        print({ response });
+        if (!response.isSuccess) {
+          return redirect('/home');
+        }
         if (!response.data) {
-          return { nodes: [start_point], edges: [] };
+          return { nodes: [start_point], edges: [], isSuccess: false };
+        }
+        const finalNodes: Node[] = [];
+        const finalEdges: Edge[] = [];
+
+        // extract edge
+        if (!!response.data.edges) {
+          try {
+            let parsedEdge = JSON.parse(response.data.edges);
+            parsedEdge = parsedEdge?.data.map((edge: Edge) => ({
+              tool_input: null,
+              ...edge,
+            }));
+            finalEdges.push(...parsedEdge);
+          } catch (error) {
+            console.log(error);
+          }
         }
 
-        const parsedServerNodes = JSON.parse(response.data.nodes);
-        const serverNodes: Node[] =
-          (parsedServerNodes.data as Node[]) || ([start_point] as Node[]);
-        const hydratedNodes = [];
-        for (let i = 0; i < serverNodes.length; i++) {
-          const node = serverNodes[i];
-          const nodeInfo = await getSystemToolsByID(node.data.id as string);
+        // extract nodes
+        if (response.data.nodes) {
+          try {
+            let parsedNodes = JSON.parse(response.data.nodes);
+            parsedNodes =
+              (parsedNodes.data as Node[]) || ([start_point] as Node[]);
+            for (let i = 0; i < parsedNodes.length; i++) {
+              const node = parsedNodes[i];
+              if (node.data.id) {
+                const nodeInfo = await getSystemToolsByID(
+                  node.data.id as string,
+                );
 
-          node.data = {
-            ...node.data,
-            ...nodeInfo,
-          };
+                node.data = {
+                  ...node.data,
+                  ...nodeInfo,
+                };
 
-          hydratedNodes.push(node);
+                finalNodes.push(node);
+              }
+            }
+          } catch (error) {
+            console.log(error);
+            finalNodes.push(start_point);
+          }
+        } else {
+          finalNodes.push(start_point);
         }
-        let serverEdges = JSON.parse(response.data.edges);
-        serverEdges = serverEdges.data.map((edge: Edge) => ({
-          tool_input: null,
-          ...edge,
-        }));
-        const apiKeys = JSON.parse(response.data.api_keys) || {};
+        let finalAPIKeys = {};
+        if (response.data.api_keys) {
+          try {
+            finalAPIKeys = JSON.parse(response.data.api_keys) || {};
+          } catch (error) {
+            console.log(error);
+            finalAPIKeys = {};
+          }
+        }
 
         return {
-          nodes: serverNodes || [start_point],
-          edges: serverEdges || [],
-          apiKeys,
+          nodes: finalNodes || [start_point],
+          edges: finalEdges || [],
+          apiKeys: finalAPIKeys,
+          isSuccess: true,
         };
       } catch (error) {
         console.log('ERROR ONE: ', error);
-        return { nodes: [start_point], edges: [], apiKeys: {} };
+        redirect('/home');
+        return { isSuccess: false };
       }
     };
-    const { edges, nodes, apiKeys } = await loadGraph();
+    const response = await loadGraph();
+
+    const { edges, nodes, apiKeys } = response;
 
     return (
       <ReactFlowProvider>
         <FlowContextWrapper
           apiKeys={apiKeys || {}}
-          initialEdges={edges}
-          initialNodes={nodes}
+          initialEdges={edges || []}
+          initialNodes={nodes || [start_point]}
           slug={slug}
         />
       </ReactFlowProvider>
     );
   } catch (_e) {
     console.log('ERROR: ', _e);
-    return (
-      <ReactFlowProvider>
-        <FlowContextWrapper
-          apiKeys={{}}
-          slug={slug}
-          initialEdges={[]}
-          initialNodes={[start_point]}
-        />
-      </ReactFlowProvider>
-    );
+    return redirect('/home');
   }
 }
