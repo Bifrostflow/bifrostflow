@@ -20,6 +20,7 @@ import { Typography } from '@/components/ui/typography';
 import { showToast } from '@/components/ui/toast';
 import Drawer, { DrawerPositionType } from '@/components/ui/drawer';
 import { Badge } from '@/components/ui/badge';
+import { Loader2Icon } from 'lucide-react';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -39,6 +40,7 @@ export default function Page() {
   const [drawerPosition, setDrawerPosition] = useState<
     DrawerPositionType | undefined
   >();
+  const [loading, setLoading] = useState(false);
   return (
     <main className="min-h-screen p-8 bg-c-background text-c-background-text flex flex-col items-center gap-10">
       <h1 className="text-2xl font-bold">🌈 Themed UI Showcase</h1>
@@ -116,6 +118,15 @@ export default function Page() {
           Submit
         </Button>
         <Button type="submit" variant={'secondary'}>
+          Submit
+        </Button>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          variant={'secondary'}
+          onClick={() => setLoading(!loading)}>
+          {loading && <Loader2Icon className="animate-spin" />}
           Submit
         </Button>
       </div>
