@@ -15,9 +15,17 @@ type Props = {
   nodes: Node[];
   edges: Edge[];
   initiatorType?: InitiatorType;
+  needUpdate: boolean;
+  onUpdateGraph: (nodes: Node[], edges: Edge[]) => void;
 };
 
-export const RunButton = ({ nodes, edges, initiatorType }: Props) => {
+export const RunButton = ({
+  nodes,
+  edges,
+  initiatorType,
+  needUpdate,
+  onUpdateGraph,
+}: Props) => {
   const {
     setShowKeyInputArea,
     apiKeys,
@@ -82,11 +90,16 @@ export const RunButton = ({ nodes, edges, initiatorType }: Props) => {
     if (isValid) {
       setUpdatingNodes(true);
       try {
-        await updateFlowGraph({
-          flow_id: slug,
-          nodes: JSON.stringify({ data: nodes }),
-          edges: JSON.stringify({ data: edges }),
-        });
+        if (needUpdate) {
+          const response = await updateFlowGraph({
+            flow_id: slug,
+            nodes: JSON.stringify({ data: nodes }),
+            edges: JSON.stringify({ data: edges }),
+          });
+          if (response?.isSuccess) {
+            onUpdateGraph(nodes, edges);
+          }
+        }
         handleInitiatorRunner();
       } catch (error) {
         console.log(error);
