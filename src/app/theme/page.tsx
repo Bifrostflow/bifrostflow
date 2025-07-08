@@ -12,12 +12,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Typography } from '@/components/ui/typography';
 import { showToast } from '@/components/ui/toast';
+import Drawer, { DrawerPositionType } from '@/components/ui/drawer';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -32,6 +33,10 @@ export default function Page() {
       username: '',
     },
   });
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [drawerPosition, setDrawerPosition] = useState<
+    DrawerPositionType | undefined
+  >();
   return (
     <main className="min-h-screen p-8 bg-c-background text-c-background-text flex flex-col items-center gap-10">
       <h1 className="text-2xl font-bold">🌈 Themed UI Showcase</h1>
@@ -160,6 +165,48 @@ export default function Page() {
           Toast Success
         </Button>
       </div>
+      <div className="gap-2 flex">
+        <Button
+          onClick={() => {
+            setShowDrawer(true);
+            setDrawerPosition('top');
+          }}
+          variant={'default'}>
+          Test Drawer
+        </Button>
+      </div>
+
+      <Drawer
+        onClose={async visible => {
+          setShowDrawer(visible);
+        }}
+        height="h-[100vh] w-[30%]"
+        position={'right'}
+        visible={showDrawer}>
+        <Typography variant={'h1'}>Title</Typography>
+        {/* <div className="flex flex-col justify-start items-start">
+          <Typography variant={'h2'}>Heading</Typography>
+          <Typography variant={'h3'}>Heading 2</Typography>
+          <Typography variant={'h4'}>Heading 3</Typography>
+          <Typography className="text-start" variant={'p'}>
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Suscipit
+            magnam reprehenderit quod temporibus hic Lorem ipsum, dolor sit amet
+            consectetur adipisicing elit. Suscipit magnam reprehenderit quod
+            temporibus hic Lorem ipsum, dolor sit amet consectetur adipisicing
+            elit. Suscipit magnam reprehenderit quod temporibus hic
+          </Typography>
+          <Typography variant={'blockquote'}>
+            <blockquote>
+              &quot;After all,&quot; he said, &quot;everyone enjoys a good joke,
+              so it&apos;s only fair that they should pay for the
+              privilege.&quot;
+            </blockquote>
+          </Typography>
+          <Typography variant={'inline_code'}>
+            <code>@radix-ui/react-alert-dialog</code>
+          </Typography>
+        </div> */}
+      </Drawer>
     </main>
   );
 }
