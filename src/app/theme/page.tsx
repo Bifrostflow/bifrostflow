@@ -181,10 +181,10 @@ export default function Page() {
           setShowDrawer(visible);
         }}
         height="h-[100vh] w-[30%]"
-        position={'right'}
+        position={'bottom'}
         visible={showDrawer}>
         <Typography variant={'h1'}>Title</Typography>
-        {/* <div className="flex flex-col justify-start items-start">
+        <div className="flex flex-col justify-start items-start">
           <Typography variant={'h2'}>Heading</Typography>
           <Typography variant={'h3'}>Heading 2</Typography>
           <Typography variant={'h4'}>Heading 3</Typography>
@@ -205,7 +205,7 @@ export default function Page() {
           <Typography variant={'inline_code'}>
             <code>@radix-ui/react-alert-dialog</code>
           </Typography>
-        </div> */}
+        </div>
       </Drawer>
     </main>
   );

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import React, { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './button';
 
 export type DrawerPositionType = 'left' | 'right' | 'bottom' | 'top' | 'center';
@@ -14,7 +14,6 @@ interface Props {
   height?: string;
 }
 
-// Start off-screen
 const initialVariants: Record<
   DrawerPositionType,
   { x?: number; y?: number; opacity?: number }
@@ -26,7 +25,6 @@ const initialVariants: Record<
   top: { y: -2000, opacity: 0 },
 };
 
-// Animate into view
 const animateVariants: Record<
   DrawerPositionType,
   { x?: number; y?: number; opacity: number }
@@ -38,7 +36,6 @@ const animateVariants: Record<
   center: { y: 0, opacity: 1 },
 };
 
-// Positioning classes
 const positionClasses: Record<DrawerPositionType, string> = {
   bottom: 'fixed bottom-0 left-0 w-full',
   top: 'fixed top-0 left-0 w-full',
@@ -57,23 +54,41 @@ function Drawer({
   ...rest
 }: React.ComponentProps<'div'> & Props) {
   return (
-    <motion.div
-      initial={initialVariants[position]}
-      animate={visible ? animateVariants[position] : initialVariants[position]}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className={cn(
-        'bg-c-surface shadow-xl rounded-xl p-4',
-        positionClasses[position],
-        width ? width : 'w-fit',
-        height ? height : 'h-fit',
-        position !== 'center'
-          ? 'z-50'
-          : 'fixed inset-0 m-auto flex justify-center items-center z-50',
-        rest.className,
-      )}>
-      <Button onClick={() => onClose(false)}>Close</Button>
-      {children}
-    </motion.div>
+    <AnimatePresence>
+      {visible && (
+        <>
+          {/* ✅ BACKDROP */}
+          <motion.div
+            className="fixed inset-0 bg-black/50 z-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => onClose(false)}
+          />
+
+          {/* ✅ DRAWER */}
+          <motion.div
+            initial={initialVariants[position]}
+            animate={animateVariants[position]}
+            exit={initialVariants[position]}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className={cn(
+              'bg-c-surface shadow-xl rounded-xl p-4',
+              positionClasses[position],
+              width ? width : 'w-fit',
+              height ? height : 'h-fit',
+              position !== 'center'
+                ? 'z-50'
+                : 'fixed inset-0 m-auto flex justify-center items-center z-50',
+              rest.className,
+            )}>
+            <Button onClick={() => onClose(false)}>Close</Button>
+            {children}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 
