@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Typography } from '@/components/ui/typography';
+import { showToast } from '@/components/ui/toast';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -35,7 +36,9 @@ export default function Page() {
     <main className="min-h-screen p-8 bg-c-background text-c-background-text flex flex-col items-center gap-10">
       <h1 className="text-2xl font-bold">🌈 Themed UI Showcase</h1>
       <ThemeToggle />
-      <h1 className="text-2xl text-c-background-text">Heading</h1>
+      <Typography variant={'h1'} className="text-2xl text-c-background-text">
+        Heading
+      </Typography>
       <p className="text-c-background-text-muted">
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi pariatur
         et libero optio adipisci amet eaque ea cum, similique eos rerum nihil
@@ -130,6 +133,32 @@ export default function Page() {
         <Typography variant={'inline_code'}>
           <code>@radix-ui/react-alert-dialog</code>
         </Typography>
+      </div>
+      <div className="gap-2 flex">
+        <Button
+          onClick={() => {
+            showToast({
+              type: 'error',
+              button: { label: 'OK', onClick() {} },
+              // title: 'Error',
+              description:
+                'Something went wrong!! Something went wrong!! Something went wrong!! Something went wrong!! ',
+            });
+          }}
+          variant={'destructive'}>
+          Toast Error
+        </Button>
+        <Button
+          onClick={() => {
+            showToast({
+              title: 'Success',
+              description: 'Generated successfully',
+              button: { label: 'OK', onClick() {} },
+            });
+          }}
+          variant={'secondary'}>
+          Toast Success
+        </Button>
       </div>
     </main>
   );

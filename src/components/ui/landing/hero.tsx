@@ -2,44 +2,50 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
+const blurVariants = {
+  animate: (i: number) => ({
+    filter: ['blur(5px)', 'blur(2px)', 'blur(5px)'],
+    width: ['70px', '75px', '70px'],
+    opacity: [0.5, 1, 0.5],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: 'easeIn',
+      delay: i * 1.5, // staggers each by 1s
+    },
+  }),
+};
+
+function BlurredBars() {
+  return (
+    <>
+      {[0, 1, 2].map(i => (
+        <motion.div
+          key={i}
+          custom={i}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          variants={blurVariants}
+          animate="animate"
+          className={`absolute rotate-30 h-[150vh] w-[70px] ${
+            i === 0
+              ? 'left-20 bg-c-secondary'
+              : i === 1
+              ? 'left-55 bg-c-primary'
+              : 'left-90 bg-c-secondary-variant'
+          }`}
+        />
+      ))}
+    </>
+  );
+}
+
 function Hero() {
   return (
     // <AuroraBackground>
 
-    <div className="bg-c-background relative mx-auto my-10 flex max-w-7xl flex-col items-end justify-center h-[90vh]">
-      <div className="bg-c-secondary-variant w-[70px] absolute rotate-30 left-90 h-[150vh]"></div>
-      <div className="bg-c-primary w-[70px] absolute rotate-30 left-55 h-[150vh]"></div>
-      <div className="bg-c-secondary w-[70px] absolute rotate-30 left-20 h-[150vh]"></div>
-      <motion.div
-        initial={{
-          translateX: 0,
-          translateY: 0,
-        }}
-        animate={{
-          translateX: 50,
-          translateY: 0,
-        }}
-        transition={{
-          duration: 5,
-          delay: 1,
-          repeat: Infinity,
-          repeatType: 'mirror',
-        }}
-        className="absolute right-120 top-10 h-[150px] w-[150px] bg-c-primary z-50 rounded-md shadow-md"></motion.div>
-      <motion.div
-        initial={{
-          translateY: 0,
-        }}
-        animate={{
-          translateY: 50,
-        }}
-        transition={{
-          duration: 4,
-          delay: 2,
-          repeat: Infinity,
-          repeatType: 'mirror',
-        }}
-        className="absolute left-60 bottom-50 h-[150px] w-[150px] bg-c-primary z-50 rounded-md shadow-md"></motion.div>
+    <div className="backdrop-blur-xl bg-cover bg-center w-full flex flex-col items-end justify-center h-[100vh]">
+      <BlurredBars />
       <div className="px-4 py-10 md:py-20 ">
         <h1 className="relative z-10 mx-auto max-w-4xl text-right text-xl font-semibold text-slate-700 md:text-2xl lg:text-4xl dark:text-white gap-10 flex flex-col">
           <div className="relative flex flex-row justify-center items-center font-bold">
