@@ -34,6 +34,7 @@ import { RunButton } from './run-flow-button';
 import { DraggablePanel } from '../draggable-panel';
 import { Button } from '../button';
 import ResponsePreview from './response-preview';
+import print from '@/lib/print';
 
 export type InitiatorType = 'on_prompt' | 'on_start';
 
@@ -58,7 +59,8 @@ export default function FlowCanvas() {
   // const [showActionPanel, setShowActionPanel] = useState(false);
   const [initiatorType, setInitiatorType] = useState<InitiatorType>();
   const [updatingNodes, setUpdatingNodes] = useState(false);
-
+  const [lastUpdatedNodes, setlastUpdatedNodes] = useState<Node[]>([]);
+  const [lastUpdatedEdges, setlastUpdatedEdges] = useState(initialEdges);
   const edgeReconnectSuccessful = useRef(true);
   const navigation = useRouter();
   const isMainNodesSelected = useMemo(() => {
@@ -98,6 +100,7 @@ export default function FlowCanvas() {
   useEffect(() => {
     const sanitizedNodes = initialNodes.map(node => mapNodesDataToNodes(node));
     setNodes(sanitizedNodes);
+    setlastUpdatedNodes(sanitizedNodes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialNodes]);
 
@@ -184,7 +187,7 @@ export default function FlowCanvas() {
   };
 
   // FIXME: track saved or unsaved changes
-  const saveFlowHandler = () => {
+  const saveFlowHandler = async () => {
     setUpdatingNodes(true);
     const minimizedNodes = nodes.map((node: Node): Node => {
       return {
@@ -194,13 +197,21 @@ export default function FlowCanvas() {
         },
       };
     });
-    updateFlowGraph({
-      flow_id: slug,
-      nodes: JSON.stringify({ data: minimizedNodes }),
-      edges: JSON.stringify({ data: edges }),
-    }).finally(() => {
+    try {
+      const response = await updateFlowGraph({
+        flow_id: slug,
+        nodes: JSON.stringify({ data: minimizedNodes }),
+        edges: JSON.stringify({ data: edges }),
+      });
+      if (response?.isSuccess) {
+        setlastUpdatedNodes(nodes);
+        setlastUpdatedEdges(edges);
+      }
+    } catch (error) {
+      print(error);
+    } finally {
       setUpdatingNodes(false);
-    });
+    }
   };
 
   const onSaveFlow = () => {
@@ -218,7 +229,11 @@ export default function FlowCanvas() {
   const onReconnect = useCallback(
     (oldEdge: Edge, newConnection: Connection) => {
       edgeReconnectSuccessful.current = true;
-      setEdges(els => reconnectEdge(oldEdge, newConnection, els));
+      setEdges(els =>
+        reconnectEdge({ ...oldEdge, animated: true }, newConnection, els).map(
+          e => ({ ...e, animated: true, type: 'smoothstep' }),
+        ),
+      );
     },
     [setEdges],
   );
@@ -246,10 +261,46 @@ export default function FlowCanvas() {
     }
     return { isKeyRequire: Object.keys(requiredKeys).length > 0, requiredKeys };
   };
+
+  const graphReadyToSave = useMemo(() => {
+    let needUpdate = false;
+    if (JSON.stringify(edges) !== JSON.stringify(lastUpdatedEdges)) {
+      needUpdate = true;
+    }
+    const compareDataCurrentNode = nodes.map(n => {
+      return {
+        node_id: n.id,
+        type: n.type,
+        data_id: n.data.id,
+        data_state: n.data.state,
+      };
+    });
+    const compareDataLastUpdatedNode = lastUpdatedNodes.map(n => {
+      return {
+        node_id: n.id,
+        type: n.type,
+        data_id: n.data.id,
+        data_state: n.data.state,
+      };
+    });
+    if (
+      JSON.stringify(compareDataCurrentNode) !==
+      JSON.stringify(compareDataLastUpdatedNode)
+    ) {
+      needUpdate = true;
+      // id,type,
+      // data->id,state,
+    }
+    return needUpdate;
+  }, [edges, nodes, lastUpdatedEdges, lastUpdatedNodes]);
+
   return (
     <div className="flex h-screen">
       <div className="flex-1">
         <ReactFlow
+          onChange={() => {
+            print('view changed');
+          }}
           onReconnect={onReconnect}
           onReconnectStart={onReconnectStart}
           onReconnectEnd={onReconnectEnd}
@@ -316,12 +367,21 @@ export default function FlowCanvas() {
                 initiatorType={initiatorType}
                 edges={edges}
                 nodes={nodes}
+                needUpdate={graphReadyToSave}
+                onUpdateGraph={(nodes, edges) => {
+                  setlastUpdatedEdges(edges);
+                  setlastUpdatedNodes(nodes);
+                }}
               />
 
               <Button
-                disabled={updatingNodes}
+                disabled={updatingNodes || !graphReadyToSave}
                 onClick={onSaveFlow}
-                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
+                className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1
+                disabled:from-gray-400
+                disabled:to-gray-500
+                disabled:opacity-100
+                ">
                 <Save className="h-[16px] w-[16px]" />
                 {updatingNodes ? 'Saving..' : 'Save'}
               </Button>
@@ -349,7 +409,6 @@ export default function FlowCanvas() {
               </div>
             </div>
           </div>
-
           <Controls position="bottom-right" orientation="horizontal" />
         </ReactFlow>
         <EnterKeys
