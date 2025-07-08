@@ -34,6 +34,7 @@ export default function Page() {
     },
   });
   const [showDrawer, setShowDrawer] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [drawerPosition, setDrawerPosition] = useState<
     DrawerPositionType | undefined
   >();
@@ -181,7 +182,7 @@ export default function Page() {
           setShowDrawer(visible);
         }}
         height="h-[100vh] w-[30%]"
-        position={'bottom'}
+        position={'left'}
         visible={showDrawer}>
         <Typography variant={'h1'}>Title</Typography>
         <div className="flex flex-col justify-start items-start">

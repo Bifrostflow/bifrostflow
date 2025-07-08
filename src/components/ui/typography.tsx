@@ -3,19 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
-import { makeBurst } from '@/lib/spark-effect';
 import '@/components/ui/spark.css';
-
-const variantToColorMap: Record<string, string> = {
-  default: '--spark',
-  destructive: '--spark',
-  secondary: '--spark',
-  ghost: '--spark',
-  outline: '--spark',
-  outline_primary: '--spark',
-  outline_secondary: '--spark',
-  link: '--spark',
-};
 
 const typographyVariants = cva('', {
   variants: {
@@ -55,13 +43,6 @@ function Typography({
   const Comp = asChild ? Slot : 'button';
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const center = {
-      x: e.clientX + window.scrollX,
-      y: e.clientY + window.scrollY,
-    };
-    const color = variantToColorMap[variant ?? 'default'];
-    makeBurst(center, color); // 👈 pass color
-
     props.onClick?.(e); // call parent onClick
   };
 

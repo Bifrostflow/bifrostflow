@@ -14,15 +14,17 @@ interface Props {
   height?: string;
 }
 
+const THRESHOLD = 120;
+
 const initialVariants: Record<
   DrawerPositionType,
   { x?: number; y?: number; opacity?: number }
 > = {
-  bottom: { y: 2000, opacity: 0 },
-  center: { y: 2000, opacity: 0 },
-  left: { x: -2000, opacity: 0 },
-  right: { x: 2000, opacity: 0 },
-  top: { y: -2000, opacity: 0 },
+  bottom: { y: 1000, opacity: 0 },
+  center: { y: 1000, opacity: 0 },
+  left: { x: -1000, opacity: 0 },
+  right: { x: 1000, opacity: 0 },
+  top: { y: -1000, opacity: 0 },
 };
 
 const animateVariants: Record<
@@ -44,6 +46,14 @@ const positionClasses: Record<DrawerPositionType, string> = {
   center: 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2',
 };
 
+const dragAxis: Record<DrawerPositionType, 'x' | 'y' | undefined> = {
+  left: 'x',
+  right: 'x',
+  top: 'y',
+  bottom: 'y',
+  center: undefined,
+};
+
 function Drawer({
   onClose,
   position,
@@ -53,11 +63,35 @@ function Drawer({
   height,
   ...rest
 }: React.ComponentProps<'div'> & Props) {
+  const handleDragEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { x: number; y: number } },
+  ) => {
+    const offset = info.offset;
+
+    switch (position) {
+      case 'left':
+        if (offset.x < -THRESHOLD) onClose(false);
+        break;
+      case 'right':
+        if (offset.x > THRESHOLD) onClose(false);
+        break;
+      case 'top':
+        if (offset.y < -THRESHOLD) onClose(false);
+        break;
+      case 'bottom':
+        if (offset.y > THRESHOLD) onClose(false);
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <AnimatePresence>
       {visible && (
         <>
-          {/* ✅ BACKDROP */}
+          {/* Backdrop */}
           <motion.div
             className="fixed inset-0 bg-black/50 z-40"
             initial={{ opacity: 0 }}
@@ -67,20 +101,21 @@ function Drawer({
             onClick={() => onClose(false)}
           />
 
-          {/* ✅ DRAWER */}
+          {/* Drawer */}
           <motion.div
             initial={initialVariants[position]}
             animate={animateVariants[position]}
             exit={initialVariants[position]}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            drag={dragAxis[position]}
+            dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
+            dragElastic={0.2} // magnetic effect
+            onDragEnd={handleDragEnd}
             className={cn(
-              'bg-c-surface shadow-xl rounded-xl p-4',
+              'bg-c-surface shadow-xl rounded-xl p-4 z-50',
               positionClasses[position],
               width ? width : 'w-fit',
               height ? height : 'h-fit',
-              position !== 'center'
-                ? 'z-50'
-                : 'fixed inset-0 m-auto flex justify-center items-center z-50',
               rest.className,
             )}>
             <Button onClick={() => onClose(false)}>Close</Button>
