@@ -19,6 +19,7 @@ import { z } from 'zod';
 import { Typography } from '@/components/ui/typography';
 import { showToast } from '@/components/ui/toast';
 import Drawer, { DrawerPositionType } from '@/components/ui/drawer';
+import { Badge } from '@/components/ui/badge';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -166,7 +167,7 @@ export default function Page() {
           Toast Success
         </Button>
       </div>
-      <div className="gap-2 flex">
+      <div className="gap-2 flex text-c-background-text">
         <Button
           onClick={() => {
             setShowDrawer(true);
@@ -175,6 +176,17 @@ export default function Page() {
           variant={'default'}>
           Test Drawer
         </Button>
+      </div>
+      <div className="gap-2 flex ">
+        <Badge variant={'secondary'}>Test</Badge>
+        <Badge variant={'outline'}>Test</Badge>
+        <Badge variant={'destructive'}>Test</Badge>
+        <Badge>Twitter</Badge>
+        <br />
+        <Badge variant={'secondary_outline'}>Test</Badge>
+        <Badge variant={'outline_2'}>Test</Badge>
+        <Badge variant={'destructive_outline'}>Test</Badge>
+        <Badge variant={'primary_outline'}>Twitter</Badge>
       </div>
 
       <Drawer
