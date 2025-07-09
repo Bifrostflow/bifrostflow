@@ -157,10 +157,10 @@
   /* custom theme */
   --c-primary:oklch(62.3% 0.214 259.815);
   --c-primary-variant:oklch(54.6% 0.245 262.881);
-  --c-on-primary:#ffffff;
-  --c-on-primary-variant:#ffffff;
-  --c-on-secondary:#002016;
-  --c-on-secondary-variant:#dedede;
+  --c-on-primary:oklch(89.466% 0.01573 269.985);
+  --c-on-primary-variant:oklch(16.145% 0.07051 261.179);
+  --c-on-secondary:#dfefea;
+  --c-on-secondary-variant:#dfefea;
   --c-secondary:oklch(69.6% 0.17 162.48);
   --c-secondary-variant:oklch(59.6% 0.145 163.225);
   --c-background:#181818;

@@ -19,10 +19,10 @@ function Toast(props: ToastProps) {
   return (
     <div
       className={cn(
-        'flex rounded-lg bg-gradient-to-br shadow-lg  w-full md:max-w-[364px] items-center p-4',
+        'flex rounded-lg  shadow-lg  w-full md:max-w-[364px] items-center p-4 bg-gradient-to-br ',
         props.type == 'success'
           ? 'from-c-secondary to-c-secondary-variant'
-          : 'from-red-400 to-red-500',
+          : 'from-red-500 to-red-600 dark:from-red-800 dark:to-red-900',
       )}>
       <div className="flex flex-1 items-center">
         <div className="w-full">
@@ -41,7 +41,7 @@ function Toast(props: ToastProps) {
             className={cn(
               props.type == 'success'
                 ? ' bg-c-surface text-c-secondary'
-                : ' bg-c-surface text-red-500 dark:text-red-400',
+                : ' bg-c-surface dark:bg-c-surface-text text-red-500 dark:text-red-800',
             )}
             onClick={() => {
               button.onClick();

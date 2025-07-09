@@ -25,6 +25,7 @@ import { Label } from '@/components/ui/label';
 
 import { motion } from 'framer-motion';
 import HomeNav from '@/components/ui/home/home-nav';
+import { AppCheckBox } from '@/components/ui/checkbox';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -227,7 +228,11 @@ export default function Page() {
           <Badge variant={'destructive_outline'}>Test</Badge>
           <Badge variant={'primary_outline'}>Twitter</Badge>
         </div>
-
+        <div className="gap-2 flex">
+          <AppCheckBox id="1" text="Turrn me on.." variant={'adaptive'} />
+          <AppCheckBox id="2" text="Turrn me on.." variant={'primary'} />
+          <AppCheckBox id="3" text="Turrn me on.." variant={'secondary'} />
+        </div>
         <Drawer
           onClose={async visible => {
             setShowDrawer(visible);
