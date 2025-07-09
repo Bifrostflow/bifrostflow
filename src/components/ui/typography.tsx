@@ -17,12 +17,6 @@ const typographyVariants = cva('', {
       inline_code:
         'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold',
     },
-    //   size: {
-    //     default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-    //     sm: 'h-8 rounded-full gap-1.5 px-3 has-[>svg]:px-2.5',
-    //     lg: 'h-10 rounded-full px-6 has-[>svg]:px-4',
-    //     icon: 'size-9',
-    //   },
   },
   defaultVariants: {
     variant: 'p',
@@ -36,22 +30,17 @@ function Typography({
   //   size,
   asChild = false,
   ...props
-}: React.ComponentProps<'button'> &
+}: React.ComponentProps<'div'> &
   VariantProps<typeof typographyVariants> & {
     asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : 'button';
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    props.onClick?.(e); // call parent onClick
-  };
+  const Comp = asChild ? Slot : 'div';
 
   return (
     <Comp
-      data-slot="button"
+      data-slot="div"
       className={cn(typographyVariants({ variant, className }))}
-      {...props}
-      onClick={handleClick} // <-- override click to inject spark
+      {...props} // <-- override click to inject spark
     />
   );
 }

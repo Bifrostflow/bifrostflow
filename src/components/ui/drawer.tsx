@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils';
 import React, { ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from './button';
 
 export type DrawerPositionType = 'left' | 'right' | 'bottom' | 'top' | 'center';
 
@@ -93,11 +92,11 @@ function Drawer({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/50 z-40"
+            className="fixed inset-0 bg-black/10 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             onClick={() => onClose(false)}
           />
 
@@ -112,13 +111,12 @@ function Drawer({
             dragElastic={0.2} // magnetic effect
             onDragEnd={handleDragEnd}
             className={cn(
-              'bg-c-surface shadow-xl rounded-xl p-4 z-50',
+              'dark:bg-zinc-700 bg-white shadow-xl rounded-xl p-4 z-50 transition-all duration-100 ease-in',
               positionClasses[position],
               width ? width : 'w-fit',
               height ? height : 'h-fit',
               rest.className,
             )}>
-            <Button onClick={() => onClose(false)}>Close</Button>
             {children}
           </motion.div>
         </>
