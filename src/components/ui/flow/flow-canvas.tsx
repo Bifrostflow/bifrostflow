@@ -5,6 +5,8 @@ import {
   Connection,
   Controls,
   Edge,
+  getNodesBounds,
+  getViewportForBounds,
   MiniMap,
   Node,
   ReactFlow,
@@ -31,6 +33,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 import { useFlow } from '@/context/flow-context';
 import EnterKeys, { APIData } from './enter-keys-area';
+import { toPng } from 'html-to-image';
 
 export default function FlowCanvas() {
   const { initialEdges, initialNodes, slug, apiKeys } = useFlow();
@@ -237,12 +240,41 @@ export default function FlowCanvas() {
     }
   };
   const onSaveFlow = () => {
-    const isValid = validateIndirectFlow(edges);
-    if (isValid) {
-      saveFlowHandler();
-    } else {
-      toast('Incomplete flow for graph.');
+    const imageHeight = 900;
+    const imageWidth = 500;
+    const nodesBounds = getNodesBounds(nodes);
+    const viewport = getViewportForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      1,
+      1,
+      2,
+    );
+
+    if (document) {
+      toPng(document.querySelector('.react-flow__viewport'), {
+        backgroundColor: 'transparent',
+        width: imageWidth,
+        height: imageHeight,
+        style: {
+          width: imageWidth,
+          height: imageHeight,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+        },
+      }).then(url => {
+        const a = document.createElement('a');
+        a.setAttribute('download', 'reactflow.png');
+        a.setAttribute('href', url);
+        a.click();
+      });
     }
+    // const isValid = validateIndirectFlow(edges);
+    // if (isValid) {
+    //   saveFlowHandler();
+    // } else {
+    //   toast('Incomplete flow for graph.');
+    // }
   };
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
@@ -317,6 +349,7 @@ export default function FlowCanvas() {
             bgColor="var(--color-zinc-900)"
           />
           <MiniMap
+            position="bottom-left"
             maskColor="var(--color-zinc-800)"
             bgColor="var(--color-zinc-700)"
             nodeColor={(node: Node) => {

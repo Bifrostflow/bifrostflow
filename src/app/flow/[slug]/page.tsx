@@ -4,6 +4,7 @@ import { Edge, Node, ReactFlowProvider } from '@xyflow/react';
 import { getNodesForFlow } from '@/_backend/private/projects/getNodesForFlow';
 import FlowContextWrapper from './flow-context-wrapper';
 import { getSystemToolsByID } from '@/_backend/getSystemTools';
+import { redirect } from 'next/navigation';
 const start_point: Node = {
   id: '0-start_point',
   type: 'start_point',
@@ -25,6 +26,9 @@ export default async function Flow({
     const loadGraph = async () => {
       try {
         const response = await getNodesForFlow(slug);
+        if (!response.isSuccess) {
+          return null;
+        }
         if (!response.data) {
           return { nodes: [start_point], edges: [] };
         }
@@ -61,7 +65,11 @@ export default async function Flow({
         return { nodes: [start_point], edges: [], apiKeys: {} };
       }
     };
-    const { edges, nodes, apiKeys } = await loadGraph();
+    const loadedresponse = await loadGraph();
+    if (!loadedresponse) {
+      return redirect('/home');
+    }
+    const { edges, nodes, apiKeys } = loadedresponse;
 
     return (
       <ReactFlowProvider>
@@ -75,15 +83,6 @@ export default async function Flow({
     );
   } catch (_e) {
     console.log('ERROR: ', _e);
-    return (
-      <ReactFlowProvider>
-        <FlowContextWrapper
-          apiKeys={{}}
-          slug={slug}
-          initialEdges={[]}
-          initialNodes={[start_point]}
-        />
-      </ReactFlowProvider>
-    );
+    return redirect('/home');
   }
 }

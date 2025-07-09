@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
 import HomeNav from '@/components/ui/home/home-nav';
 import { AppCheckBox } from '@/components/ui/checkbox';
+import ProjectCard from '@/components/ui/project/project-card';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -81,6 +82,15 @@ export default function Page() {
           et libero optio adipisci amet eaque ea cum, similique eos rerum nihil
           quia necessitatibus aliquid
         </p>
+        <ProjectCard
+          item={{
+            updated_at: '2025-07-09 17:26:45.182081+00:00',
+            description: 'djhvc dasvbhjk vdaskvjub vkbads',
+            id: 'asc',
+            name: 'Project',
+            status: 'touched',
+          }}
+        />
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pb-5  border-b-2 border-b-c-divider">
           {[1, 2, 3].map(card => (
@@ -233,6 +243,7 @@ export default function Page() {
           <AppCheckBox id="2" text="Turrn me on.." variant={'primary'} />
           <AppCheckBox id="3" text="Turrn me on.." variant={'secondary'} />
         </div>
+
         <Drawer
           onClose={async visible => {
             setShowDrawer(visible);
