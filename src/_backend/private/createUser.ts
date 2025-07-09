@@ -14,7 +14,7 @@ export const createUser = async () => {
       },
     });
     if (!res.ok) {
-      throw new Error('Failed to fetch project files');
+      return null;
     }
 
     const json = await res.json();

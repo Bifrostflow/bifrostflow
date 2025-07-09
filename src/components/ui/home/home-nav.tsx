@@ -1,10 +1,11 @@
+'use client';
 import React from 'react';
 import { Button } from '../button';
 import AppNavIconItem from '../app-nav-icon-item';
 import AppNav from '../app-nav';
 import { motion } from 'framer-motion';
 
-const HomeNav = ({ onShowMore }: { onShowMore: () => void }) => {
+const HomeNav = () => {
   return (
     <AppNav
       renderItems={() => {
@@ -33,7 +34,7 @@ const HomeNav = ({ onShowMore }: { onShowMore: () => void }) => {
               hoverLabel="Ctrl+M"
               iconName="layout-grid"
               label="More"
-              onClick={onShowMore}
+              onClick={() => {}}
             />
             <Button
               className="

@@ -28,7 +28,7 @@ export const getProjects = async (): Promise<APIResponse<
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch projects: ${res.statusText}`);
+      return null;
     }
 
     const json: APIResponse<ProjectWithStatus[]> = await res.json();
