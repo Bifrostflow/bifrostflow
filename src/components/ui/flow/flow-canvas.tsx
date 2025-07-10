@@ -40,6 +40,8 @@ import { DraggablePanel } from '../draggable-panel';
 import { Button } from '../button';
 import ResponsePreview from './response-preview';
 import print from '@/lib/print';
+import Drawer from '../drawer';
+import EditFlow from './edit-flow';
 
 export type InitiatorType = 'on_prompt' | 'on_start';
 
@@ -53,8 +55,10 @@ export default function FlowCanvas() {
     setAPIKeys,
     chunkResponse,
     loaderUIText,
+    paramShowRequest,
   } = useFlow();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [idCounter, setIdCounter] = useState<number>(1);
@@ -68,6 +72,11 @@ export default function FlowCanvas() {
   const [lastUpdatedEdges, setlastUpdatedEdges] = useState(initialEdges);
   const edgeReconnectSuccessful = useRef(true);
   const navigation = useRouter();
+  useEffect(() => {
+    if (paramShowRequest === 'edit') {
+      setEditDrawerOpen(true);
+    }
+  }, [paramShowRequest]);
   const isMainNodesSelected = useMemo(() => {
     const { length } = nodes.filter(n => {
       const data: SystemTool = n.data as unknown as SystemTool;
@@ -473,6 +482,17 @@ export default function FlowCanvas() {
           </motion.div>
         )}
       </div>
+      <Drawer
+        width={'w-[400px]'}
+        height={'h-[300px]'}
+        className="top-[110px] left-auto right-[10px] sm:top-[60px] sm:left-auto sm:right-[10px]"
+        position="top"
+        visible={editDrawerOpen}
+        onClose={() => {
+          setEditDrawerOpen(false);
+        }}>
+        <EditFlow slug={slug} />
+      </Drawer>
       <SideDrawer
         activeTabs={tabsToSelect}
         onAddNode={handleAddNode}

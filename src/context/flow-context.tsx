@@ -21,6 +21,7 @@ type FlowContextType = {
   loaderUIText: string[];
   chunkResponse: ChunkResponse | undefined;
   runningFlow: boolean;
+  paramShowRequest: 'edit' | 'other' | undefined;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
@@ -36,12 +37,14 @@ export const FlowProvider = ({
   defaultEdges,
   defaultNodes,
   apiKeys,
+  paramShowRequest,
 }: {
   children: ReactNode;
   slug: string;
   apiKeys: APIData;
   defaultNodes: Node[];
   defaultEdges: Edge[];
+  paramShowRequest?: 'edit' | 'other';
 }) => {
   const [APIKeys, setAPIKeys] = useState<APIData>(apiKeys);
   const [showKeyInputArea, setShowKeyInputArea] = useState(false);
@@ -131,6 +134,7 @@ export const FlowProvider = ({
         chunkResponse,
         loaderUIText: UILoaderText,
         runningFlow,
+        paramShowRequest,
       }}>
       {children}
     </FlowContext.Provider>

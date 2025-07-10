@@ -16,12 +16,19 @@ const start_point: Node = {
   draggable: false,
 };
 
+type SearchParamsKeys = 'show';
+
 export default async function Flow({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{
+    [key: SearchParamsKeys | string]: string | string[] | undefined;
+  }>;
 }) {
   const { slug } = await params;
+  const searchParamValue = await searchParams;
   try {
     const loadGraph = async () => {
       try {
@@ -108,6 +115,9 @@ export default async function Flow({
     return (
       <ReactFlowProvider>
         <FlowContextWrapper
+          paramShowRequest={
+            searchParamValue.show as 'edit' | 'other' | undefined
+          }
           apiKeys={apiKeys || {}}
           initialEdges={edges || []}
           initialNodes={nodes || [start_point]}
