@@ -30,9 +30,9 @@ const buttonVariants = cva(
         outline:
           'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         outline_primary:
-          'border text-c-primary-variant bg-c-primary/10 shadow-xs hover:bg-c-primary/30 ',
+          'border-2 border-c-primary text-c-primary-variant bg-c-primary/10 shadow-xs hover:bg-c-primary/30 ',
         outline_secondary:
-          'border text-c-secondary-variant bg-c-secondary/10 shadow-xs hover:bg-c-secondary/30',
+          'border-2 border-c-secondary text-c-secondary-variant bg-c-secondary/10 shadow-xs hover:bg-c-secondary/30',
         secondary:
           'bg-gradient-to-br from-c-secondary to-c-secondary-variant text-c-on-secondary shadow-xs hover:bg-c-secondary-variant',
         ghost:

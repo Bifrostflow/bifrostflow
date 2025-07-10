@@ -1,12 +1,9 @@
-import { UserButton } from '@clerk/nextjs';
+import HomeNav from '@/components/ui/project/home-nav';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="p-4 ">
-      <nav className="flex justify-between">
-        <h1 className="text-4xl">Home</h1>
-        <UserButton userProfileUrl="/profile" />
-      </nav>
+    <div className=" bg-c-background text-c-background-text min-h-screen">
+      <HomeNav />
       {children}
     </div>
   );

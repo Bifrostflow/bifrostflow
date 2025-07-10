@@ -27,6 +27,9 @@ export const getProjects =
 
       const res = await fetch(endpoint, {
         method: 'GET',
+        next: {
+          revalidate: 60, // Cache for 60 seconds
+        },
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

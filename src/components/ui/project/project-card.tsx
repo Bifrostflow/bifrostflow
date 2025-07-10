@@ -2,12 +2,13 @@
 import { ProjectWithStatus } from '@/_backend/private/projects/getProjects';
 import React from 'react';
 import { useClerk } from '@clerk/nextjs';
-import { cn } from '@/lib/utils';
-import moment from 'moment';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Typography } from '../typography';
 import print from '@/lib/print';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import moment from 'moment';
+import { Typography } from '../typography';
+
 type Props = {
   item: ProjectWithStatus;
 };
@@ -16,59 +17,57 @@ function ProjectCard({ item }: Props) {
   const { user } = useClerk();
   print(item);
   return (
-    <Link href={`/flow/${item.id}`}>
-      <div className="rounded-md min-w-2xs max-w-2xs w-full group/card bg-c-surface">
-        <div
-          className={cn(
-            'cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm mx-auto flex flex-col justify-between p-4 dark:border-2 dark:border-c-border dark:group-hover/card:border-c-primary/50 hover:shadow-2xl transition-all  duration-300 group-hover/card:scale-105 group-hover/card:shadow-2xl',
-          )}>
-          {/* ✅ Scalable background image layer */}
-          {item.snap_path && (
-            <div
-              className={cn(
-                'absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 scale-120 group-hover/card:scale-150 z-0',
-              )}
-              style={{
-                backgroundImage: `url(${item.snap_path})`,
-              }}></div>
-          )}
-
-          {/* ✅ Overlay gradient */}
-          <div className="absolute inset-0 transition duration-300  bg-gradient-to-b from-transparent dark:via-black/50 hover:dark:via-transparent dark:to-black/90 via-transparent to-c-background-text/90 opacity-60 z-10"></div>
-
-          {/* ✅ Foreground content */}
-          <div className="flex flex-row items-center space-x-4 z-20">
-            <Image
-              height="100"
-              width="100"
-              alt="Avatar"
-              src={user?.imageUrl || '/icon.png'}
-              className="h-10 w-10 rounded-full border-2 object-cover"
-            />
-            <div className="flex flex-col">
-              <Typography variant={'p'}>{user?.fullName}</Typography>
-              <p className="text-sm text-gray-400">
-                {moment(item.updated_at).local().fromNow()}
-              </p>
-            </div>
-          </div>
-
-          <div className="text content flex gap-2 flex-col z-20">
-            <Typography
-              variant={'h3'}
-              className="font-bold relative z-10 text-c-background-text">
-              {item.name}
-            </Typography>
-            <Typography
-              variant={'p'}
-              className="font-normal text-sm relative z-10 text-c-background-text-muted">
-              {item.description?.substring(0, 60)}
-              {(item.description?.length || 60) > 60 ? '...' : ''}
-            </Typography>
+    <motion.div
+      whileHover={{ scale: 1.03 }}
+      transition={{ duration: 0.3 }}
+      className="relative h-80 p-4 rounded-2xl min-w-2xs max-w-2xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-border/90 hover:border-c-secondary">
+      <Link
+        href={`/flow/${item.id}`}
+        className="block h-full w-full relative z-10">
+        {/* User Info */}
+        <div className="relative z-20 flex flex-row items-center gap-4 mb-4">
+          <Image
+            height={32}
+            width={32}
+            alt="Avatar"
+            src={user?.imageUrl || '/icon.png'}
+            className="h-8 w-8 rounded-full border-2 object-cover"
+          />
+          <div className="flex flex-col">
+            <p className="text-c-secondary font-semibold">{user?.fullName}</p>
+            <p className="text-sm text-c-background-text/70">
+              {moment(item.updated_at).local().fromNow()}
+            </p>
           </div>
         </div>
-      </div>
-    </Link>
+
+        {/* Background Snapshot */}
+        {item.snap_path && (
+          <motion.div
+            initial={{ scale: 1, translateY: 0 }}
+            className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-90 blur-md group-hover:blur-none group-hover:scale-120 transition-all duration-500"
+            style={{
+              backgroundImage: `url(${item.snap_path})`,
+            }}
+          />
+        )}
+
+        {/* Title + Description */}
+        <div className="z-20 flex flex-col gap-1 absolute bottom-1 left-1 text-c-background-text">
+          <Typography
+            variant={'h2'}
+            className="group-hover:text-xl  text-c-secondary-variant transition-all duration-300 ease-in-out">
+            {item.name}
+          </Typography>
+          <Typography
+            variant={'p'}
+            className="group-hover:hidden text-c-background-text/90">
+            {item.description?.substring(0, 60)}
+            {(item.description?.length || 0) > 60 ? '...' : ''}
+          </Typography>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
 

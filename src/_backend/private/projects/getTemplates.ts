@@ -75,6 +75,9 @@ export const getTemplates = async (): Promise<APIResponse<
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      next: {
+        revalidate: 3600, // Cache for 1 hour
+      },
     });
 
     if (!res.ok) {

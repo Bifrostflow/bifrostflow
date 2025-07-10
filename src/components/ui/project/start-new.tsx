@@ -1,10 +1,10 @@
 'use client';
 import React, { useState } from 'react';
 import { Typography } from '../typography';
-import { cn } from '@/lib/utils';
 import { createProject } from '@/_backend/private/projects/createProject';
 import { showToast } from '../toast';
 import { Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const StartNew = ({
   current_project_count,
@@ -58,37 +58,32 @@ const StartNew = ({
     }
   };
   return (
-    <button
+    <motion.button
       disabled={creating}
-      type="button"
       aria-label="Start New Project"
       title="Start New Project"
       data-testid="start-new-project"
       id="start-new-project"
       onClick={createProjectHandler}
-      className="rounded-md min-w-2xs max-w-2xs w-full group/card bg-c-surface">
-      <div
-        className={cn(
-          'cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm mx-auto flex flex-col justify-center items-center p-4 dark:border-2 dark:border-c-border ',
-        )}>
-        {/* ✅ Overlay gradient */}
-        <div className="absolute inset-0 transition duration-300  bg-gradient-to-b from-transparent dark:via-black/50 hover:dark:via-transparent dark:to-black/90 via-transparent to-c-primary/90 opacity-60 z-10"></div>
-
-        <Typography
-          variant={'h2'}
-          className="group-hover/card:text-c-primary/80">
-          Start New
-        </Typography>
-        <Typography
-          variant={'p'}
-          className="group-hover/card:text-c-primary/80">
-          Notingh can stop you now...
-        </Typography>
-        {creating && (
-          <Loader className="absolute top-4 right-4 text-c-background-text group-hover/card:text-c-primary/80 transition duration-300 animate-spin" />
-        )}
-      </div>
-    </button>
+      whileHover={{ scale: 1.03 }}
+      transition={{ duration: 0.3 }}
+      className="relative h-80 p-4 rounded-2xl min-w-2xs max-w-2xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-border/90 hover:border-c-secondary mr-10 justify-start items-start flex flex-col text-left">
+      <Typography
+        variant={'h2'}
+        className="group-hover/card:text-c-secondary/80">
+        Start New
+      </Typography>
+      <Typography
+        variant={'blockquote'}
+        className="group-hover/card:text-c-secondary/80">
+        <blockquote>
+          &quot; Every unicorn starts with a single click...&quot;
+        </blockquote>
+      </Typography>
+      {creating && (
+        <Loader className="absolute bottom-4 right-4 text-c-secondary group-hover/card:text-c-primary/80 transition duration-300 animate-spin" />
+      )}
+    </motion.button>
   );
 };
 

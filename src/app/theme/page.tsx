@@ -24,9 +24,9 @@ import { Loader2Icon, Settings } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 
 import { motion } from 'framer-motion';
-import HomeNav from '@/components/ui/home/home-nav';
 import { AppCheckBox } from '@/components/ui/checkbox';
 import ProjectCard from '@/components/ui/project/project-card';
+import HomeNav from '@/components/ui/project/home-nav';
 
 const FormSchema = z.object({
   username: z.string().min(2, {
@@ -52,10 +52,10 @@ export default function Page() {
   return (
     <div className="bg-c-secondary">
       <HomeNav
-        onShowMore={() => {
-          setShowForm(false);
-          setShowMore(!showMore);
-        }}
+      // onShowMore={() => {
+      //   setShowForm(false);
+      //   setShowMore(!showMore);
+      // }}
       />
       <Drawer
         width={'w-[250px]'}

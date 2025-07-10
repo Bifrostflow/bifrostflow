@@ -4,7 +4,7 @@ import AppNavIconItem from '../app-nav-icon-item';
 import AppNav from '../app-nav';
 import { motion } from 'framer-motion';
 
-const HomeNav = ({ onShowMore }: { onShowMore: () => void }) => {
+const FlowNav = ({ onShowMore }: { onShowMore: () => void }) => {
   return (
     <AppNav
       renderItems={() => {
@@ -52,4 +52,4 @@ const HomeNav = ({ onShowMore }: { onShowMore: () => void }) => {
   );
 };
 
-export default HomeNav;
+export default FlowNav;
