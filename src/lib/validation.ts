@@ -1,6 +1,6 @@
 import { Edge } from '@xyflow/react';
 
-const initiateIds = ['684d858808dca10a34a65a53'];
+const initiateIds = ['684d858808dca10a34a65a53', '686a060b7493977b931934c3'];
 const closeIds = ['684e733dc2b59ec01fb72c77'];
 
 export const validateIndirectFlow = (edges: Edge[]): boolean => {
