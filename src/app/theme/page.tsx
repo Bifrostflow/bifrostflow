@@ -85,10 +85,13 @@ export default function Page() {
         <ProjectCard
           item={{
             updated_at: '2025-07-09 17:26:45.182081+00:00',
-            description: 'djhvc dasvbhjk vdaskvjub vkbads',
+            description:
+              'Copy paste the most trending components and use them in your websites without having to worry about styling and animations.',
             id: 'asc',
             name: 'Project',
             status: 'touched',
+            snap_path:
+              'https://uzpxsxqbppxlvplihkqm.supabase.co/storage/v1/object/public/flow-snaps/19d321e1-b7ca-4115-bab5-677adc5ceae6.png',
           }}
         />
         {/* Cards Grid */}

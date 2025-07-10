@@ -34,6 +34,7 @@ import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 import { useFlow } from '@/context/flow-context';
 import EnterKeys, { APIData } from './enter-keys-area';
 import { toPng } from 'html-to-image';
+import { fallback } from '@/lib/fallback-flow-snap';
 
 export default function FlowCanvas() {
   const { initialEdges, initialNodes, slug, apiKeys } = useFlow();
@@ -190,18 +191,49 @@ export default function FlowCanvas() {
   const onExecuteFlow = async () => {
     const { isKeyRequire } = checkIfAPIKeyRequired();
     if (!isKeyRequire) {
-      runFlow();
+      const imageString = await getImage();
+      runFlow(imageString || fallback);
     } else {
       if (!validateRequiredKeys()) {
         setShowKeysInputArea(true);
       } else {
-        runFlow();
+        const imageString = await getImage();
+        runFlow(imageString || fallback);
       }
     }
   };
+  const getImage = async () => {
+    const imageHeight = 1080;
+    const imageWidth = 720;
+    const nodesBounds = getNodesBounds(nodes);
+    const viewport = getViewportForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      1,
+      1,
+      2,
+    );
 
+    if (document) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return toPng(document.querySelector('.react-flow__viewport'), {
+        backgroundColor: 'transparent',
+        width: imageWidth,
+        height: imageHeight,
+        style: {
+          width: imageWidth,
+          height: imageHeight,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+        },
+      });
+    } else {
+      return null;
+    }
+  };
   // FIXME: track saved or unsaved changes
-  const saveFlowHandler = () => {
+  const saveFlowHandler = (imageString: string) => {
     setUpdatingNodes(true);
     const minimizedNodes = nodes.map((node: Node): Node => {
       return {
@@ -215,11 +247,12 @@ export default function FlowCanvas() {
       flow_id: slug,
       nodes: JSON.stringify({ data: minimizedNodes }),
       edges: JSON.stringify({ data: edges }),
+      snap: imageString,
     }).finally(() => {
       setUpdatingNodes(false);
     });
   };
-  const runFlow = async () => {
+  const runFlow = async (imageString: string) => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
       setUpdatingNodes(true);
@@ -228,6 +261,7 @@ export default function FlowCanvas() {
           flow_id: slug,
           nodes: JSON.stringify({ data: nodes }),
           edges: JSON.stringify({ data: edges }),
+          snap: imageString,
         });
         setShowActionPanel(true);
       } catch (error) {
@@ -239,42 +273,14 @@ export default function FlowCanvas() {
       toast('Incomplete flow for graph.');
     }
   };
-  const onSaveFlow = () => {
-    const imageHeight = 900;
-    const imageWidth = 500;
-    const nodesBounds = getNodesBounds(nodes);
-    const viewport = getViewportForBounds(
-      nodesBounds,
-      imageWidth,
-      imageHeight,
-      1,
-      1,
-      2,
-    );
-
-    if (document) {
-      toPng(document.querySelector('.react-flow__viewport'), {
-        backgroundColor: 'transparent',
-        width: imageWidth,
-        height: imageHeight,
-        style: {
-          width: imageWidth,
-          height: imageHeight,
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-        },
-      }).then(url => {
-        const a = document.createElement('a');
-        a.setAttribute('download', 'reactflow.png');
-        a.setAttribute('href', url);
-        a.click();
-      });
+  const onSaveFlow = async () => {
+    const isValid = validateIndirectFlow(edges);
+    if (isValid) {
+      const imageString = await getImage();
+      saveFlowHandler(imageString || fallback);
+    } else {
+      toast('Incomplete flow for graph.');
     }
-    // const isValid = validateIndirectFlow(edges);
-    // if (isValid) {
-    //   saveFlowHandler();
-    // } else {
-    //   toast('Incomplete flow for graph.');
-    // }
   };
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
