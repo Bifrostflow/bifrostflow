@@ -3,13 +3,20 @@
 import { SystemTool } from '@/_backend/getSystemTools';
 import { useFlow } from '@/context/flow-context';
 import { validateIndirectFlow } from '@/lib/validation';
-import { Edge, Node } from '@xyflow/react';
+import {
+  Edge,
+  getNodesBounds,
+  getViewportForBounds,
+  Node,
+} from '@xyflow/react';
 import { Play } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '../button';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 import { InitiatorType } from './flow-canvas';
+import { fallback } from '@/lib/fallback-flow-snap';
+import { toPng } from 'html-to-image';
 
 type Props = {
   nodes: Node[];
@@ -50,19 +57,50 @@ export const RunButton = ({
     }
     return fieldCounter === Object.keys(requiredKeys).length;
   };
-  const runPressHandler = () => {
+  const runPressHandler = async () => {
     const { isKeyRequire } = checkIfAPIKeyRequired();
     if (!isKeyRequire) {
-      runFlow();
+      const imageString = await getImage();
+      runFlow(imageString || fallback);
     } else {
       if (!validateRequiredKeys()) {
         setShowKeyInputArea(true);
       } else {
-        runFlow();
+        const imageString = await getImage();
+        runFlow(imageString || fallback);
       }
     }
   };
+  const getImage = async () => {
+    const imageHeight = 1080;
+    const imageWidth = 720;
+    const nodesBounds = getNodesBounds(nodes);
+    const viewport = getViewportForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      1,
+      1,
+      2,
+    );
 
+    if (document) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return toPng(document.querySelector('.react-flow__viewport'), {
+        backgroundColor: 'transparent',
+        width: imageWidth,
+        height: imageHeight,
+        style: {
+          width: imageWidth,
+          height: imageHeight,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+        },
+      });
+    } else {
+      return null;
+    }
+  };
   const checkIfAPIKeyRequired = () => {
     const requiredKeys: Record<string, boolean> = {};
     for (let i = 0; i < nodes.length; i++) {
@@ -85,16 +123,17 @@ export const RunButton = ({
     }
   };
 
-  const runFlow = async () => {
+  const runFlow = async (imageString: string) => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
-      setUpdatingNodes(true);
       try {
         if (needUpdate) {
+          setUpdatingNodes(true);
           const response = await updateFlowGraph({
             flow_id: slug,
             nodes: JSON.stringify({ data: nodes }),
             edges: JSON.stringify({ data: edges }),
+            snap: imageString,
           });
           if (response?.isSuccess) {
             onUpdateGraph(nodes, edges);

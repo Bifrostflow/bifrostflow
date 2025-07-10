@@ -5,7 +5,6 @@ import { getNodesForFlow } from '@/_backend/private/projects/getNodesForFlow';
 import FlowContextWrapper from './flow-context-wrapper';
 import { getSystemToolsByID } from '@/_backend/getSystemTools';
 import { redirect } from 'next/navigation';
-import print from '@/lib/print';
 const start_point: Node = {
   id: '0-start_point',
   type: 'start_point',
@@ -27,9 +26,8 @@ export default async function Flow({
     const loadGraph = async () => {
       try {
         const response = await getNodesForFlow(slug);
-        print({ response });
         if (!response.isSuccess) {
-          return redirect('/home');
+          return null;
         }
         if (!response.data) {
           return { nodes: [start_point], edges: [], isSuccess: false };
@@ -101,9 +99,11 @@ export default async function Flow({
         return { isSuccess: false };
       }
     };
-    const response = await loadGraph();
-
-    const { edges, nodes, apiKeys } = response;
+    const loadedresponse = await loadGraph();
+    if (!loadedresponse) {
+      return redirect('/home');
+    }
+    const { edges, nodes, apiKeys } = loadedresponse;
 
     return (
       <ReactFlowProvider>

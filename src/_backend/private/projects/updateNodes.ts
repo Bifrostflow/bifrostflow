@@ -8,6 +8,7 @@ interface UpdateFlowGraph {
   nodes: string;
   edges: string;
   flow_id: string;
+  snap: string;
 }
 
 export const updateFlowGraph = async (

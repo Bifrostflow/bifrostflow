@@ -5,6 +5,8 @@ import {
   Connection,
   Controls,
   Edge,
+  getNodesBounds,
+  getViewportForBounds,
   MiniMap,
   Node,
   ReactFlow,
@@ -29,6 +31,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 import { useFlow } from '@/context/flow-context';
 import EnterKeys from './enter-keys-area';
+import { toPng } from 'html-to-image';
+import { fallback } from '@/lib/fallback-flow-snap';
+
 import { useRouter } from 'next/navigation';
 import { RunButton } from './run-flow-button';
 import { DraggablePanel } from '../draggable-panel';
@@ -186,8 +191,38 @@ export default function FlowCanvas() {
     );
   };
 
+  const getImage = async () => {
+    const imageHeight = 1080;
+    const imageWidth = 720;
+    const nodesBounds = getNodesBounds(nodes);
+    const viewport = getViewportForBounds(
+      nodesBounds,
+      imageWidth,
+      imageHeight,
+      1,
+      1,
+      2,
+    );
+
+    if (document) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      return toPng(document.querySelector('.react-flow__viewport'), {
+        backgroundColor: 'transparent',
+        width: imageWidth,
+        height: imageHeight,
+        style: {
+          width: imageWidth,
+          height: imageHeight,
+          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+        },
+      });
+    } else {
+      return null;
+    }
+  };
   // FIXME: track saved or unsaved changes
-  const saveFlowHandler = async () => {
+  const saveFlowHandler = (imageString: string) => {
     setUpdatingNodes(true);
     const minimizedNodes = nodes.map((node: Node): Node => {
       return {
@@ -197,27 +232,21 @@ export default function FlowCanvas() {
         },
       };
     });
-    try {
-      const response = await updateFlowGraph({
-        flow_id: slug,
-        nodes: JSON.stringify({ data: minimizedNodes }),
-        edges: JSON.stringify({ data: edges }),
-      });
-      if (response?.isSuccess) {
-        setlastUpdatedNodes(nodes);
-        setlastUpdatedEdges(edges);
-      }
-    } catch (error) {
-      print(error);
-    } finally {
+    updateFlowGraph({
+      flow_id: slug,
+      nodes: JSON.stringify({ data: minimizedNodes }),
+      edges: JSON.stringify({ data: edges }),
+      snap: imageString,
+    }).finally(() => {
       setUpdatingNodes(false);
-    }
+    });
   };
 
-  const onSaveFlow = () => {
+  const onSaveFlow = async () => {
     const isValid = validateIndirectFlow(edges);
     if (isValid) {
-      saveFlowHandler();
+      const imageString = await getImage();
+      saveFlowHandler(imageString || fallback);
     } else {
       toast('Incomplete flow for graph.');
     }
@@ -335,6 +364,7 @@ export default function FlowCanvas() {
             bgColor="var(--color-zinc-900)"
           />
           <MiniMap
+            position="bottom-left"
             maskColor="var(--color-zinc-800)"
             bgColor="var(--color-zinc-700)"
             nodeColor={(node: Node) => {
