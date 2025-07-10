@@ -16,7 +16,10 @@ export default async function Page() {
     <div>
       <div className="flex">
         <div className="flex flex-row gap-4 my-4">
-          {current_project_count < project_limit && <StartNew />}
+          <StartNew
+            current_project_count={current_project_count}
+            project_limit={project_limit}
+          />
           {projects.map(res => {
             return <ProjectCard item={res} key={res.id} />;
           })}

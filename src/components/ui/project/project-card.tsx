@@ -26,7 +26,7 @@ function ProjectCard({ item }: Props) {
           {item.snap_path && (
             <div
               className={cn(
-                'absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover/card:scale-110 z-0',
+                'absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 scale-120 group-hover/card:scale-150 z-0',
               )}
               style={{
                 backgroundImage: `url(${item.snap_path})`,
@@ -48,7 +48,7 @@ function ProjectCard({ item }: Props) {
             <div className="flex flex-col">
               <Typography variant={'p'}>{user?.fullName}</Typography>
               <p className="text-sm text-gray-400">
-                {moment(item.updated_at).startOf('day').fromNow()}
+                {moment(item.updated_at).local().fromNow()}
               </p>
             </div>
           </div>
@@ -62,7 +62,8 @@ function ProjectCard({ item }: Props) {
             <Typography
               variant={'p'}
               className="font-normal text-sm relative z-10 text-c-background-text-muted">
-              {item.description?.substring(0, 60)}...
+              {item.description?.substring(0, 60)}
+              {(item.description?.length || 60) > 60 ? '...' : ''}
             </Typography>
           </div>
         </div>

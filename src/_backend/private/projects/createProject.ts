@@ -6,8 +6,13 @@ import { CreateProjectInput } from '@/lib/zod/createProjectSchemas';
 import { APIResponse } from '@/_backend/models/response';
 import { ProjectWithStatus } from './getProjects';
 
+interface CreateProject extends CreateProjectInput {
+  name: string;
+  description: string;
+}
+
 export const createProject = async (
-  body: CreateProjectInput,
+  body: CreateProject,
 ): Promise<APIResponse<ProjectWithStatus[]> | null> => {
   const endpoint = `${url}/create-flow`;
   try {

@@ -9,18 +9,21 @@ function FlowContextWrapper({
   initialEdges,
   initialNodes,
   apiKeys,
+  paramShowRequest,
 }: {
   apiKeys: APIData;
   slug: string;
   initialNodes: Node[];
   initialEdges: Edge[];
+  paramShowRequest: 'edit' | 'other' | undefined;
 }) {
   return (
     <FlowProvider
       defaultEdges={initialEdges}
       defaultNodes={initialNodes}
       apiKeys={apiKeys}
-      slug={slug}>
+      slug={slug}
+      paramShowRequest={paramShowRequest}>
       <FlowCanvas />
     </FlowProvider>
   );
