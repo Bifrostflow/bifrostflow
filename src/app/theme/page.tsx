@@ -47,10 +47,16 @@ export default function Page() {
     DrawerPositionType | undefined
   >();
   const [showMore, setShowMore] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   return (
     <div className="bg-c-secondary">
-      <HomeNav onShowMore={() => setShowMore(!showMore)} />
+      <HomeNav
+        onShowMore={() => {
+          setShowForm(false);
+          setShowMore(!showMore);
+        }}
+      />
       <Drawer
         width={'w-[250px]'}
         height={'h-[230px]'}
@@ -58,10 +64,14 @@ export default function Page() {
         position="right"
         className="top-[110px] left-auto right-[10px] sm:top-[60px] sm:left-auto sm:right-[10px]"
         onClose={setShowMore}>
-        <div className="flex flex-row flex-wrap gap-3 justify-between items-center">
+        <div className="flex flex-wrap gap-3 justify-between items-center">
           {[1, 2, 3, 4, 5, 6, 7].map(res => {
             return (
               <motion.div
+                onClick={() => {
+                  setShowMore(false);
+                  setShowForm(true);
+                }}
                 key={res}
                 className="flex flex-col justify-center items-center my-2 gap-1">
                 <Settings />
@@ -71,7 +81,90 @@ export default function Page() {
           })}
         </div>
       </Drawer>
-      <main className="min-h-screen p-8 bg-c-background text-c-background-text flex flex-col items-center gap-10">
+      <Drawer
+        // width={'w-[500px]'}
+        // height={'h-[230px]'}
+        visible={showForm}
+        position="right"
+        className="top-[110px] left-auto right-[10px] sm:top-[60px] sm:left-auto sm:right-[10px]"
+        onClose={setShowForm}>
+        <div className="flex flex-col">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(() => {})}
+              className="w-[400px] space-y-6 border-2 border-c-border p-6 rounded-lg bg-c-surface">
+              <div className="flex flex-col gap-2">
+                <Typography variant={'h2'} className="text-c-surface-text">
+                  Form Example
+                </Typography>
+                <p className="text-c-surface-text-muted">
+                  This is a simple form example to showcase the theme.
+                </p>
+              </div>
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This is your public display name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This is your public display name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This is your public display name.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex flex-row gap-2">
+                <Button type="submit">Submit</Button>
+                <Button
+                  onClick={e => {
+                    e.preventDefault();
+                    form.reset();
+                  }}
+                  variant={'outline'}>
+                  Close
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </Drawer>
+      <main className="min-h-screen p-8 bg-c-background text-c-background-text flex flex-col items-center gap-10 pt-20">
         <h1 className="text-2xl font-bold">🌈 Themed UI Showcase</h1>
         <ThemeToggle />
         <Typography variant={'h1'} className="text-2xl text-c-background-text">
@@ -116,7 +209,15 @@ export default function Page() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(() => {})}
-            className="w-2/3 space-y-6">
+            className="w-2/8 space-y-6 border-2 border-c-border p-6 rounded-lg bg-c-surface">
+            <div className="flex flex-col gap-2">
+              <Typography variant={'h2'} className="text-c-surface-text">
+                Form Example
+              </Typography>
+              <p className="text-c-surface-text-muted">
+                This is a simple form example to showcase the theme.
+              </p>
+            </div>
             <FormField
               control={form.control}
               name="username"
@@ -133,7 +234,49 @@ export default function Page() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="shadcn" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="shadcn" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex flex-row gap-2">
+              <Button type="submit">Submit</Button>
+              <Button
+                onClick={e => {
+                  e.preventDefault();
+                  form.reset();
+                }}
+                variant={'outline'}>
+                Close
+              </Button>
+            </div>
           </form>
         </Form>
         <div className="flex gap-2">

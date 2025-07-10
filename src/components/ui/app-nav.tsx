@@ -14,7 +14,7 @@ function AppNav({ renderItems }: { renderItems: () => JSX.Element }) {
   const [showMenuItems, setShowMenuItems] = useState(false);
   return (
     <>
-      <div className="z-100 relative w-[100%] px-4 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20">
+      <div className="z-100 fixed w-[100%] px-4 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20">
         <div className="flex flex-row justify-start items-center gap-4">
           <Image
             src={'/icon.png'}

@@ -20,7 +20,7 @@ function ProjectCard({ item }: Props) {
       <div className="rounded-md min-w-2xs max-w-2xs w-full group/card bg-c-surface">
         <div
           className={cn(
-            'cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm mx-auto flex flex-col justify-between p-4 dark:border-2 dark:border-c-border',
+            'cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl max-w-sm mx-auto flex flex-col justify-between p-4 dark:border-2 dark:border-c-border dark:group-hover/card:border-c-primary/50 hover:shadow-2xl transition-all  duration-300 group-hover/card:scale-105 group-hover/card:shadow-2xl',
           )}>
           {/* ✅ Scalable background image layer */}
           {item.snap_path && (
@@ -34,7 +34,7 @@ function ProjectCard({ item }: Props) {
           )}
 
           {/* ✅ Overlay gradient */}
-          <div className="absolute inset-0 transition duration-300  bg-gradient-to-b from-transparent dark:via-black/50 hover:dark:via-transparent dark:to-black/90 via-transparent to-c-primary/90 opacity-60 z-10"></div>
+          <div className="absolute inset-0 transition duration-300  bg-gradient-to-b from-transparent dark:via-black/50 hover:dark:via-transparent dark:to-black/90 via-transparent to-c-background-text/90 opacity-60 z-10"></div>
 
           {/* ✅ Foreground content */}
           <div className="flex flex-row items-center space-x-4 z-20">
