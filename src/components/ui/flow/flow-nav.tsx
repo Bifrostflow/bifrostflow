@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 const FlowNav = ({ onShowMore }: { onShowMore: () => void }) => {
   return (
     <AppNav
+        logoHeading={name}
       renderItems={() => {
         return (
           <motion.div className="flex flex-row justify-between items-center gap-4 font-semibold text-[10px] text-c-surface-text-muted transition-all duration-100 ease-in">

@@ -98,6 +98,7 @@ export default async function Flow({
           nodes: finalNodes || [start_point],
           edges: finalEdges || [],
           apiKeys: finalAPIKeys,
+          name: response.data.name,
           isSuccess: true,
         };
       } catch (error) {
@@ -110,11 +111,12 @@ export default async function Flow({
     if (!loadedresponse) {
       return redirect('/home');
     }
-    const { edges, nodes, apiKeys } = loadedresponse;
+    const { edges, nodes, apiKeys, name } = loadedresponse;
 
     return (
       <ReactFlowProvider>
         <FlowContextWrapper
+          name={name || ''}
           paramShowRequest={
             searchParamValue.show as 'edit' | 'other' | undefined
           }

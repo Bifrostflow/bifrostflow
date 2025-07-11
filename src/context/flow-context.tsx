@@ -21,6 +21,7 @@ type FlowContextType = {
   loaderUIText: string[];
   chunkResponse: ChunkResponse | undefined;
   runningFlow: boolean;
+  name: string;
   paramShowRequest: 'edit' | 'other' | undefined;
 };
 
@@ -37,10 +38,12 @@ export const FlowProvider = ({
   defaultEdges,
   defaultNodes,
   apiKeys,
+  name,
   paramShowRequest,
 }: {
   children: ReactNode;
   slug: string;
+  name: string;
   apiKeys: APIData;
   defaultNodes: Node[];
   defaultEdges: Edge[];
