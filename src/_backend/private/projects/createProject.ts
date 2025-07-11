@@ -9,6 +9,7 @@ import { ProjectWithStatus } from './getProjects';
 interface CreateProject extends CreateProjectInput {
   name: string;
   description: string;
+  snap_path: string;
 }
 
 export const createProject = async (
