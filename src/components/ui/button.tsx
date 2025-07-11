@@ -33,6 +33,8 @@ const buttonVariants = cva(
           'border-2 border-c-primary text-c-primary-variant bg-c-primary/10 shadow-xs hover:bg-c-primary/30 ',
         outline_secondary:
           'border-2 border-c-secondary text-c-secondary-variant bg-c-secondary/10 shadow-xs hover:bg-c-secondary/30',
+        outline_destructive:
+          'border-2 border-destructive text-destructive bg-destructive/10 shadow-xs hover:bg-destructive/30',
         secondary:
           'bg-gradient-to-br from-c-secondary to-c-secondary-variant text-c-on-secondary shadow-xs hover:bg-c-secondary-variant',
         ghost:
