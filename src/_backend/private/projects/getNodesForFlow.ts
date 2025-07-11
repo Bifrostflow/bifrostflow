@@ -8,6 +8,7 @@ interface GraphResponse {
   nodes: string;
   edges: string;
   api_keys: string;
+  name: string;
 }
 
 export const getNodesForFlow = async (
