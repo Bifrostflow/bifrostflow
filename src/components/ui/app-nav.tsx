@@ -11,18 +11,20 @@ import Link from 'next/link';
 function AppNav({
   renderItems,
   logoHeading,
+  fixed = true,
 }: {
   logoHeading?: string;
   renderItems?: () => JSX.Element;
+  fixed?: boolean;
 }) {
-  //   useHotkeys('ctrl+s', () => onSaveHandler());
-  //   const onSaveHandler = () => {
-  //     console.log('running ctrl + s');
-  //   };
   const [showMenuItems, setShowMenuItems] = useState(false);
   return (
     <>
-      <div className="z-100 fixed h-[64px] w-[100%] px-36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20">
+      <div
+        className={cn(
+          'z-100 h-[64px] w-[100%] px-36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20',
+          fixed ? 'fixed' : 'relative',
+        )}>
         <div className="flex flex-row justify-start items-center gap-4">
           <Link href={'/home'}>
             <Image
@@ -57,19 +59,21 @@ function AppNav({
         </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          duration: 0.3,
-          ease: 'easeInOut',
-        }}
-        className={cn(
-          'fixed top-10 w-[100%] flex-row gap-2 px-4 justify-end items-center pr-10 py-1 transition-all duration-100 ease-in dark:bg-zinc-800 bg-c-surface shadow-md dark:shadow-zinc-900 z-100 ',
-          showMenuItems ? 'flex md:hidden' : 'hidden',
-        )}>
-        {renderItems && renderItems()}
-      </motion.div>
+      {showMenuItems && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.3,
+            ease: 'easeInOut',
+          }}
+          className={cn(
+            'fixed top-10 w-[100%] flex-row gap-2 px-4 justify-end items-center pr-10 py-1 transition-all duration-100 ease-in dark:bg-zinc-800 bg-c-surface shadow-md dark:shadow-zinc-900 z-100 ',
+            showMenuItems ? 'flex md:hidden' : 'hidden',
+          )}>
+          {renderItems && renderItems()}
+        </motion.div>
+      )}
     </>
   );
 }

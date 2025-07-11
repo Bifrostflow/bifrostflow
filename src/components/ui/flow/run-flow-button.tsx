@@ -1,47 +1,52 @@
 'use client';
-
+'strict';
 import { SystemTool } from '@/_backend/getSystemTools';
 import { useFlow } from '@/context/flow-context';
 import { validateIndirectFlow } from '@/lib/validation';
 import {
-  Edge,
   getNodesBounds,
   getViewportForBounds,
-  Node,
+  useReactFlow,
 } from '@xyflow/react';
-import { Play } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '../button';
+
+import { useEffect, useState } from 'react';
+
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
-import { InitiatorType } from './flow-canvas';
+
 import { fallback } from '@/lib/fallback-flow-snap';
 import { toPng } from 'html-to-image';
+import AppNavIconItem from '../app-nav-icon-item';
+import Drawer from '../drawer';
+import EnterKeys from './enter-keys-area';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { showToast } from '../toast';
+export const RunButton = () => {
+  useEffect(() => {
+    console.log('::::RUN INITIATED::::');
+  }, []);
 
-type Props = {
-  nodes: Node[];
-  edges: Edge[];
-  initiatorType?: InitiatorType;
-  needUpdate: boolean;
-  onUpdateGraph: (nodes: Node[], edges: Edge[]) => void;
-};
-
-export const RunButton = ({
-  nodes,
-  edges,
-  initiatorType,
-  needUpdate,
-  onUpdateGraph,
-}: Props) => {
   const {
-    setShowKeyInputArea,
     apiKeys,
     slug,
     setActionPanelVisible,
     runFlowHandler,
     runningFlow,
+    initiatorTypeValue,
+    graphHaveChanges,
+    updateLastSavedGraph,
+    setShowKeyInputArea,
+    showKeyInputArea,
+    setAPIKeys,
   } = useFlow();
+  const { getEdges, getNodes } = useReactFlow();
   const [updatingNodes, setUpdatingNodes] = useState(false);
+  useHotkeys('ctrl+r', () => {
+    console.log('HOTKEY TRIGGERED');
+    runPressHandler();
+  });
+  useHotkeys('esc', () => {
+    setShowKeyInputArea(false);
+  });
 
   const validateRequiredKeys = () => {
     const { requiredKeys } = checkIfAPIKeyRequired();
@@ -74,7 +79,7 @@ export const RunButton = ({
   const getImage = async () => {
     const imageHeight = 1080;
     const imageWidth = 720;
-    const nodesBounds = getNodesBounds(nodes);
+    const nodesBounds = getNodesBounds(getNodes());
     const viewport = getViewportForBounds(
       nodesBounds,
       imageWidth,
@@ -103,8 +108,8 @@ export const RunButton = ({
   };
   const checkIfAPIKeyRequired = () => {
     const requiredKeys: Record<string, boolean> = {};
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
+    for (let i = 0; i < getNodes().length; i++) {
+      const node = getNodes()[i];
       const nodeData = node.data as unknown as SystemTool;
       if (nodeData.require_key) {
         if (nodeData.key_name) {
@@ -116,27 +121,27 @@ export const RunButton = ({
   };
 
   const handleInitiatorRunner = () => {
-    if (initiatorType === 'on_prompt') {
+    if (initiatorTypeValue === 'on_prompt') {
       setActionPanelVisible(true);
-    } else if (initiatorType === 'on_start') {
-      runFlowHandler({ edges, message: 'ignore' });
+    } else if (initiatorTypeValue === 'on_start') {
+      runFlowHandler({ edges: getEdges(), message: 'ignore' });
     }
   };
 
   const runFlow = async (imageString: string) => {
-    const isValid = validateIndirectFlow(edges);
+    const isValid = validateIndirectFlow(getEdges());
     if (isValid) {
       try {
-        if (needUpdate) {
+        if (graphHaveChanges) {
           setUpdatingNodes(true);
           const response = await updateFlowGraph({
             flow_id: slug,
-            nodes: JSON.stringify({ data: nodes }),
-            edges: JSON.stringify({ data: edges }),
+            nodes: JSON.stringify({ data: getNodes() }),
+            edges: JSON.stringify({ data: getEdges() }),
             snap: imageString,
           });
           if (response?.isSuccess) {
-            onUpdateGraph(nodes, edges);
+            updateLastSavedGraph(getNodes(), getEdges());
           }
         }
         handleInitiatorRunner();
@@ -146,16 +151,31 @@ export const RunButton = ({
         setUpdatingNodes(false);
       }
     } else {
-      toast('Incomplete flow for graph.');
+      showToast({ description: 'Incomplete flow for graph.', type: 'error' });
     }
   };
   return (
-    <Button
-      disabled={updatingNodes || !initiatorType || runningFlow}
-      onClick={runPressHandler}
-      className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
-      <Play className="h-[16px] w-[16px]" />
-      {`${runningFlow ? 'Running' : updatingNodes ? 'Saving...' : 'Run'}`}
-    </Button>
+    <>
+      <AppNavIconItem
+        disable={updatingNodes || !initiatorTypeValue || runningFlow}
+        hoverLabel="Ctrl+R"
+        iconName="play"
+        label="Run"
+        onClick={runPressHandler}
+      />
+      <Drawer
+        onClose={setShowKeyInputArea}
+        visible={showKeyInputArea}
+        position="center">
+        <EnterKeys
+          apiDataFields={checkIfAPIKeyRequired().requiredKeys}
+          onClose={() => setShowKeyInputArea(false)}
+          onKeysSaved={resData => {
+            setShowKeyInputArea(false);
+            setAPIKeys(resData);
+          }}
+        />
+      </Drawer>
+    </>
   );
 };

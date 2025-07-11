@@ -40,6 +40,7 @@ const StartNew = ({
         edges: '',
         nodes: '',
         api_keys: '',
+        snap_path: '',
       });
       if (response?.data) {
         window.location.href = `/flow/${response.data[0].id}?show=edit`;

@@ -7,13 +7,7 @@ import { useEffect, useState } from 'react';
 import { SystemToolItem } from './system-tool-item';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-
-interface ISideDrawer {
-  open: boolean;
-  onClose: () => void;
-  onAddNode: (node: SystemTool) => void;
-  activeTabs: ToolCategory[];
-}
+import { useFlow } from '@/context/flow-context';
 
 const nodesClassification: ToolCategory[] = [
   'initiate',
@@ -40,26 +34,16 @@ const typeToActiveColor = (category: ToolCategory) => {
   }
 };
 
-export default function SideDrawer({
-  open,
-  onClose,
-  onAddNode,
-  activeTabs,
-}: ISideDrawer) {
-  const [isOpen, setIsOpen] = useState(open);
+export default function SideDrawer() {
   const [systemNodes, setSystemNodes] = useState<SystemTool[]>();
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | null>(
     null,
   );
-
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
+  const { handleAddNode, setToolDrawerOpen, tabsToSelectValue } = useFlow();
 
   const onCloseHandler = () => {
-    onClose();
-    setIsOpen(false);
+    setToolDrawerOpen(false);
   };
 
   useEffect(() => {
@@ -71,7 +55,7 @@ export default function SideDrawer({
   }, []);
 
   const filteredNodes = systemNodes?.filter(node => {
-    const isActiveTab = activeTabs.includes(node.category);
+    const isActiveTab = tabsToSelectValue.includes(node.category);
     const matchesSelected = selectedCategory
       ? node.category === selectedCategory
       : true;
@@ -80,10 +64,7 @@ export default function SideDrawer({
 
   return (
     <>
-      <div
-        className={`fixed top-0 right-0 h-full w-80 bg-zinc-800 shadow-lg transform transition-transform duration-300 z-50 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
+      <div className={``}>
         <div className="p-4 flex justify-between items-center">
           <h2 className="text-lg font-semibold bg-gradient-to-tl from-blue-400 to-blue-500 bg-clip-text text-transparent">
             Select Tools
@@ -106,8 +87,8 @@ export default function SideDrawer({
               typeToActiveColor(category),
               {
                 'ring-2 ring-blue-400': isSelected,
-                'opacity-50': !activeTabs.includes(category),
-                'cursor-pointer': activeTabs.includes(category),
+                'opacity-50': !tabsToSelectValue.includes(category),
+                'cursor-pointer': tabsToSelectValue.includes(category),
               },
               'disabled:text-zinc-400',
             );
@@ -115,7 +96,7 @@ export default function SideDrawer({
             return (
               <button
                 key={category}
-                disabled={!activeTabs.includes(category)}
+                disabled={!tabsToSelectValue.includes(category)}
                 className={categoryClass}
                 onClick={() => {
                   if (selectedCategory === category) {
@@ -143,7 +124,7 @@ export default function SideDrawer({
               node.type === 'classify_message' ? null : (
                 <SystemToolItem
                   onAddNode={node => {
-                    onAddNode(node);
+                    handleAddNode(node);
                   }}
                   node={node}
                   key={node.id}

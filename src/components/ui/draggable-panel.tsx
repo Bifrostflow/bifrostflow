@@ -1,16 +1,12 @@
 import { motion } from 'framer-motion';
 import { OnPrompt } from './initiator/on_prompt';
-import { Edge } from '@xyflow/react';
-import { InitiatorType } from './flow/flow-canvas';
 import { useFlow } from '@/context/flow-context';
+import { useReactFlow } from '@xyflow/react';
 
-interface IProps {
-  edges: Edge[];
-  initiatorType?: InitiatorType;
-}
-
-export const DraggablePanel = ({ initiatorType, edges }: IProps) => {
-  const { actionPanelVisible, setActionPanelVisible } = useFlow();
+export const DraggablePanel = () => {
+  const { actionPanelVisible, setActionPanelVisible, initiatorTypeValue } =
+    useFlow();
+  const { getEdges } = useReactFlow();
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -23,8 +19,11 @@ export const DraggablePanel = ({ initiatorType, edges }: IProps) => {
           transform transition-transform duration-300
           ${actionPanelVisible ? 'translate-y-0' : 'translate-y-100'}
         `}>
-      {initiatorType === 'on_prompt' && (
-        <OnPrompt onClose={() => setActionPanelVisible(false)} edges={edges} />
+      {initiatorTypeValue === 'on_prompt' && (
+        <OnPrompt
+          onClose={() => setActionPanelVisible(false)}
+          edges={getEdges()}
+        />
       )}
       {/* {initiatorType === 'on_start' && (
         <OnPrompt flow_id={flow_id} onClose={onClose} edges={edges} />
