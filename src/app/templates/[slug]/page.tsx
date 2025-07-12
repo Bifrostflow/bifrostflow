@@ -20,7 +20,7 @@ export default async function Flow({
     return (
       <div className="pt-30">
         <div
-          className="mx-36
+          className="ml-[25%]
         flex flex-col">
           <div
             id="content"

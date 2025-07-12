@@ -14,6 +14,7 @@ export type MetaTypes = 'evaluate_code' | 'code_documentation' | 'other';
 
 export interface MetaForNode {
   node_id: string;
+  type: string;
 }
 
 export interface CodeEvaluate extends MetaForNode {
@@ -49,12 +50,14 @@ interface ChunkNodeData {
 
 type Meta = CodeEvaluate | CodeDocumentation | Other;
 
+export type LLMMessageType = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
+
 export interface ChunkResponse {
-  messages: {
-    role: 'system' | 'user' | 'assistant' | string;
-    content: string;
-  };
-  meta: Meta;
+  messages: LLMMessageType;
+  meta?: Meta;
   type: null | string;
 }
 export interface ChunkResponseData {

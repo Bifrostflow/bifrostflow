@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
 import { Input } from '../input';
@@ -29,15 +30,14 @@ interface ISideDrawer {
 
 const getDefaultValues = (
   apiDataFields: RequiredKeysType,
-  fieldSchema: Record<string, z.ZodTypeAny>,
+
   defaultData: Record<string, string>,
 ) => {
   const defaultValues: Record<string, string> = {};
-
   Object.entries(apiDataFields).forEach(([key]) => {
-    fieldSchema[key] = z.string();
     defaultValues[key] = defaultData[key] || '';
   });
+
   return defaultValues;
 };
 
@@ -46,6 +46,9 @@ export default function EnterKeys({
   apiDataFields,
   onKeysSaved,
 }: ISideDrawer) {
+  const [requiredAPIInputKeys, setRequiredAPIInputKeys] =
+    useState<RequiredKeysType>(apiDataFields);
+
   const fieldSchema = Object.entries(apiDataFields).reduce((acc, [key]) => {
     acc[key] = z.string().min(2, {
       message: `Please enter valid ${key} key`,
@@ -56,19 +59,33 @@ export default function EnterKeys({
   // Final Zod object schema
   const FormSchema = z.object(fieldSchema);
   const { slug, apiKeys, setAPIKeys, setShowKeyInputArea } = useFlow();
-  console.log({ FormSchema });
+
+  useEffect(() => {
+    if (
+      Object.keys(apiDataFields).length === 0 &&
+      Object.keys(apiKeys).length > 0
+    ) {
+      // use must coming from setting
+      const newObject: RequiredKeysType = {};
+      Object.keys(apiKeys).map(key => {
+        newObject[key] = true;
+      });
+      setRequiredAPIInputKeys(newObject);
+    } else {
+      setRequiredAPIInputKeys(apiDataFields);
+    }
+  }, [apiDataFields, apiKeys]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: getDefaultValues(apiDataFields, fieldSchema, apiKeys),
+    values: getDefaultValues(requiredAPIInputKeys, apiKeys),
+    defaultValues: getDefaultValues(requiredAPIInputKeys, apiKeys),
   });
 
   const [APIKeyValues, setAPIKeyValues] = useState<APIData>(apiKeys);
   const [errors, setError] = useState<APIData>({});
   const [updating, setUpdating] = useState(false);
   const [deletingKey, setDeletingKey] = useState<string>();
-
-  useEffect(() => {}, [apiDataFields]);
 
   const onCloseHandler = () => {
     onClose();
@@ -112,7 +129,6 @@ export default function EnterKeys({
       console.log(error);
     } finally {
       setUpdating(false);
-      setShowKeyInputArea(false);
     }
   };
   const deleteKeyHandler = async (key: string) => {
@@ -136,12 +152,16 @@ export default function EnterKeys({
       {!!Object.keys(apiKeys).length && (
         <div className="mb-4 flex flex-col gap-2">
           <Typography variant={'h4'}>Delete keys</Typography>
-          <div className="flex flex-row ">
+          <div className="flex flex-row gap-2">
             {Object.keys(apiKeys).map(key => {
               return (
                 <Button
+                  type="button"
                   className="capitalize"
-                  onClick={() => deleteKeyHandler(key)}
+                  onClick={e => {
+                    e.preventDefault();
+                    deleteKeyHandler(key);
+                  }}
                   key={key}
                   variant={'outline_destructive'}
                   disabled={!!deletingKey}>
@@ -154,59 +174,82 @@ export default function EnterKeys({
         </div>
       )}
 
-      <Typography variant={'h4'}>Add keys</Typography>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(() => {
-            onSaveHandler(form.getValues());
-          })}
-          className="w-full space-y-6 py-4">
-          {Object.keys(apiDataFields).map(key => {
-            return (
-              <FormField
-                key={key}
-                control={form.control}
-                name={key}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">{key}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter key here..."
-                        {...field}
-                        type="password"
-                      />
-                    </FormControl>
-                    <FormMessage>{errors[key]}</FormMessage>
-                  </FormItem>
-                )}
-              />
-            );
-          })}
+      {Object.keys(requiredAPIInputKeys).length > 0 ? (
+        <>
+          <Typography variant={'h4'}>Add keys</Typography>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(() => {
+                onSaveHandler(form.getValues()).finally(() => {
+                  setShowKeyInputArea(false);
+                });
+              })}
+              className="w-full space-y-6 py-4">
+              {Object.keys(requiredAPIInputKeys).map(key => {
+                return (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name={key}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="capitalize">{key}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter key here..."
+                              {...field}
+                              value={field.value || ''}
+                              defaultValue={field.value || ''}
+                              type="password"
+                            />
+                          </FormControl>
+                          <FormMessage>{errors[key]}</FormMessage>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                );
+              })}
 
-          <div className="flex flex-row gap-2">
-            <Button
-              onClick={e => {
-                e.preventDefault();
-                form.reset();
-                onCloseHandler();
-              }}
-              variant={'outline_destructive'}>
-              Close
-            </Button>
-            <Button type="submit" disabled={updating}>
-              {updating && <Loader2 className="animate-spin" />}
-              Submit
-            </Button>
-          </div>
-        </form>
-      </Form>
-      <Typography variant={'blockquote'} className="text-lg">
-        &quot;Privacy is a myth — and so is security. But still, all we can
-        really do today is trust... and press Submit.&quot;
-        <br />
-        <span className="font-bold">-Sam Chandraberg</span>
-      </Typography>
+              <div className="flex flex-row gap-2">
+                <Button
+                  onClick={e => {
+                    e.preventDefault();
+                    form.reset();
+                    onCloseHandler();
+                  }}
+                  variant={'outline_destructive'}>
+                  Close
+                </Button>
+                <Button type="submit" disabled={updating}>
+                  {updating && <Loader2 className="animate-spin" />}
+                  Submit
+                </Button>
+              </div>
+            </form>
+          </Form>
+          <Typography variant={'blockquote'} className="text-lg">
+            &quot;Privacy is a myth — and so is security. But still, all we can
+            really do today is trust... and press Submit.&quot;
+            <br />
+            <span className="font-bold">-Sam Chandraberg</span>
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Typography variant={'p'} className="text-xl italic text-c-secondary">
+            No keys needed for this flow, you're all set for now!
+          </Typography>
+          <Typography variant={'blockquote'} className="text-lg">
+            &quot;Sometimes, the most powerful tools need no keys.
+            <br />
+            Just intention... and a click.&quot;
+            <br />
+            <span className="font-bold">- Flow Engine</span>
+          </Typography>
+        </>
+      )}
       {/* {Object.keys(apiDataFields).map(key => {
         return (
           <div key={key} className="my-2 flex flex-col gap-2">

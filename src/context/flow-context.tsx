@@ -39,6 +39,7 @@ type FlowContextType = {
   runFlowHandler: (body: FlowBody) => void;
   loaderUIText: string[];
   chunkResponse: ChunkResponse | undefined;
+  setChunkResponse: (value: ChunkResponse | undefined) => void;
   runningFlow: boolean;
   name: string;
   paramShowRequest: 'edit' | 'other' | undefined;
@@ -59,6 +60,12 @@ type FlowContextType = {
   setToolDrawerOpen: (value: boolean) => void;
   isMainNodesSelected: boolean;
   tabsToSelectValue: ToolCategory[];
+  showEditDrawer: boolean;
+  setShowEditDrawer: (value: boolean) => void;
+  flowName: string;
+  setFlowName: (value: string) => void;
+  showMore: boolean;
+  setShowMore: (value: boolean) => void;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
@@ -98,9 +105,12 @@ export const FlowProvider = ({
   const [lastUpdatedEdges, setlastUpdatedEdges] = useState(defaultEdges);
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false);
   const [idCounter, setIdCounter] = useState<number>(1);
+  const [showEditDrawer, setShowEditDrawer] = useState(false);
   // noded and edges
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges);
+  const [flowName, setFlowName] = useState(name);
+  const [showMore, setShowMore] = useState(false);
   // noded and edges
   useEffect(() => {
     const sanitizedNodes = defaultNodes.map(node => mapNodesDataToNodes(node));
@@ -222,7 +232,7 @@ export const FlowProvider = ({
       const decoder = new TextDecoder();
       let buffer = '';
       const responseArray: ChunkResponse[] = [];
-      setUILoaderText(prev => [...prev, 'Building Graph.']);
+      setUILoaderText(prev => [...prev, 'Sending query.']);
       print(UILoaderText);
       await new Promise(resolve => setTimeout(resolve, 300));
       while (true) {
@@ -240,11 +250,13 @@ export const FlowProvider = ({
               const json: ChunkResponseData = JSON.parse(
                 line.replace('data: ', ''),
               );
-              responseArray.push(json.response);
               if (json.error) {
                 toast(json.error || '');
               }
-              if (json.response.type === 'show-documents') {
+              responseArray.push(json.response);
+              setChunkResponse(json.response);
+
+              if (json?.response?.type === 'show-documents') {
                 toast(json.ui_response, { action: <Link /> });
               }
               setUILoaderText(prev => [...prev, json.ui_response]);
@@ -257,7 +269,6 @@ export const FlowProvider = ({
       }
       if (responseArray[responseArray.length - 1].type === '')
         print('LAST RES: ', responseArray[responseArray.length - 1]);
-      setChunkResponse(responseArray[responseArray.length - 1]);
     } catch (error) {
       print(error);
       // setUILoaderText([]);
@@ -269,6 +280,8 @@ export const FlowProvider = ({
   };
   const handleAddNode = (node: SystemTool) => {
     const id = `${idCounter}-${node.id}`;
+    console.log(id);
+
     if (node.category === 'initiate') {
       setInitiatorType(node.type as InitiatorType);
     }
@@ -293,7 +306,7 @@ export const FlowProvider = ({
       } as unknown as Record<string, unknown>,
       position: { x: 250, y: 250 },
     };
-    setIdCounter(id => id + 1);
+    setIdCounter(pid => pid + 1);
     setNodes(nds => {
       if (newNode.data.category === 'initiate') {
         const filterStartPoint = nds.filter(
@@ -306,7 +319,6 @@ export const FlowProvider = ({
     });
   };
 
-  print('UILoaderText: ', UILoaderText);
   return (
     <FlowContext.Provider
       value={{
@@ -326,6 +338,7 @@ export const FlowProvider = ({
         actionPanelVisible: showActionPanel,
         setActionPanelVisible: setShowActionPanel,
         runFlowHandler: runFlowHandler,
+        setChunkResponse,
         chunkResponse,
         loaderUIText: UILoaderText,
         runningFlow,
@@ -345,6 +358,14 @@ export const FlowProvider = ({
         toolDrawerOpen,
         isMainNodesSelected,
         tabsToSelectValue,
+        // ------
+        setShowEditDrawer,
+        showEditDrawer,
+        // ------
+        flowName,
+        setFlowName,
+        showMore,
+        setShowMore,
       }}>
       {children}
     </FlowContext.Provider>

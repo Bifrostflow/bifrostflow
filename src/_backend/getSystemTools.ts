@@ -1,5 +1,6 @@
 'use server';
 import { url } from '@/lib/path';
+import { auth } from '@clerk/nextjs/server';
 
 export type SystemToolType =
   | 'start'
@@ -26,7 +27,6 @@ export interface SystemTool {
   gpt_model: string;
   llm: string;
   description: string;
-  what_i_do: string;
   category: ToolCategory;
   state: 'active' | 'inactive';
   require_key: boolean;
@@ -39,9 +39,18 @@ export type SystemTools = SystemTool[];
 
 export const getSystemTools = async (): Promise<SystemTools> => {
   const endpoint = `${url}/system-tools`;
-
+  const { getToken } = await auth();
+  const token = await getToken();
   try {
-    const res = await fetch(endpoint);
+    const res = await fetch(endpoint, {
+      next: {
+        revalidate: 6000, // Cache for 60 seconds
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!res.ok) {
       return [];
     }
@@ -58,9 +67,18 @@ export const getSystemToolsByID = async (
   id: string,
 ): Promise<SystemTool | null> => {
   const endpoint = `${url}/system-tools/${id}`;
-
+  const { getToken } = await auth();
+  const token = await getToken();
   try {
-    const res = await fetch(endpoint);
+    const res = await fetch(endpoint, {
+      next: {
+        revalidate: 6000, // Cache for 60 seconds
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!res.ok) {
       return null;
     }

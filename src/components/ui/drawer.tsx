@@ -38,7 +38,7 @@ const animateVariants: Record<
 };
 
 const positionClasses: Record<DrawerPositionType, string> = {
-  bottom: 'fixed bottom-0 left-0 w-full',
+  bottom: 'fixed bottom-0 left-auto w-full',
   top: 'fixed top-0 left-0 w-full',
   left: 'fixed top-0 left-0 h-full',
   right: 'fixed top-0 right-0 h-full',
@@ -92,7 +92,7 @@ function Drawer({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/10 z-40"
+            className="fixed inset-0 bg-black/30 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

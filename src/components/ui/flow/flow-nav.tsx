@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '../button';
 import AppNavIconItem from '../app-nav-icon-item';
 import AppNav from '../app-nav';
@@ -12,21 +12,56 @@ import Drawer from '../drawer';
 import { KeySquare } from 'lucide-react';
 import { Label } from '../label';
 import { useHotkeys } from 'react-hotkeys-hook';
+import EditFlow from './edit-flow';
 
 const FlowNav = () => {
-  const { name, setShowKeyInputArea } = useFlow();
-  useEffect(() => {
-    console.log('::::FlowNav INITIATED::::');
-  }, []);
+  const {
+    flowName,
+    setShowKeyInputArea,
+    showKeyInputArea,
+    showEditDrawer,
+    setShowEditDrawer,
+    paramShowRequest,
+    showMore,
+    setShowMore,
+    setToolDrawerOpen,
+  } = useFlow();
+
   useHotkeys('ctrl+m', () => {
-    setShowMore(!showMore);
+    onMoreAreaPressHandler();
+  });
+  useHotkeys('ctrl+e', () => {
+    onEditAreaPressHandler();
   });
 
-  const [showMore, setShowMore] = useState(false);
+  useEffect(() => {
+    if (paramShowRequest === 'edit') {
+      setShowEditDrawer(true);
+    }
+  }, [paramShowRequest, setShowEditDrawer]);
+
+  const onEditAreaPressHandler = () => {
+    setShowEditDrawer(!showEditDrawer);
+    setShowMore(false);
+    setShowKeyInputArea(false);
+    setToolDrawerOpen(false);
+  };
+  const onMoreAreaPressHandler = () => {
+    setShowMore(!showMore);
+    setShowEditDrawer(false);
+    setShowKeyInputArea(false);
+    setToolDrawerOpen(false);
+  };
+  const onKeyInputAreaPressHandler = () => {
+    setShowKeyInputArea(!showKeyInputArea);
+    setShowEditDrawer(false);
+    setShowMore(false);
+    setToolDrawerOpen(false);
+  };
   return (
     <>
       <AppNav
-        logoHeading={name}
+        logoHeading={flowName}
         renderItems={() => {
           return (
             <motion.div className="flex flex-row justify-between items-center gap-4 font-semibold text-[10px] text-c-surface-text-muted transition-all duration-100 ease-in">
@@ -37,15 +72,13 @@ const FlowNav = () => {
                 hoverLabel="Ctrl+E"
                 iconName="edit"
                 label="Edit"
-                onClick={() => {}}
+                onClick={onEditAreaPressHandler}
               />
               <AppNavIconItem
                 hoverLabel="Ctrl+M"
                 iconName="layout-grid"
                 label="More"
-                onClick={() => {
-                  setShowMore(true);
-                }}
+                onClick={onMoreAreaPressHandler}
               />
               <Button
                 className="
@@ -70,18 +103,21 @@ const FlowNav = () => {
         onClose={setShowMore}>
         <div className="flex flex-wrap gap-3 justify-between items-center">
           <motion.div
-            onClick={() => {
-              setShowKeyInputArea(true);
-            }}
+            onClick={onKeyInputAreaPressHandler}
             className="flex flex-col justify-center items-center my-2 gap-2">
             <KeySquare size={32} />
             <Label className="text-xs">Manage Keys</Label>
           </motion.div>
-          {/* {[1, 2, 3, 4, 5, 6, 7].map(res => {
-            return (
-            );
-          })} */}
         </div>
+      </Drawer>
+      <Drawer
+        width={'w-[400px]'}
+        height={'h-[300px]'}
+        className="top-[110px] left-auto right-[10px] sm:top-[80px] sm:left-auto sm:right-[10px]"
+        position="top"
+        visible={showEditDrawer}
+        onClose={onEditAreaPressHandler}>
+        <EditFlow />
       </Drawer>
     </>
   );

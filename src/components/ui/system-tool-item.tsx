@@ -1,116 +1,183 @@
+'use client';
 import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
-
 import clsx from 'clsx';
-import {
-  CirclePowerIcon,
-  Cog,
-  Pickaxe,
-  Play,
-  SignpostBig,
-  Wrench,
-} from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DynamicIcon, IconName } from 'lucide-react/dynamic';
+import { Typography } from './typography';
+import { cn } from '@/lib/utils';
+import { Button } from './button';
+import { useState } from 'react';
+import AppTooltip from './app-tooltip';
 type SystemToolItemProps = {
   onAddNode: (node: SystemTool) => void;
   node: SystemTool;
 };
 
-const typeToBGColor = (category: ToolCategory) => {
+const typeToIcon = (category: ToolCategory): IconName => {
   switch (category) {
     case 'action':
-      return 'bg-gradient-to-tl from-cyan-950 to-cyan-900';
+      return 'pickaxe';
     case 'close':
-      return 'bg-gradient-to-tl from-orange-950 to-orange-900';
+      return 'circle-power';
     case 'conditional':
-      return 'bg-gradient-to-tl from-lime-950 to-lime-900';
+      return 'signpost-big';
     case 'generate':
-      return 'bg-gradient-to-tl from-cyan-950 to-cyan-900';
+      return 'cog';
     case 'initiate':
-      return 'bg-gradient-to-tl from-emerald-950 to-emerald-900';
+      return 'play';
     default:
-      return 'bg-gradient-to-tl from-zinc-950 to-zinc-900';
+      return 'wrench';
   }
 };
-
-const typeToIcon = (category: ToolCategory) => {
+const typeToHoverTextColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
-      return <Pickaxe className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-green-500 dark:group-hover:text-green-400 ';
     case 'close':
-      return <CirclePowerIcon className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-orange-500 dark:group-hover:text-orange-600 ';
     case 'conditional':
-      return <SignpostBig className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-cyan-500 dark:group-hover:text-cyan-400 ';
     case 'generate':
-      return <Cog className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-blue-500 dark:group-hover:text-blue-400 ';
     case 'initiate':
-      return <Play className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-emerald-500 dark:group-hover:text-emerald-400 ';
     default:
-      return <Wrench className="h-[22px] w-[22px]" />;
+      return 'group-hover:text-green-500 dark:group-hover:text-green-400 ';
   }
 };
-const typeToTextColor = (category: ToolCategory) => {
+const typeToHoverColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
-      return 'text-cyan-300';
+      return 'dark:hover:border-green-500 hover:border-green-500';
     case 'close':
-      return 'text-orange-300';
+      return 'dark:hover:border-orange-600 hover:border-orange-500';
     case 'conditional':
-      return 'text-lime-300';
+      return 'dark:hover:border-cyan-500 hover:border-cyan-500';
     case 'generate':
-      return 'text-cyan-300';
+      return 'dark:hover:border-blue-500 hover:border-blue-500';
     case 'initiate':
-      return 'text-emerald-300';
+      return 'dark:hover:border-emerald-500 hover:border-emerald-500';
     default:
-      return 'text-zinc-300';
+      return 'dark:hover:border-green-500 hover:border-green-500';
   }
 };
-const typeToDescTextColor = (category: ToolCategory) => {
+const typeToButtonBGColor = (category: ToolCategory) => {
   switch (category) {
     case 'action':
-      return 'text-cyan-500';
+      return 'dark:group-hover:from-green-600 dark:group-hover:to-green-700  group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-green-600';
     case 'close':
-      return 'text-orange-300';
+      return 'group-hover:bg-gradient-to-r dark:group-hover:from-orange-700 dark:group-hover:to-orange-700/50   group-hover:from-orange-400 group-hover:to-orange-600';
     case 'conditional':
-      return 'text-lime-500';
+      return 'dark:group-hover:from-cyan-600 dark:group-hover:to-cyan-700  group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-cyan-600';
     case 'generate':
-      return 'text-cyan-500';
+      return 'dark:group-hover:from-blue-400 dark:group-hover:to-blue-500  group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-blue-600';
     case 'initiate':
-      return 'text-emerald-500';
+      return 'dark:group-hover:from-emerald-500 dark:group-hover:to-emerald-500  group-hover:bg-gradient-to-r group-hover:from-emerald-500 group-hover:to-emerald-600';
     default:
-      return 'text-zinc-500';
+      return 'dark:group-hover:from-green-500 dark:group-hover:to-green-500  group-hover:bg-gradient-to-r group-hover:from-green-500 group-hover:to-green-600';
   }
 };
 
 export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
   // w-full
-
-  const classes = clsx(
-    'min-w-[calc(100%-14px)] w-auto h-[70px] flex items-center gap-2',
-    `text-left border-0 border-zinc-400 rounded-sm m-2 px-3`,
-    'p-2 text-xs transition-all duration-100 ease-in-out active:scale-[0.95]',
-    typeToBGColor(node.category),
-    typeToTextColor(node.category),
-    'disabled:from-zinc-700 disabled:to-zinc-800 disabled:scale-[1] disabled:text-zinc-400',
-  );
-
-  const descriptionTextClass = clsx(
-    'font-xs',
-    typeToDescTextColor(node.category),
-    node.state === 'inactive' ? 'text-zinc-500' : '',
+  const [fullDetails, setFullDetails] = useState(false);
+  const iconClass = clsx(
+    'flex-1 mt-2 ',
+    `${typeToHoverTextColor(node.category)}`,
   );
   return (
-    <motion.button
-      disabled={node.state === 'inactive'}
+    <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={classes}
-      onClick={() => onAddNode(node)}>
-      {typeToIcon(node.category)}
-      <div>
-        <p className={'text-sm font-medium'}>{node.name}</p>
-        <p className={descriptionTextClass}>{node.description}</p>
+      className={cn(
+        'border-2 border-transparent rounded-xl p-3  shadow-md bg-zinc-200/80 dark:bg-c-background/60 group transition-all duration-100 ease-in-out bg-gradient-to-r from-zinc-200/40 via-zinc-50 to-zinc-200 dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-900',
+        typeToHoverColor(node.category),
+      )}>
+      <div className="flex flex-row gap-3 justify-start items-start">
+        <DynamicIcon
+          name={typeToIcon(node.category)}
+          size={40}
+          className={iconClass}
+        />
+        <div className="flex flex-col gap-1 flex-7 justify-center items-start ">
+          <div className="flex flex-col gap-1 items-start text-left  w-full ">
+            <div className="flex flex-row justify-between items-center w-full">
+              <Typography
+                variant={'h4'}
+                className={cn(
+                  'text-c-background-text',
+                  `${typeToHoverTextColor(node.category)}`,
+                )}>
+                {node.name}
+              </Typography>
+              <Button
+                onClick={() => {
+                  setFullDetails(!fullDetails);
+                }}
+                size={'icon'}
+                variant={'ghost'}>
+                <DynamicIcon name="maximize" size={18} />
+              </Button>
+            </div>
+            <Typography
+              variant={'p'}
+              className="text-sm text-c-background-text-muted">
+              {node.description}
+            </Typography>
+          </div>
+          <div className="flex flex-row justify-start items-center gap-1">
+            {node.llm && (
+              <Typography className="capitalize font-bold text-c-primary text-xs">
+                LLM: {node.llm}
+              </Typography>
+            )}
+            {node.gpt_model && (
+              <Typography className="capitalize font-bold text-c-primary text-xs">
+                {node.gpt_model}
+              </Typography>
+            )}
+          </div>
+
+          <Button
+            className={cn(
+              'transition-all duration-100 ease-in-out my-2',
+              'bg-gradient-to-r dark:from-zinc-600 dark:to-zinc-700   from-zinc-500 to-zinc-600',
+              `${typeToButtonBGColor(node.category)}`,
+            )}
+            disabled={node.state === 'inactive'}
+            onClick={() => onAddNode(node)}
+            size="default">
+            Use
+          </Button>
+          {fullDetails && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="flex flex-row justify-between items-center my-2">
+              <div className="flex flex-row-justify-start-items-center gap-2">
+                <AppTooltip
+                  tip={node.require_key ? 'Key required' : 'No key rerquired'}>
+                  <DynamicIcon
+                    name="key"
+                    className={
+                      node.require_key
+                        ? 'text-c-secondary'
+                        : 'text-c-background-text-muted'
+                    }
+                  />
+                </AppTooltip>
+                {node.require_key && (
+                  <Typography className="uppercase font-semibold tracking-wider">
+                    {node.key_name?.replaceAll('-', ' ')}
+                  </Typography>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
-    </motion.button>
+    </motion.div>
   );
 };

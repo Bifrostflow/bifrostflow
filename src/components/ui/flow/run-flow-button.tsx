@@ -1,5 +1,4 @@
 'use client';
-'strict';
 import { SystemTool } from '@/_backend/getSystemTools';
 import { useFlow } from '@/context/flow-context';
 import { validateIndirectFlow } from '@/lib/validation';
@@ -9,7 +8,7 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 
@@ -20,10 +19,12 @@ import Drawer from '../drawer';
 import EnterKeys from './enter-keys-area';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { showToast } from '../toast';
+import { Button } from '../button';
+import { X } from 'lucide-react';
+import ChatResponseViewer from '../initiator/chat_response_viewer';
+
 export const RunButton = () => {
-  useEffect(() => {
-    console.log('::::RUN INITIATED::::');
-  }, []);
+  const [showChatResponseView, setShowChatResponseView] = useState(false);
 
   const {
     apiKeys,
@@ -37,6 +38,10 @@ export const RunButton = () => {
     setShowKeyInputArea,
     showKeyInputArea,
     setAPIKeys,
+    setShowEditDrawer,
+    setShowMore,
+    setToolDrawerOpen,
+    setChunkResponse,
   } = useFlow();
   const { getEdges, getNodes } = useReactFlow();
   const [updatingNodes, setUpdatingNodes] = useState(false);
@@ -64,6 +69,7 @@ export const RunButton = () => {
   };
   const runPressHandler = async () => {
     const { isKeyRequire } = checkIfAPIKeyRequired();
+
     if (!isKeyRequire) {
       const imageString = await getImage();
       runFlow(imageString || fallback);
@@ -117,13 +123,19 @@ export const RunButton = () => {
         }
       }
     }
+    console.log({ requiredKeys });
     return { isKeyRequire: Object.keys(requiredKeys).length > 0, requiredKeys };
   };
 
   const handleInitiatorRunner = () => {
     if (initiatorTypeValue === 'on_prompt') {
       setActionPanelVisible(true);
+      setShowEditDrawer(false);
+      setShowMore(false);
+      setToolDrawerOpen(false);
     } else if (initiatorTypeValue === 'on_start') {
+      setActionPanelVisible(false);
+      setShowChatResponseView(true);
       runFlowHandler({ edges: getEdges(), message: 'ignore' });
     }
   };
@@ -161,6 +173,7 @@ export const RunButton = () => {
         hoverLabel="Ctrl+R"
         iconName="play"
         label="Run"
+        loading={updatingNodes || runningFlow}
         onClick={runPressHandler}
       />
       <Drawer
@@ -175,6 +188,32 @@ export const RunButton = () => {
             setAPIKeys(resData);
           }}
         />
+      </Drawer>
+
+      <Drawer
+        visible={showChatResponseView}
+        onClose={() => {
+          setShowChatResponseView(false);
+        }}
+        position="bottom"
+        className="bottom-10 right-20 left-auto w-3xl max-w-3xl">
+        <div className="w-full max-w-5xl flex-col justify-center items-center">
+          <div className="flex justify-end mb-3">
+            <Button
+              size={'icon'}
+              onClick={
+                runningFlow
+                  ? () => {}
+                  : () => {
+                      setChunkResponse(undefined);
+                      setShowChatResponseView(false);
+                    }
+              }>
+              <X />
+            </Button>
+          </div>
+          <ChatResponseViewer />
+        </div>
       </Drawer>
     </>
   );

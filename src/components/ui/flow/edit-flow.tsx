@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { redirect } from 'next/navigation';
 import { toast } from 'sonner';
 
 import {
@@ -16,18 +15,24 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import getProject from '@/_backend/private/projects/getProject';
 import { editProject } from '@/_backend/private/projects/editProject';
+import { useFlow } from '@/context/flow-context';
+import { showToast } from '../toast';
+import { Loader2 } from 'lucide-react';
 
 const FormSchema = z.object({
-  name: z.string().min(3, {
-    message: 'name length should be 3 characters.',
+  name: z.string().min(4, {
+    message: 'name length should be 4 characters.',
   }),
   description: z.string(),
 });
 
-export default function EditFlow({ slug }: { slug: string }) {
+export default function EditFlow() {
+  const { slug, setShowEditDrawer, setFlowName } = useFlow();
+  const [loadingData, setLoadingData] = useState(true);
+  const [editingData, setEditingData] = useState(false);
   useEffect(() => {
     const getSlug = async () => {
       getProject(slug)
@@ -41,7 +46,8 @@ export default function EditFlow({ slug }: { slug: string }) {
         })
         .catch(er => {
           toast(er);
-        });
+        })
+        .finally(() => setLoadingData(false));
       // form.setValue()
     };
     getSlug();
@@ -56,49 +62,93 @@ export default function EditFlow({ slug }: { slug: string }) {
     },
   });
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    const response = await editProject({
-      description: data.description || '',
-      name: data.name,
-      id: slug,
-    });
-    if (response?.data) {
-      redirect('/flow/' + slug);
-    } else {
-      toast(response?.message || response?.error || 'Update app failed');
+    setEditingData(true);
+    try {
+      const response = await editProject({
+        description: data.description || '',
+        name: data.name,
+        id: slug,
+      });
+      if (response?.data) {
+        setFlowName(data.name);
+        setShowEditDrawer(false);
+        showToast({
+          description: response?.message,
+          type: 'success',
+        });
+      } else {
+        showToast({
+          title: 'Failed',
+          description:
+            response?.message || response?.error || 'Update app failed',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      showToast({
+        title: 'Failed',
+        description: `Error: ${error}`,
+        type: 'error',
+      });
+    } finally {
+      setEditingData(false);
     }
   }
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Flow Name</FormLabel>
-              <FormControl>
-                <Input placeholder="name" {...field} />
-              </FormControl>
-              <FormDescription>This will be name of your App.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input placeholder="description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Edit</Button>
-      </form>
-    </Form>
+    <div className="p-4">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-2/3 space-y-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Flow Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="name" {...field} />
+                </FormControl>
+                <FormDescription>
+                  This will be name of your flow.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-row gap-2">
+            <Button
+              disabled={editingData}
+              onClick={e => {
+                e.preventDefault();
+                form.reset();
+                setShowEditDrawer(false);
+              }}
+              variant={'outline_secondary'}>
+              Close
+            </Button>
+            <Button
+              variant={'secondary'}
+              disabled={editingData || loadingData}
+              type="submit">
+              {editingData && <Loader2 className="animate-spin" />}Edit
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

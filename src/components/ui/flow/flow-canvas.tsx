@@ -10,7 +10,6 @@ import {
   ReactFlow,
   reconnectEdge,
 } from '@xyflow/react';
-import { motion } from 'framer-motion';
 import { DefaultNode } from '@/components/ui/nodes/default';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
@@ -18,47 +17,38 @@ import { StartNode } from '@/components/ui/nodes/start';
 import { StartPointNode } from '@/components/ui/nodes/start-point';
 import SideDrawer from '@/components/ui/side-drawer';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useFlow, useGraphOP } from '@/context/flow-context';
 
 import { DraggablePanel } from '../draggable-panel';
 
-import ResponsePreview from './response-preview';
-import print from '@/lib/print';
 import Drawer from '../drawer';
-import EditFlow from './edit-flow';
-import { Typography } from '../typography';
+
 import { Button } from '../button';
+import { SettingsIcon } from 'lucide-react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useThemeToggle } from '@/hooks/theme-toggle';
 
 export type InitiatorType = 'on_prompt' | 'on_start';
 
 export default function FlowCanvas() {
   const {
     initialEdges,
-    slug,
-    setShowKeyInputArea,
-    showKeyInputArea,
-
-    chunkResponse,
-    loaderUIText,
-    paramShowRequest,
     setToolDrawerOpen,
     toolDrawerOpen,
+    setActionPanelVisible,
+    setShowEditDrawer,
+    setShowKeyInputArea,
+    setShowMore,
   } = useFlow();
-
-  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
-
+  const { theme } = useThemeToggle();
   const edgeReconnectSuccessful = useRef(true);
 
   const { edgesOG, nodesOG, onEdgesChange, onNodesChange, setEdges } =
     useGraphOP();
-
-  useEffect(() => {
-    if (paramShowRequest === 'edit') {
-      setEditDrawerOpen(true);
-    }
-  }, [paramShowRequest]);
-
+  useHotkeys('ctrl+t', () => {
+    showToolHandler();
+  });
   const onConnect = useCallback(
     (params: Edge | Connection) => {
       const sourceNode = nodesOG.find(n => n.id === params.source);
@@ -99,27 +89,18 @@ export default function FlowCanvas() {
     },
     [setEdges],
   );
-  // const checkIfAPIKeyRequired = () => {
-  //   const requiredKeys: Record<string, boolean> = {};
-  //   for (let i = 0; i < nodesOG.length; i++) {
-  //     const node = nodesOG[i];
-  //     const nodeData = node.data as unknown as SystemTool;
-  //     if (nodeData.require_key) {
-  //       if (nodeData.key_name) {
-  //         requiredKeys[nodeData.key_name] = true;
-  //       }
-  //     }
-  //   }
-  //   return { isKeyRequire: Object.keys(requiredKeys).length > 0, requiredKeys };
-  // };
-
+  const showToolHandler = () => {
+    setToolDrawerOpen(!toolDrawerOpen);
+    setActionPanelVisible(false);
+    setShowEditDrawer(false);
+    setShowKeyInputArea(false);
+    setShowMore(false);
+  };
   return (
     <div className="flex h-screen">
       <div className="flex-1">
         <ReactFlow
-          onChange={() => {
-            print('view changed');
-          }}
+          colorMode={theme}
           onReconnect={onReconnect}
           onReconnectStart={onReconnectStart}
           onReconnectEnd={onReconnectEnd}
@@ -169,8 +150,7 @@ export default function FlowCanvas() {
               return 'var(--color-cyan-400)';
             }}
           />
-          <div className="px-4 my-4 bg-zinc-700/00 w-full flex justify-between items-center gap-1 absolute right-0 z-1000">
-            {/* <div className="flex gap-3">
+          {/* <div className="flex gap-3">
               <Button
                 onClick={() => setShowKeyInputArea(true)}
                 className=" px-5 py-2 cursor-pointer rounded-full text-white text-sm bg-gradient-to-br from-green-400 to-green-800  transition-all duration-50 ease-linear active:pb-1.5 active:pt-2.5 flex justify-between items-center gap-1">
@@ -197,64 +177,25 @@ export default function FlowCanvas() {
                 </Button>
               </div>
             </div> */}
-          </div>
 
           <Button
-            className="absolute right-2 top-20 z-999"
-            onClick={() => setToolDrawerOpen(true)}>
+            className="absolute right-2 top-20 z-999 group"
+            onClick={showToolHandler}>
             Tools
+            <SettingsIcon />
+            <span className="hidden group-hover:flex">(Ctrl+T)</span>
           </Button>
 
           <Controls position="bottom-left" orientation="horizontal" />
         </ReactFlow>
 
-        {/* <EnterKeys
-          onKeysSaved={resData => {
-            setShowKeyInputArea(false);
-            setAPIKeys(resData);
-          }}
-          apiDataFields={checkIfAPIKeyRequired().requiredKeys}
-          onClose={() => setShowKeyInputArea(false)}
-          open={showKeyInputArea}
-        /> */}
-        {!!chunkResponse && <ResponsePreview data={{ ...chunkResponse }} />}
         <DraggablePanel />
-        {loaderUIText.length && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: 0.2,
-              delay: 0.1,
-            }}
-            className="p-5 min-w-[200px] min-h-[200px] rounded-sm bg-white absolute bottom-10 left-10 transition-all ease-in duration-100">
-            {loaderUIText.map((text, i) => {
-              return (
-                <p
-                  key={`${text}-${i}`}
-                  className="italic text-md text-black font-semibold p-2 transition-all duration-200 ease-in-out tracking-tight">
-                  {text}
-                </p>
-              );
-            })}
-          </motion.div>
-        )}
       </div>
+
       <Drawer
-        width={'w-[400px]'}
-        height={'h-[300px]'}
-        className="top-[110px] left-auto right-[10px] sm:top-[60px] sm:left-auto sm:right-[10px]"
-        position="top"
-        visible={editDrawerOpen}
-        onClose={() => {
-          setEditDrawerOpen(false);
-        }}>
-        <EditFlow slug={slug} />
-      </Drawer>
-      <Drawer
-        width={'w-[400px]'}
-        height={'h-fit'}
-        className="top-[110px] left-auto right-[10px] sm:top-[70px] sm:left-auto sm:right-[10px]"
+        // width={'w-[400px]'}
+        height={'h-full'}
+        className="top-[110px] left-auto right-[0px] sm:top-[64px] sm:left-auto sm:right-[0px] bg-c-surface w-[550px] max-h-full scroll-auto px-2 rounded-none  border-l-4 border-zinc-300 dark:border-zinc-500"
         position="right"
         visible={toolDrawerOpen}
         onClose={() => {
