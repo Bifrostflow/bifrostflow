@@ -109,7 +109,7 @@
   --c-background:#f3f3f3;
   --c-background-text:#0d0d0d;
   --c-background-text-muted:#242424;
-  --c-surface:#f4f4f4;
+  --c-surface:#d9d9d9;
   --c-surface-text:#252934;
   --c-surface-text-muted:#414349;
   --c-border:#e7e7e7;
@@ -156,9 +156,9 @@
   --sidebar-ring: oklch(0.556 0 0);
   /* custom theme */
   --c-primary:oklch(62.3% 0.214 259.815);
-  --c-primary-variant:oklch(60.472% 0.17881 258.504);
+  --c-primary-variant:oklch(64.124% 0.17421 258.453);
   --c-on-primary:oklch(89.466% 0.01573 269.985);
-  --c-on-primary-variant:oklch(16.145% 0.07051 261.179);
+  --c-on-primary-variant:oklch(92.846% 0.00979 273.334);
   --c-on-secondary:#dfefea;
   --c-on-secondary-variant:#dfefea;
   --c-secondary:oklch(69.6% 0.17 162.48);

@@ -6,11 +6,10 @@ import AppNav from '../app-nav';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useThemeToggle } from '@/hooks/theme-toggle';
+import NavThemeToggle from '../nav-theme-toggle';
 
 const HomeNav = () => {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useThemeToggle();
 
   return (
     <>
@@ -43,13 +42,19 @@ const HomeNav = () => {
                   onClick={() => {}}
                 />
               </Link>
-
-              <AppNavIconItem
-                hoverLabel="My Keys"
-                iconName={theme !== 'dark' ? 'moon' : 'sun'}
-                label="Theme"
-                onClick={toggleTheme}
-              />
+              <Link
+                href={'/home/settings'}
+                className={`link ${
+                  pathname.includes('settings') ? 'text-c-secondary' : ''
+                }`}>
+                <AppNavIconItem
+                  hoverLabel="Settings"
+                  iconName="settings"
+                  label="Settings"
+                  onClick={() => {}}
+                />
+              </Link>
+              <NavThemeToggle />
               <Button
                 className="
               relative inline-block font-semibold overflow-hidden group 

@@ -45,7 +45,7 @@ export function HeroNav() {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <UserButton userProfileUrl="/profile" />
+              <UserButton userProfileUrl="/home/settings/profile" />
             </SignedIn>
           </div>
         </NavBody>
@@ -82,7 +82,7 @@ export function HeroNav() {
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <UserButton userProfileUrl="/profile" />
+                <UserButton userProfileUrl="/home/settings/profile" />
               </SignedIn>
             </div>
           </MobileNavMenu>

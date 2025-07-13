@@ -22,7 +22,7 @@ function AppNav({
     <>
       <div
         className={cn(
-          'z-100 h-[64px] w-[100%] px-36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20',
+          'z-100 h-[64px] w-[100%] px-5 sm:px-10 md:px-10 lg:px-10 xl:px-36 2xl:36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20',
           fixed ? 'fixed' : 'relative',
         )}>
         <div className="flex flex-row justify-start items-center gap-4">
@@ -46,7 +46,7 @@ function AppNav({
             {renderItems && renderItems()}
           </div>
           <SignedIn>
-            <UserButton userProfileUrl="/profile" />
+            <UserButton userProfileUrl="/home/settings/profile" />
           </SignedIn>
           <Button
             variant={'link'}
@@ -68,7 +68,7 @@ function AppNav({
             ease: 'easeInOut',
           }}
           className={cn(
-            'fixed top-10 w-[100%] flex-row gap-2 px-4 justify-end items-center pr-10 py-1 transition-all duration-100 ease-in dark:bg-zinc-800 bg-c-surface shadow-md dark:shadow-zinc-900 z-100 ',
+            'fixed top-15 w-[100%] flex-row gap-2 px-4 justify-end items-center pr-10 py-1 transition-all duration-100 ease-in dark:bg-zinc-800 bg-c-surface shadow-md dark:shadow-zinc-900 z-100 ',
             showMenuItems ? 'flex md:hidden' : 'hidden',
           )}>
           {renderItems && renderItems()}
