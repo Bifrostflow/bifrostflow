@@ -5,6 +5,7 @@ import {
   Connection,
   Controls,
   Edge,
+  EdgeProps,
   MiniMap,
   Node,
   ReactFlow,
@@ -13,11 +14,11 @@ import {
 import { DefaultNode } from '@/components/ui/nodes/default';
 import { EndNode } from '@/components/ui/nodes/end';
 import { RoutingNode } from '@/components/ui/nodes/routing';
-import { StartNode } from '@/components/ui/nodes/start';
+import { InitiateNode } from '@/components/ui/nodes/start';
 import { StartPointNode } from '@/components/ui/nodes/start-point';
 import SideDrawer from '@/components/ui/side-drawer';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { JSX, useCallback, useEffect, useRef } from 'react';
 import { useFlow, useGraphOP } from '@/context/flow-context';
 
 import { DraggablePanel } from '../draggable-panel';
@@ -28,8 +29,43 @@ import { Button } from '../button';
 import { SettingsIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useThemeToggle } from '@/hooks/theme-toggle';
+import { ActionNode } from '../nodes/action';
+
+import { GenerateNode } from '../nodes/generate';
+import { useNodeViewport } from '@/hooks/use-node-loader';
+import {
+  AnimatedSVGEdge,
+  AnimatedSVGEdgeAction,
+  AnimatedSVGEdgeClose,
+  AnimatedSVGEdgeConditional,
+  AnimatedSVGEdgeGenerate,
+} from './AnimtedSVGEdge';
+import { ToolCategory } from '@/_backend/getSystemTools';
 
 export type InitiatorType = 'on_prompt' | 'on_start';
+
+type CustomEdgeType =
+  | 'animated-svg'
+  | 'animated-svg-conditional'
+  | 'animated-svg-action'
+  | 'animated-svg-generate'
+  | 'animated-svg-close';
+
+const edgeTypes: Record<CustomEdgeType, (props: EdgeProps) => JSX.Element> = {
+  'animated-svg': AnimatedSVGEdge,
+  'animated-svg-conditional': AnimatedSVGEdgeConditional,
+  'animated-svg-action': AnimatedSVGEdgeAction,
+  'animated-svg-generate': AnimatedSVGEdgeGenerate,
+  'animated-svg-close': AnimatedSVGEdgeClose,
+};
+
+export const categoryToEdgeTypeMapping: Record<ToolCategory, CustomEdgeType> = {
+  initiate: 'animated-svg',
+  conditional: 'animated-svg-conditional',
+  action: 'animated-svg-action',
+  generate: 'animated-svg-generate',
+  close: 'animated-svg-close',
+};
 
 export default function FlowCanvas() {
   const {
@@ -53,14 +89,16 @@ export default function FlowCanvas() {
     (params: Edge | Connection) => {
       const sourceNode = nodesOG.find(n => n.id === params.source);
       if (!sourceNode) return;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      setEdges(eds => addEdge({ ...params, tool_input: '' }, eds));
+      setEdges(eds =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        addEdge({ ...params, type: 'smoothstep', tool_input: '' }, eds),
+      );
     },
     [nodesOG, setEdges],
   );
   useEffect(() => {
-    setEdges(initialEdges);
+    setEdges(initialEdges.map(rs => ({ ...rs, type: 'smoothstep' })));
   }, [initialEdges, setEdges]);
 
   const onReconnectStart = useCallback(() => {
@@ -71,9 +109,10 @@ export default function FlowCanvas() {
     (oldEdge: Edge, newConnection: Connection) => {
       edgeReconnectSuccessful.current = true;
       setEdges(els =>
-        reconnectEdge({ ...oldEdge, animated: true }, newConnection, els).map(
-          e => ({ ...e, animated: true, type: 'smoothstep' }),
-        ),
+        reconnectEdge({ ...oldEdge }, newConnection, els).map(e => ({
+          ...e,
+          type: 'smoothstep',
+        })),
       );
     },
     [setEdges],
@@ -89,6 +128,7 @@ export default function FlowCanvas() {
     },
     [setEdges],
   );
+  const {} = useNodeViewport();
   const showToolHandler = () => {
     setToolDrawerOpen(!toolDrawerOpen);
     setActionPanelVisible(false);
@@ -96,10 +136,13 @@ export default function FlowCanvas() {
     setShowKeyInputArea(false);
     setShowMore(false);
   };
+
   return (
     <div className="flex h-screen">
       <div className="flex-1">
         <ReactFlow
+          defaultViewport={{ x: 250, y: 250, zoom: 1.2 }}
+          edgeTypes={edgeTypes}
           colorMode={theme}
           onReconnect={onReconnect}
           onReconnectStart={onReconnectStart}
@@ -110,24 +153,17 @@ export default function FlowCanvas() {
           nodeTypes={{
             custom: DefaultNode,
             default: DefaultNode,
-            start_point: props => (
-              <StartPointNode
-                {...props}
-                onPress={() => {
-                  setToolDrawerOpen(true);
-                }}
-              />
-            ),
+            start_point: props => <StartPointNode {...props} />,
             conditional: RoutingNode,
-            action: DefaultNode,
-            generate: DefaultNode,
-            initiate: StartNode,
+            action: ActionNode,
+            generate: GenerateNode,
+            initiate: InitiateNode,
             close: EndNode,
           }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView>
+          onConnect={onConnect}>
+          {' '}
           <Background
             color="var(--color-zinc-500)"
             size={0.8}
@@ -136,18 +172,26 @@ export default function FlowCanvas() {
           />
           <MiniMap
             position="bottom-left"
-            maskColor="var(--c-secondary)"
+            maskColor="var(--c-surface-text)"
             bgColor="var(--c-background)"
             color="var(--c-background-color)"
             nodeColor={(node: Node) => {
-              if (node.data.category === 'initiate')
-                return 'var(--color-emerald-400)';
-              if (node.data.category === 'start_point')
-                return 'var(--c-background)';
-              if (node.data.category === 'close') return 'var(--color-red-400)';
-              if (node.data.category === 'conditional')
-                return 'var(--color-lime-400)';
-              return 'var(--color-cyan-400)';
+              switch (node.data.category) {
+                case 'initiate':
+                  return 'var(--color-emerald-400)';
+                case 'conditional':
+                  return 'var(--color-cyan-400)';
+                case 'action':
+                  return 'var(--color-green-400)';
+                case 'generate':
+                  return 'var(--color-blue-400)';
+                case 'close':
+                  return 'var(--color-orange-400)';
+                case 'start_point':
+                  return 'var(--color-emerald-400)';
+                default:
+                  return 'var(--color-emerald-400)';
+              }
             }}
           />
           {/* <div className="flex gap-3">
@@ -177,20 +221,18 @@ export default function FlowCanvas() {
                 </Button>
               </div>
             </div> */}
-
-          <Button
-            className="absolute right-2 top-20 z-999 group"
-            onClick={showToolHandler}>
-            Tools
-            <SettingsIcon />
-            <span className="hidden group-hover:flex">(Ctrl+T)</span>
-          </Button>
-
           <Controls position="bottom-left" orientation="horizontal" />
         </ReactFlow>
 
         <DraggablePanel />
       </div>
+      <Button
+        className="absolute right-2 top-20 z-9 group"
+        onClick={showToolHandler}>
+        Tools
+        <SettingsIcon />
+        <span className="hidden group-hover:flex">(Ctrl+T)</span>
+      </Button>
 
       <Drawer
         // width={'w-[400px]'}
