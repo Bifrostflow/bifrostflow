@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Typography } from '../typography';
 import { createProject } from '@/_backend/private/projects/createProject';
 import { showToast } from '../toast';
-import { Loader } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DynamicIcon } from 'lucide-react/dynamic';
 
 const StartNew = ({
   current_project_count,
@@ -68,7 +69,7 @@ const StartNew = ({
       onClick={createProjectHandler}
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
-      className="relative h-80 p-4 rounded-2xl min-w-2xs max-w-2xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-border/90 hover:border-c-secondary mr-10 justify-start items-start flex flex-col text-left">
+      className="relative h-80 p-4 rounded-2xl min-w-2xs max-w-2xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-secondary mr-10 justify-start items-start flex flex-col text-left">
       <Typography
         variant={'h2'}
         className="group-hover/card:text-c-secondary/80">
@@ -81,8 +82,19 @@ const StartNew = ({
           &quot; Every unicorn starts with a single click...&quot;
         </blockquote>
       </Typography>
+      {!creating && (
+        <div className="flex fex-row w-full justify-center items-center h-full">
+          <div className="p-2 rounded-full border-2 border-c-secondary-variant">
+            <DynamicIcon
+              name="plus"
+              size={64 / 1.5}
+              className="text-c-secondary-variant"
+            />
+          </div>
+        </div>
+      )}
       {creating && (
-        <Loader className="absolute bottom-4 right-4 text-c-secondary group-hover/card:text-c-primary/80 transition duration-300 animate-spin" />
+        <Loader2 className="absolute bottom-4 right-4 text-c-secondary group-hover/card:text-c-primary/80 transition duration-300 animate-spin" />
       )}
     </motion.button>
   );
