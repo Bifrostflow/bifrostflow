@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 import {
   Form,
@@ -41,11 +40,11 @@ export default function EditFlow() {
             form.setValue('name', res.data[0].name);
             form.setValue('description', res.data[0].description || '');
           } else {
-            toast(res?.message);
+            showToast({ description: res?.message, type: 'error' });
           }
         })
         .catch(er => {
-          toast(er);
+          showToast({ description: er, type: 'error' });
         })
         .finally(() => setLoadingData(false));
       // form.setValue()

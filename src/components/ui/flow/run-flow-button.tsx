@@ -141,11 +141,12 @@ export const RunButton = () => {
   };
 
   const runFlow = async (imageString: string) => {
+    if (updatingNodes) return;
     const isValid = validateIndirectFlow(getEdges());
     if (isValid) {
       try {
         if (graphHaveChanges) {
-          setUpdatingNodes(true);
+          setUpdatingNodes(() => true);
           const response = await updateFlowGraph({
             flow_id: slug,
             nodes: JSON.stringify({ data: getNodes() }),

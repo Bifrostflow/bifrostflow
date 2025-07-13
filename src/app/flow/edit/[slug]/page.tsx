@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { redirect } from 'next/navigation';
-import { toast } from 'sonner';
 
 import {
   Form,
@@ -19,6 +18,7 @@ import {
 import { useEffect } from 'react';
 import getProject from '@/_backend/private/projects/getProject';
 import { editProject } from '@/_backend/private/projects/editProject';
+import { showToast } from '@/components/ui/toast';
 
 const FormSchema = z.object({
   name: z.string().min(3, {
@@ -41,11 +41,11 @@ export default function Page({
             form.setValue('name', res.data[0].name);
             form.setValue('description', res.data[0].description || '');
           } else {
-            toast(res?.message);
+            showToast({ description: res?.message, type: 'error' });
           }
         })
         .catch(er => {
-          toast(er);
+          showToast({ description: er, type: 'error' });
         });
       // form.setValue()
     };
@@ -70,7 +70,11 @@ export default function Page({
     if (response?.data) {
       redirect('/flow/' + slug);
     } else {
-      toast(response?.message || response?.error || 'Update app failed');
+      showToast({
+        description:
+          response?.message || response?.error || 'Update app failed',
+        type: 'error',
+      });
     }
   }
   return (

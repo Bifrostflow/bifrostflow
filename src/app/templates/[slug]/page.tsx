@@ -72,6 +72,16 @@ export default async function Flow({
                 {price ? `$${price}` : 'Free'}
               </Typography>
             </div>
+            {!!price && (
+              <div className="w-2xs flex flex-row justify-between items-center my-2 pt-3 border-t-1 border-t-c-border">
+                <Typography className="mb-2 text-c-secondary" variant={'h3'}>
+                  Total:
+                </Typography>
+                <Typography className={'mb-2 text-c-secondary'} variant={'h4'}>
+                  {`$${price}`}
+                </Typography>
+              </div>
+            )}
             <div className="flex flex-row gap-2 mt-3">
               <GoBack />
               {price ? (

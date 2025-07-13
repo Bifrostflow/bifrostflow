@@ -5,7 +5,7 @@ import { Input } from '../input';
 import { Button } from '../button';
 import { updateFlowKeys } from '@/_backend/private/projects/updateFlowKeys';
 import { useFlow } from '@/context/flow-context';
-import { toast } from 'sonner';
+
 import { Typography } from '../typography';
 import {
   Form,
@@ -18,6 +18,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
+import { showToast } from '../toast';
 
 export type APIData = Record<string, string>;
 export type RequiredKeysType = Record<string, boolean>;
@@ -119,13 +120,19 @@ export default function EnterKeys({
         apiKeys: JSON.stringify(keys),
         flow_id: slug,
       });
-      toast(response?.message);
       if (response?.isSuccess) {
+        showToast({ description: response.message, type: 'success' });
+
         onKeysSaved(keys);
         setAPIKeys(keys);
+      } else {
+        showToast({
+          description: 'Failed to update keys. Please try again.',
+          type: 'error',
+        });
       }
     } catch (error) {
-      toast(`FAILED: ${error}`);
+      showToast({ description: `FAILED: ${error}`, type: 'error' });
       console.log(error);
     } finally {
       setUpdating(false);
@@ -199,7 +206,6 @@ export default function EnterKeys({
                             <Input
                               placeholder="Enter key here..."
                               {...field}
-                              value={field.value || ''}
                               defaultValue={field.value || ''}
                               type="password"
                             />
@@ -239,7 +245,7 @@ export default function EnterKeys({
       ) : (
         <>
           <Typography variant={'p'} className="text-xl italic text-c-secondary">
-            No keys needed for this flow, you're all set for now!
+            No keys needed for this flow, you&squot;re all set for now!
           </Typography>
           <Typography variant={'blockquote'} className="text-lg">
             &quot;Sometimes, the most powerful tools need no keys.
@@ -250,30 +256,6 @@ export default function EnterKeys({
           </Typography>
         </>
       )}
-      {/* {Object.keys(apiDataFields).map(key => {
-        return (
-          <div key={key} className="my-2 flex flex-col gap-2">
-            <Label>
-              Enter Key<span className="capitalize">{key.trim()}</span>
-            </Label>
-            <Input
-              type="password"
-              placeholder={key}
-              value={APIKeyValues[key] ?? ''}
-              onChange={e => {
-                setAPIKeyValues({
-                  ...APIKeyValues,
-                  [key]: e.target.value,
-                });
-              }}
-            />
-            <p className="text-red-700">{errors[key] || ''}</p>
-          </div>
-        );
-      })} */}
-      {/* <Button onClick={() => onSaveHandler(APIKeyValues)} disabled={updating}>
-        {updating ? 'Saving' : 'Save'} Keys
-      </Button> */}
     </div>
   );
 }

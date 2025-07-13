@@ -24,14 +24,18 @@ const MyProjects = async () => {
           {current_project_count} of {project_limit} flows used
         </Typography>
       </div>
-      <div className={cn('flex flex-row gap-4 my-4 flex-wrap')}>
-        <StartNew
-          current_project_count={current_project_count}
-          project_limit={project_limit}
-        />
-        {projects.map(res => {
-          return <ProjectCard item={res} key={res.id} />;
-        })}
+      <div className={cn('flex flex-row gap-4 my-4 ')}>
+        <div className="flex flex-col">
+          <StartNew
+            current_project_count={current_project_count}
+            project_limit={project_limit}
+          />
+        </div>
+        <div className="flex flex-row gap-4 flex-wrap">
+          {projects.map(res => {
+            return <ProjectCard item={res} key={res.id} />;
+          })}
+        </div>
       </div>
     </section>
   );
