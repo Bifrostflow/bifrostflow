@@ -1,3 +1,4 @@
+'use server';
 // /app/api/run-flow/route.ts
 import { runFlowWithInput } from '@/_backend/runFlow';
 import { NextResponse } from 'next/server';
