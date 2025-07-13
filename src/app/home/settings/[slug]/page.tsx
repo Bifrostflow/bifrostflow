@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-screen p-6">
-      <div className="flex flex-col max-w-6xl mx-auto bg-c-surface rounded-xl shadow-xl p-0 gap-6 mt-20 md:flex-row">
+      <div className="flex flex-col max-w-6xl mx-auto  rounded-xl p-0 gap-6 mt-20 md:flex-row">
         <SettingsSidebar />
         <section className="flex-1">{renderSection()}</section>
       </div>

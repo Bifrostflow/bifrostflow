@@ -35,7 +35,7 @@ export default function SettingsSidebar({}) {
 
                 // Selected (active) styles
                 pathname.includes(opt.path) &&
-                  'bg-c-primary-variant text-c-on-primary-variant',
+                  'bg-c-on-primary/80  rounded-lg pl-4 p-2 m-1 text-c-primary',
               )}>
               <DynamicIcon name={opt.icon as IconName} size={24} />
               <Typography variant={'h4'}>{opt.label}</Typography>

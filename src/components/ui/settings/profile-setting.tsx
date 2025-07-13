@@ -65,21 +65,21 @@ export default function ProfileSettings() {
 
   return (
     <div className="pb-4 md:pr-4 pt-2 flex gap-6 flex-col">
-      <div className="dark:bg-neutral-700 bg-c-on-primary/80 rounded-xl p-4 hidden md:flex flex-row justify-start items-center">
+      <div className="rounded-xl p-4 hidden md:flex flex-row justify-start items-center">
         <Typography
           variant={'h2'}
           className="font-semibold text-c-primary pb-0">
           Profile
         </Typography>
       </div>
-      <div className="dark:bg-neutral-700 bg-zinc-200 rounded-xl p-4">
+      <div className="bg-c-primary-variant/10 rounded-xl p-4">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(values => {
               console.log(values);
               submitHandler(values);
             })}
-            className="w-[400px] space-y-6 p-6 rounded-lg">
+            className="w-[400px] space-y-6 p-6 rounded-lg ">
             <FormField
               control={form.control}
               name="first_name"
@@ -120,10 +120,7 @@ export default function ProfileSettings() {
               )}
             />
             <div className="flex flex-row gap-2">
-              <Button
-                disabled={updatingUser}
-                type="submit"
-                variant={'secondary'}>
+              <Button disabled={updatingUser} type="submit">
                 {updatingUser && <Loader2 size={24} className="animate-spin" />}
                 Submit
               </Button>
@@ -132,7 +129,7 @@ export default function ProfileSettings() {
                   e.preventDefault();
                   form.reset();
                 }}
-                variant={'outline_secondary'}>
+                variant={'outline_primary'}>
                 Close
               </Button>
             </div>

@@ -3,12 +3,14 @@ import { Typography } from '../typography';
 export default function PlansSettings() {
   return (
     <div className="pr-4 pt-2 flex gap-6 flex-col">
-      <div className="dark:bg-c-on-primary/10 bg-c-on-primary/80 rounded-xl p-4">
-        <Typography variant={'h2'} className="font-semibold text-c-primary">
+      <div className="rounded-xl p-4">
+        <Typography
+          variant={'h2'}
+          className="font-semibold text-c-primary pb-0">
           Plans
         </Typography>
       </div>
-      <div className="dark:bg-zinc-800 bg-zinc-200 rounded-xl p-4"></div>
+      <div className="bg-c-primary-variant/10 rounded-xl p-4"></div>
     </div>
   );
 }
