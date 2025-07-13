@@ -58,6 +58,8 @@ export type FlowTemplate = {
   keywords: string[];
   tags: string[];
   version: string;
+  product_id: string;
+  is_purchased?: boolean;
 };
 
 export const getTemplates = async (): Promise<APIResponse<
