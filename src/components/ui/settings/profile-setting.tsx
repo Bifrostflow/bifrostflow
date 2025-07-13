@@ -14,6 +14,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { useClerk } from '@clerk/nextjs';
 import { Button } from '../button';
+import { useState } from 'react';
+import { showToast } from '../toast';
+import updateClerkUser from '@/_backend/private/projects/updateClerkUser';
+import { Loader2 } from 'lucide-react';
 
 export const ClerkProfileSchema = z.object({
   first_name: z.string().min(4, {
@@ -29,6 +33,7 @@ export const ClerkProfileSchema = z.object({
 
 export default function ProfileSettings() {
   const { user } = useClerk();
+  const [updatingUser, setUpdatingUser] = useState(false);
   console.log(user?.firstName, user?.lastName, user?.username);
 
   const form = useForm<z.infer<typeof ClerkProfileSchema>>({
@@ -39,6 +44,25 @@ export default function ProfileSettings() {
       username: user?.username || '',
     },
   });
+
+  const submitHandler = async (data: z.infer<typeof ClerkProfileSchema>) => {
+    if (updatingUser) return;
+    setUpdatingUser(true);
+    try {
+      const response = await updateClerkUser(data);
+      showToast({
+        description: response?.message,
+        type: response?.isSuccess ? 'success' : 'error',
+      });
+
+      console.log(response?.data);
+    } catch (error) {
+      showToast({ description: `${error}`, type: 'error' });
+    } finally {
+      setUpdatingUser(false);
+    }
+  };
+
   return (
     <div className="pr-4 pt-2 flex gap-6 flex-col">
       <div className="dark:bg-neutral-700 bg-c-on-primary/80 rounded-xl p-4">
@@ -51,6 +75,7 @@ export default function ProfileSettings() {
           <form
             onSubmit={form.handleSubmit(values => {
               console.log(values);
+              submitHandler(values);
             })}
             className="w-[400px] space-y-6 p-6 rounded-lg">
             <FormField
@@ -93,7 +118,11 @@ export default function ProfileSettings() {
               )}
             />
             <div className="flex flex-row gap-2">
-              <Button type="submit" variant={'secondary'}>
+              <Button
+                disabled={updatingUser}
+                type="submit"
+                variant={'secondary'}>
+                {updatingUser && <Loader2 size={24} className="animate-spin" />}
                 Submit
               </Button>
               <Button

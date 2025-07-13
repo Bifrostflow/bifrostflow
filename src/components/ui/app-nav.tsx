@@ -46,7 +46,7 @@ function AppNav({
             {renderItems && renderItems()}
           </div>
           <SignedIn>
-            <UserButton userProfileUrl="/profile" />
+            <UserButton userProfileUrl="/home/settings/profile" />
           </SignedIn>
           <Button
             variant={'link'}
