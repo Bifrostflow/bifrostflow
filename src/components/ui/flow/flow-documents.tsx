@@ -28,7 +28,7 @@ const FlowDocuments = () => {
       .finally(() => {
         setGettingDocs(false);
       });
-  }, []);
+  }, [setGettingDocs, setDocuments, slug]);
   return (
     <div className="max-w-[450px]">
       <Typography className="text-14 font-semibold py-2">
