@@ -13,7 +13,7 @@ function TryNowButton({ template }: { template: FlowTemplate }) {
   const router = useRouter();
   return (
     <Button
-      variant={'secondary'}
+      variant={'default'}
       className="w-28"
       disabled={creatingProject}
       onClick={async () => {

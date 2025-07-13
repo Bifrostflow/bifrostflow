@@ -20,11 +20,11 @@ export default async function Flow({
     return (
       <div className="pt-30">
         <div
-          className="ml-[25%]
+          className="px-4 lg:px-10 xl:px-40
         flex flex-col">
           <div
             id="content"
-            className="flex flex-row justify-start items-start gap-10">
+            className="flex flex-col-reverse lg:flex-row justify-start items-start gap-10">
             <div className="flex flex-col justify-start items-start gap-2">
               <Typography
                 variant={'h1'}
@@ -32,7 +32,7 @@ export default async function Flow({
                 {name}
               </Typography>
               <Typography
-                className="w-3xl mb-5 text-c-background-text"
+                className="w-3sm lg:w-3xl mb-5 text-c-background-text"
                 variant={'p'}>
                 {description}
               </Typography>
