@@ -5,7 +5,6 @@ import { getNodesForFlow } from '@/_backend/private/projects/getNodesForFlow';
 import FlowContextWrapper from './flow-context-wrapper';
 import { getSystemToolsByID } from '@/_backend/getSystemTools';
 import { redirect } from 'next/navigation';
-import print from '@/lib/print';
 const start_point: Node = {
   id: '0-start_point',
   type: 'start_point',
@@ -17,19 +16,25 @@ const start_point: Node = {
   draggable: false,
 };
 
+type SearchParamsKeys = 'show';
+
 export default async function Flow({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{
+    [key: SearchParamsKeys | string]: string | string[] | undefined;
+  }>;
 }) {
   const { slug } = await params;
+  const searchParamValue = await searchParams;
   try {
     const loadGraph = async () => {
       try {
         const response = await getNodesForFlow(slug);
-        print({ response });
         if (!response.isSuccess) {
-          return redirect('/home');
+          return null;
         }
         if (!response.data) {
           return { nodes: [start_point], edges: [], isSuccess: false };
@@ -93,6 +98,7 @@ export default async function Flow({
           nodes: finalNodes || [start_point],
           edges: finalEdges || [],
           apiKeys: finalAPIKeys,
+          name: response.data.name,
           isSuccess: true,
         };
       } catch (error) {
@@ -101,13 +107,19 @@ export default async function Flow({
         return { isSuccess: false };
       }
     };
-    const response = await loadGraph();
-
-    const { edges, nodes, apiKeys } = response;
+    const loadedresponse = await loadGraph();
+    if (!loadedresponse) {
+      return redirect('/home');
+    }
+    const { edges, nodes, apiKeys, name } = loadedresponse;
 
     return (
       <ReactFlowProvider>
         <FlowContextWrapper
+          name={name || ''}
+          paramShowRequest={
+            searchParamValue.show as 'edit' | 'other' | undefined
+          }
           apiKeys={apiKeys || {}}
           initialEdges={edges || []}
           initialNodes={nodes || [start_point]}

@@ -7,18 +7,18 @@ type Props = {
 
 export const CodeEvaluateResponse = ({ response }: Props) => {
   const { meta } = response;
-
+  if (!meta) return null;
   if (meta.type === 'evaluate_code') {
     return (
-      <div className="bg-zinc-900 border border-emerald-600 rounded-md shadow-lg p-4 space-y-2 w-full max-w-md text-sm text-emerald-100">
+      <div className="bg-background border border-c-secondary rounded-md shadow-lg p-4 space-y-2 w-full max-w-md text-sm text-c-background-text">
         <p className="flex items-start gap-1">
-          <span className="font-semibold text-emerald-400">
-            {meta.is_code ? 'Code :' : ''}
+          <span className="font-semibold text-c-secondary">
+            {meta.is_code ? 'Code:' : ''}
           </span>
           {!!meta.code && (
-            <code className="bg-emerald-950 px-2 py-1 rounded text-emerald-300 font-mono text-xs">
-              {meta.code}
-            </code>
+            <pre className="bg-c-secondary-variant px-2 py-1 rounded text-c-on-secondary font-semibold font-mono text-xs whitespace-pre-wrap break-words">
+              <code>{meta.code}</code>
+            </pre>
           )}
         </p>
         <p>
@@ -27,7 +27,9 @@ export const CodeEvaluateResponse = ({ response }: Props) => {
         </p>
         <p>
           <span className="font-semibold text-emerald-400">Rating:</span>{' '}
-          <span className="text-yellow-400 font-bold">{meta.rating}/10</span>
+          <span className="text-c-background-text font-bold">
+            {meta.rating}/10
+          </span>
         </p>
       </div>
     );

@@ -28,14 +28,14 @@ export function HeroNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="relative w-full">
-      <Navbar>
+    <div className="relative w-full bg-transparent">
+      <Navbar className="bg-transparent">
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          <NavItems items={navItems} />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-row justify-end">
+            <NavItems items={navItems} />
             <SignedOut>
               <SignInButton
                 forceRedirectUrl={'/home'}
@@ -84,13 +84,6 @@ export function HeroNav() {
               <SignedIn>
                 <UserButton userProfileUrl="/profile" />
               </SignedIn>
-
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full">
-                Book a call
-              </NavbarButton>
             </div>
           </MobileNavMenu>
         </MobileNav>

@@ -4,14 +4,17 @@ import { Button } from '../button';
 import { tryTemplate } from '@/_backend/private/projects/createProject';
 import { FlowTemplate } from '@/_backend/private/projects/getTemplates';
 import print from '@/lib/print';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { showToast } from '../toast';
+import { Loader2 } from 'lucide-react';
 
 function TryNowButton({ template }: { template: FlowTemplate }) {
   const [creatingProject, setcreatingProject] = useState(false);
   const router = useRouter();
   return (
     <Button
+      variant={'secondary'}
+      className="w-28"
       disabled={creatingProject}
       onClick={async () => {
         setcreatingProject(true);
@@ -20,16 +23,25 @@ function TryNowButton({ template }: { template: FlowTemplate }) {
           if (response?.data) {
             router.replace(`/flow/${response?.data[0]?.id}`);
           } else {
-            toast(response?.message || response?.error || 'Create app failed');
+            showToast({
+              description:
+                response?.message || response?.error || 'Create app failed',
+              type: 'error',
+            });
           }
         } catch (error) {
-          toast('Create app failed');
+          showToast({
+            description: 'Create app failed',
+            type: 'error',
+          });
+
           print(error);
         } finally {
           setcreatingProject(false);
         }
       }}>
-      {creatingProject ? 'Creating...' : 'Try Now'}
+      {creatingProject && <Loader2 className="animate-spin" />}
+      Try Now
     </Button>
   );
 }

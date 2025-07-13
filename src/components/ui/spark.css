@@ -1,0 +1,11 @@
+/* styles/spark.css */
+.spark {
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  border-radius: 4px;
+  background-color: white;
+  transform: none;
+  pointer-events: none;
+  z-index: 9999;
+}

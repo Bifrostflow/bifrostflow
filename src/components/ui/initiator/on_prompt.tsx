@@ -3,10 +3,11 @@ import { Loader2, Send, X } from 'lucide-react';
 import { useState } from 'react';
 import { Edge } from '@xyflow/react';
 import { Textarea } from '../textarea';
-import { CodeEvaluateResponse } from '../responses/code_evaluate';
-import { MarkdownTextResponse } from '../responses/markdown-text';
 
 import { useFlow } from '@/context/flow-context';
+import { Button } from '../button';
+
+import ChatResponseViewer from './chat_response_viewer';
 
 type Props = {
   edges: Edge[];
@@ -14,51 +15,46 @@ type Props = {
 };
 
 export const OnPrompt = ({ edges, onClose }: Props) => {
-  const { runFlowHandler, chunkResponse, loaderUIText, runningFlow } =
-    useFlow();
+  const { runFlowHandler, runningFlow, setChunkResponse } = useFlow();
   const [message, setMessage] = useState('');
 
   return (
-    <div className="w-full flex-col justify-center items-center rounded-2xl">
-      <div className="flex justify-end">
-        <button
-          onClick={runningFlow ? () => {} : onClose}
-          className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-emerald-500 to-emerald-800 p-1 rounded-full mb-2">
+    <div className="w-full max-w-5xl flex-col justify-center items-center">
+      <div className="flex justify-end mb-3">
+        <Button
+          size={'icon'}
+          onClick={
+            runningFlow
+              ? () => {}
+              : () => {
+                  setChunkResponse(undefined);
+                  onClose();
+                }
+          }>
           <X />
-        </button>
+        </Button>
       </div>
-      <div className="w-full min-h-[200px] max-h-[300px] mb-2 rounded-2xl border-2 border-zinc-600 overflow-y-scroll h-64 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-zinc-800">
-        {chunkResponse && (
-          <>
-            {chunkResponse.meta.type === 'evaluate_code' && (
-              <CodeEvaluateResponse response={chunkResponse} />
-            )}
-            {(!chunkResponse.meta.type ||
-              chunkResponse.meta.type === 'other') && (
-              <MarkdownTextResponse response={chunkResponse.messages.content} />
-            )}
-          </>
-        )}
-      </div>
-      <p className="italic p-2 text-sm text-white"> {loaderUIText}</p>
-      <div className="w-full max-w-3xl flex gap-2 items-center">
+      <ChatResponseViewer />
+      <div className="w-full max-w-5xl flex gap-2 items-end justify-start">
         <Textarea
           disabled={runningFlow}
           value={message}
           onChange={e => setMessage(e.target.value)}
           placeholder={'Type your message...'}
-          className="flex-1 min-h-[40px] max-h-[100px] resize-y border-emerald-500 placeholder:text-emerald-500 text-emerald-200"
+          className="text-c-background-text text-lg border-2 border-c-primary rounded-xl"
         />
-        <button
+        <Button
           disabled={runningFlow || !message}
-          onClick={() => runFlowHandler({ edges, message })}
-          className="bg-gradient-to-br from-emerald-500 to-emerald-800 rounded-full p-2">
+          onClick={() => {
+            runFlowHandler({ edges, message });
+          }}>
+          Send
           {runningFlow ? (
-            <Loader2 className="animate-spin text-white h-[18px] w-[18px]" />
+            <Loader2 className="animate-spin h-[18px] w-[18px]" />
           ) : (
-            <Send className="text-white h-[18px] w-[18px]" />
+            <Send className=" h-[18px] w-[18px]" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

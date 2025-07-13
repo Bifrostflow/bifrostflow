@@ -1,34 +1,29 @@
-import { motion } from 'framer-motion';
 import { OnPrompt } from './initiator/on_prompt';
-import { Edge } from '@xyflow/react';
-import { InitiatorType } from './flow/flow-canvas';
 import { useFlow } from '@/context/flow-context';
+import { useReactFlow } from '@xyflow/react';
+import Drawer from './drawer';
 
-interface IProps {
-  edges: Edge[];
-  initiatorType?: InitiatorType;
-}
-
-export const DraggablePanel = ({ initiatorType, edges }: IProps) => {
-  const { actionPanelVisible, setActionPanelVisible } = useFlow();
+export const DraggablePanel = () => {
+  const {
+    actionPanelVisible,
+    setActionPanelVisible,
+    initiatorTypeValue,
+    setChunkResponse,
+  } = useFlow();
+  const { getEdges } = useReactFlow();
+  const onCloseHandler = () => {
+    setActionPanelVisible(false);
+    setChunkResponse(undefined);
+  };
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`p-3 bg-zinc-700 rounded-2xl m-1 border-2 border-zinc-400 w-[300px] z-[10000]
-            absolute
-            bottom-0
-          left-5
-          transform transition-transform duration-300
-          ${actionPanelVisible ? 'translate-y-0' : 'translate-y-100'}
-        `}>
-      {initiatorType === 'on_prompt' && (
-        <OnPrompt onClose={() => setActionPanelVisible(false)} edges={edges} />
+    <Drawer
+      visible={actionPanelVisible}
+      onClose={onCloseHandler}
+      position="bottom"
+      className="bottom-10 right-20 left-auto w-3xl max-w-3xl">
+      {initiatorTypeValue === 'on_prompt' && (
+        <OnPrompt onClose={onCloseHandler} edges={getEdges()} />
       )}
-      {/* {initiatorType === 'on_start' && (
-        <OnPrompt flow_id={flow_id} onClose={onClose} edges={edges} />
-      )} */}
-    </motion.div>
+    </Drawer>
   );
 };
