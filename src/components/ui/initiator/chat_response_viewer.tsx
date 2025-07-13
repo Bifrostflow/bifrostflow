@@ -34,6 +34,12 @@ const ChatResponseViewer = () => {
       setChunkMessageList([]);
     }
   }, [runningFlow]);
+  const bottomRef = React.useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chunkMessageList]);
 
   useEffect(() => {
     if (loaderUIText[loaderUIText.length - 1]) {
@@ -136,6 +142,7 @@ const ChatResponseViewer = () => {
             </motion.div>
           );
         })}
+      <div ref={bottomRef} />
     </div>
   );
 };

@@ -1,10 +1,15 @@
 'use client';
 import { SystemTool, ToolCategory } from '@/_backend/getSystemTools';
-import { ChunkResponse, ChunkResponseData } from '@/_backend/runFlow';
+import {
+  ChunkNodeData,
+  ChunkResponse,
+  ChunkResponseData,
+} from '@/_backend/runFlow';
 import { APIData } from '@/components/ui/flow/enter-keys-area';
 import { InitiatorType } from '@/components/ui/flow/flow-canvas';
+import { showToast } from '@/components/ui/toast';
 import print from '@/lib/print';
-import { mapTypesToDeleteButtonColor } from '@/lib/utils';
+
 import {
   Edge,
   Node,
@@ -13,7 +18,7 @@ import {
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
-import { Link, Trash2 } from 'lucide-react';
+
 import {
   createContext,
   Dispatch,
@@ -24,7 +29,6 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { toast } from 'sonner';
 
 type FlowContextType = {
   slug: string;
@@ -61,11 +65,14 @@ type FlowContextType = {
   isMainNodesSelected: boolean;
   tabsToSelectValue: ToolCategory[];
   showEditDrawer: boolean;
+  showFlowDocs: boolean;
+  setShowFlowDocs: (value: boolean) => void;
   setShowEditDrawer: (value: boolean) => void;
   flowName: string;
   setFlowName: (value: string) => void;
   showMore: boolean;
   setShowMore: (value: boolean) => void;
+  currentNodeInProcess: ChunkNodeData | undefined;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
@@ -98,6 +105,7 @@ export const FlowProvider = ({
   const [APIKeys, setAPIKeys] = useState<APIData>(apiKeys);
   const [showKeyInputArea, setShowKeyInputArea] = useState(false);
   const [showActionPanel, setShowActionPanel] = useState(false);
+  const [showFlowDocs, setShowFlowDocs] = useState(false);
   const [UILoaderText, setUILoaderText] = useState<string[]>([]);
   const [chunkResponse, setChunkResponse] = useState<ChunkResponse>();
   const [runningFlow, setRunningFlow] = useState(false);
@@ -111,6 +119,8 @@ export const FlowProvider = ({
   const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges);
   const [flowName, setFlowName] = useState(name);
   const [showMore, setShowMore] = useState(false);
+  const [currentNodeInProcess, setCurrentNodeInProcess] =
+    useState<ChunkNodeData>();
   // noded and edges
   useEffect(() => {
     const sanitizedNodes = defaultNodes.map(node => mapNodesDataToNodes(node));
@@ -164,8 +174,6 @@ export const FlowProvider = ({
       JSON.stringify(compareDataLastUpdatedNode)
     ) {
       needUpdate = true;
-      // id,type,
-      // data->id,state,
     }
     return needUpdate;
   }, [edges, nodes, lastUpdatedEdges, lastUpdatedNodes]);
@@ -184,36 +192,16 @@ export const FlowProvider = ({
       type: node.type,
       data: {
         ...node.data,
-        onClick: () => {
-          setToolDrawerOpen(true);
-        },
-        delete: (
-          <Trash2
-            size={10}
-            color={
-              mapTypesToDeleteButtonColor[
-                node.data.category as unknown as ToolCategory
-              ]
-            }
-            onClick={() => {
-              handleRemoveNode(node.id);
-            }}
-          />
-        ),
+        node_id: node.id,
       } as unknown as Record<string, unknown>,
       position: node.position,
     };
     return newNode;
   };
-  const handleRemoveNode = (id: string) => {
-    setNodes(nds => nds.filter(node => node.id !== id));
-    setEdges(eds =>
-      eds.filter(edge => edge.source !== id && edge.target !== id),
-    );
-  };
 
   const runFlowHandler = async ({ edges, message }: FlowBody) => {
-    setRunningFlow(true);
+    if (runningFlow) return;
+    setRunningFlow(() => true);
     setUILoaderText(prev => [...prev, 'Preparing Flow.']);
     setChunkResponse(undefined);
     try {
@@ -251,22 +239,30 @@ export const FlowProvider = ({
                 line.replace('data: ', ''),
               );
               if (json.error) {
-                toast(json.error || '');
+                showToast({ description: json.error, type: 'error' });
               }
+              setCurrentNodeInProcess(json.node_data);
               responseArray.push(json.response);
               setChunkResponse(json.response);
 
               if (json?.response?.type === 'show-documents') {
-                toast(json.ui_response, { action: <Link /> });
+                setShowMore(true);
+                setShowFlowDocs(true);
+                showToast({
+                  description: json.ui_response,
+                  type: 'success',
+                  button: { label: 'Check Here.', onClick() {} },
+                });
               }
               setUILoaderText(prev => [...prev, json.ui_response]);
-              await new Promise(resolve => setTimeout(resolve, 100));
+              await new Promise(resolve => setTimeout(resolve, 1000));
             } catch (err) {
               console.error('Error parsing JSON', err);
             }
           }
         }
       }
+      setCurrentNodeInProcess(undefined);
       if (responseArray[responseArray.length - 1].type === '')
         print('LAST RES: ', responseArray[responseArray.length - 1]);
     } catch (error) {
@@ -291,18 +287,7 @@ export const FlowProvider = ({
       type: node.category || 'default',
       data: {
         ...node,
-        onClick: () => {
-          setToolDrawerOpen(true);
-        },
-        delete: (
-          <Trash2
-            size={10}
-            color={mapTypesToDeleteButtonColor[node.category]}
-            onClick={() => {
-              handleRemoveNode(id);
-            }}
-          />
-        ),
+        node_id: id,
       } as unknown as Record<string, unknown>,
       position: { x: 250, y: 250 },
     };
@@ -322,6 +307,9 @@ export const FlowProvider = ({
   return (
     <FlowContext.Provider
       value={{
+        setShowFlowDocs,
+        showFlowDocs,
+        currentNodeInProcess: currentNodeInProcess,
         updateLastSavedGraph(nodes, edges) {
           setlastUpdatedEdges(edges);
           setlastUpdatedNodes(nodes);

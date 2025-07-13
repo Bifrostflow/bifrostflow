@@ -1,59 +1,3 @@
-// import React, { memo, ReactNode, useEffect, useState } from 'react';
-// import { NodeProps, Position } from '@xyflow/react';
-// import { SystemTool } from '@/_backend/getSystemTools';
-// import CustomHandle from '../handles/custom-handle';
-
-// type UnionType = SystemTool & { delete: ReactNode };
-
-// const RNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
-//   const [nodeData, setNodeData] = useState<UnionType>();
-//   useEffect(() => {
-//     setNodeData(data as unknown as UnionType);
-//   }, [data]);
-
-//   return (
-//     <div
-//       className="
-//      rounded-2xl
-//     px-3 py-1
-//     shadow-lg
-//     transition-all duration-100 ease-[cubic-bezier(0.34, 1.56, 0.64, 1)]
-//     border
-//      bg-zinc-900
-//     border-lime-400
-//     active:bg-zinc-800
-//     ">
-//       <div className="flex justify-between items-center gap-2">
-//         <CustomHandle
-//           connectionCount={1}
-//           style={{
-//             backgroundColor: 'var(--color-lime-400)',
-//           }}
-//           type="target"
-//           position={Position.Top}
-//           isConnectable={isConnectable}
-//         />
-//         <div>
-//           <p className="text-[10px] text-lime-400">{nodeData?.name}</p>
-//           <p className="text-[6px] text-lime-400">{nodeData?.description}</p>
-//         </div>
-//         {nodeData?.delete}
-//       </div>
-//       <CustomHandle
-//         connectionCount={2}
-//         style={{
-//           backgroundColor: 'var(--color-lime-400)',
-//         }}
-//         type="source"
-//         position={Position.Bottom}
-//         isConnectable={isConnectable}
-//       />
-//     </div>
-//   );
-// };
-
-// export const RoutingNode = memo(RNode);
-
 import React, { memo, ReactNode, useEffect, useState } from 'react';
 import { NodeProps, Position, useReactFlow } from '@xyflow/react';
 import { SystemTool } from '@/_backend/getSystemTools';
@@ -71,7 +15,7 @@ import { useNodeLoader } from '@/hooks/use-node-loader';
 import { cn } from '@/lib/utils';
 type UnionType = SystemTool & { delete: ReactNode };
 
-const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
+const GenerateNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
   const { theme } = useThemeToggle();
   const [nodeData, setNodeData] = useState<UnionType>();
   const { setNodes, setEdges } = useReactFlow();
@@ -91,7 +35,7 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
   };
   const play = useHapticSound('/node-drag.wav', 0.1);
   const { isLoading } = useNodeLoader(nodeData);
-  //   cyan
+  //   blue
   return (
     <motion.div
       drag
@@ -102,31 +46,9 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
       onDragEnd={() => {
         play();
       }}
-      className="group 
-      
-      shadow-sm 
-      active:shadow-lg 
-      shadow-gray-500/80 
-    dark:shadow-gray-950 
-
-
-      dark:bg-zinc-800 
-      active:bg-zinc-200
-      bg-zinc-100 
-
-      p-2 
-      rounded-lg 
-      max-w-3xs 
-      min-w-3xs 
-
-      border-1
-       dark:border-zinc-500 
-       border-cyan-600 
-       dark:hover:border-cyan-500 
-       hover:border-cyan-500 
-       transition-all 
-       duration-100 
-       ease-linear">
+      className={cn(
+        'group shadow-sm active:shadow-lg shadow-gray-500/80 dark:shadow-gray-950 dark:bg-zinc-800 active:bg-zinc-200 bg-zinc-100 p-2 rounded-lg max-w-3xs min-w-3xs border-1 dark:border-zinc-500  border-blue-600  dark:hover:border-blue-400  hover:border-blue-500  transition-all  duration-100  ease-linear',
+      )}>
       <CustomHandle
         connectionCount={1}
         type="target"
@@ -135,7 +57,7 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
         isConnectable={isConnectable}
         style={{
           backgroundColor:
-            theme == 'dark' ? 'var(--color-cyan-300)' : 'var(--color-cyan-600)',
+            theme == 'dark' ? 'var(--color-blue-300)' : 'var(--color-blue-600)',
         }}
       />
 
@@ -147,7 +69,7 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
                 <DynamicIcon
                   name={isLoading ? 'loader-2' : typeToIcon(nodeData?.category)}
                   className={cn(
-                    'dark:group-hover:text-cyan-500 group-hover:text-cyan-600 text-zinc-500 dark:text-zinc-400',
+                    'dark:group-hover:text-blue-400 group-hover:text-blue-600 text-zinc-500 dark:text-zinc-400',
                     isLoading ? 'animate-spin' : '',
                   )}
                   size={16}
@@ -155,26 +77,27 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
               )}
               <Typography
                 variant={'h4'}
-                className="dark:group-hover:text-cyan-500 text-zinc-500 dark:text-zinc-400 group-hover:text-cyan-600 text-[14px]">
+                className="text-zinc-500 dark:text-zinc-400 dark:group-hover:text-blue-400 group-hover:text-blue-600 text-[14px]">
                 {nodeData?.name}
               </Typography>
             </div>
             <Button
               size="sm"
               variant={'ghost'}
-              className="hover:shadow-none hover:bg-transparent dark:hover:bg-transparent shadow-none absolute top-[-2px] right-[-2px] "
+              className="hover:shadow-none 
+              dark:hover:bg-transparent hover:bg-transparent shadow-none absolute top-[-2px] right-[-2px] "
               onClick={onDeleteHandler}>
               <X size={8} />
             </Button>
           </div>
           <Typography
             variant={'p'}
-            className="text-[8px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words font-medium tracking-normal truncate overflow-hidden text-ellipsis w-3xs pr-4 dark:group-hover:text-cyan-500 group-hover:text-cyan-700 transition-all duration-100 ease-linear">
+            className="text-[8px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words font-medium tracking-normal truncate overflow-hidden text-ellipsis w-3xs pr-4 dark:group-hover:text-blue-400 group-hover:text-blue-700 transition-all duration-100 ease-linear">
             {nodeData?.description}
           </Typography>
           {nodeData?.gpt_model && (
             <Typography
-              className="text-[10px] group-hover:text-cyan-500 text-zinc-500 dark:text-zinc-400 capitalize font-semibold mt-1"
+              className="text-[10px] dark:group-hover:text-blue-400 group-hover:text-blue-500 text-zinc-500 dark:text-zinc-400 capitalize font-semibold mt-1"
               variant={'p'}>
               {nodeData?.llm.replaceAll('-', ' ')} :{' '}
               <span className="uppercase">{nodeData?.gpt_model}</span>
@@ -191,10 +114,10 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
         </div>
       </div>
       <CustomHandle
-        connectionCount={2}
+        connectionCount={1}
         style={{
           backgroundColor:
-            theme == 'dark' ? 'var(--color-cyan-600)' : 'var(--color-cyan-800)',
+            theme == 'dark' ? 'var(--color-blue-600)' : 'var(--color-blue-800)',
         }}
         type="source"
         position={Position.Bottom}
@@ -204,4 +127,4 @@ const RoutingNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
   );
 };
 
-export const RoutingNode = memo(RoutingNodeComp);
+export const GenerateNode = memo(GenerateNodeComp);

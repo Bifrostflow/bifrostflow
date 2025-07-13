@@ -22,6 +22,7 @@ export type ToolCategory =
 
 export interface SystemTool {
   id: string;
+  node_id: string;
   name: string;
   type: SystemToolType;
   gpt_model: string;

@@ -13,7 +13,7 @@ type SystemToolItemProps = {
   node: SystemTool;
 };
 
-const typeToIcon = (category: ToolCategory): IconName => {
+export const typeToIcon = (category: ToolCategory): IconName => {
   switch (category) {
     case 'action':
       return 'pickaxe';

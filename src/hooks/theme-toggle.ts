@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export function useThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';

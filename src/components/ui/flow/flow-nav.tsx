@@ -9,10 +9,12 @@ import { useFlow } from '@/context/flow-context';
 import { RunButton } from './run-flow-button';
 import SaveFlowButton from './save-flow-button';
 import Drawer from '../drawer';
-import { KeySquare } from 'lucide-react';
+import { File, KeySquare } from 'lucide-react';
 import { Label } from '../label';
 import { useHotkeys } from 'react-hotkeys-hook';
 import EditFlow from './edit-flow';
+
+import FlowDocuments from './flow-documents';
 
 const FlowNav = () => {
   const {
@@ -25,6 +27,8 @@ const FlowNav = () => {
     showMore,
     setShowMore,
     setToolDrawerOpen,
+    showFlowDocs,
+    setShowFlowDocs,
   } = useFlow();
 
   useHotkeys('ctrl+m', () => {
@@ -45,18 +49,28 @@ const FlowNav = () => {
     setShowMore(false);
     setShowKeyInputArea(false);
     setToolDrawerOpen(false);
+    setShowFlowDocs(false);
+  };
+  const onShowDocPressHandler = () => {
+    setShowFlowDocs(!showFlowDocs);
+    setShowEditDrawer(false);
+    setShowMore(false);
+    setShowKeyInputArea(false);
+    setToolDrawerOpen(false);
   };
   const onMoreAreaPressHandler = () => {
     setShowMore(!showMore);
     setShowEditDrawer(false);
     setShowKeyInputArea(false);
     setToolDrawerOpen(false);
+    setShowFlowDocs(false);
   };
   const onKeyInputAreaPressHandler = () => {
     setShowKeyInputArea(!showKeyInputArea);
     setShowEditDrawer(false);
     setShowMore(false);
     setToolDrawerOpen(false);
+    setShowFlowDocs(false);
   };
   return (
     <>
@@ -101,12 +115,18 @@ const FlowNav = () => {
         position="right"
         className="top-[110px] left-auto right-[10px] sm:top-[80px] sm:left-auto sm:right-[10px]"
         onClose={setShowMore}>
-        <div className="flex flex-wrap gap-3 justify-between items-center">
+        <div className="flex flex-wrap gap-3 justify-start items-center">
           <motion.div
             onClick={onKeyInputAreaPressHandler}
             className="flex flex-col justify-center items-center my-2 gap-2">
             <KeySquare size={32} />
             <Label className="text-xs">Manage Keys</Label>
+          </motion.div>
+          <motion.div
+            onClick={onShowDocPressHandler}
+            className="flex flex-col justify-center items-center my-2 gap-2">
+            <File size={32} />
+            <Label className="text-xs">Flow Docs</Label>
           </motion.div>
         </div>
       </Drawer>
@@ -118,6 +138,15 @@ const FlowNav = () => {
         visible={showEditDrawer}
         onClose={onEditAreaPressHandler}>
         <EditFlow />
+      </Drawer>
+      <Drawer
+        width={'w-fit'}
+        height={'h-fit'}
+        className="top-[110px] left-auto right-[10px] sm:top-[80px] sm:left-auto sm:right-[10px]"
+        position="top"
+        visible={showFlowDocs}
+        onClose={onShowDocPressHandler}>
+        <FlowDocuments />
       </Drawer>
     </>
   );

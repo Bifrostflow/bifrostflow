@@ -5,6 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { makeBurst } from '@/lib/spark-effect';
 import '@/components/ui/spark.css';
+import { useHapticSound } from '@/hooks/useHapticSound';
 
 const variantToColorMap: Record<string, string> = {
   default: '--spark',
@@ -65,6 +66,7 @@ function Button({
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
   }) {
+  const play = useHapticSound('/btn-click.wav');
   const Comp = asChild ? Slot : 'button';
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -73,6 +75,7 @@ function Button({
       y: e.clientY + window.scrollY,
     };
     const color = variantToColorMap[variant ?? 'default'];
+    play();
     makeBurst(center, color); // 👈 pass color
 
     props.onClick?.(e); // call parent onClick

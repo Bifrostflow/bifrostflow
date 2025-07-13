@@ -42,7 +42,7 @@ type RunFlowInput = {
   flow_id: string;
 };
 
-interface ChunkNodeData {
+export interface ChunkNodeData {
   node_graph_id: string;
   node_input: string | null;
   next_nodes: string[] | null;
