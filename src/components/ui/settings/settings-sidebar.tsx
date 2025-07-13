@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 const options = [
   { label: 'Profile', path: 'profile', icon: 'user' },
   { label: 'Theme', path: 'theme', icon: 'sun' },
-  { label: 'Accessibility', path: 'accessibility', icon: 'touchpad' },
+  // { label: 'Accessibility', path: 'accessibility', icon: 'touchpad' },
   { label: 'Plans', path: 'plans', icon: 'dollar-sign' },
 ];
 
@@ -17,7 +17,7 @@ export default function SettingsSidebar({}) {
   const pathname = usePathname();
 
   return (
-    <aside className="h-[70vh] w-full md:w-64 border-r-2 border-r-c-divider bg-c-primary rounded-xl text-c-on-primary">
+    <aside className="h-fit md:h-[70vh] w-full md:w-64 border-r-2 border-r-c-divider bg-c-primary rounded-xl text-c-on-primary">
       <div id="header" className="p-6 justify-center items-center flex ">
         <Typography variant={'h2'} className="font-bold mb-4 mr-2">
           Settings

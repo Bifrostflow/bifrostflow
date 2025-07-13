@@ -64,9 +64,11 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div className="pr-4 pt-2 flex gap-6 flex-col">
-      <div className="dark:bg-neutral-700 bg-c-on-primary/80 rounded-xl p-4">
-        <Typography variant={'h2'} className="font-semibold text-c-primary">
+    <div className="pb-4 md:pr-4 pt-2 flex gap-6 flex-col">
+      <div className="dark:bg-neutral-700 bg-c-on-primary/80 rounded-xl p-4 hidden md:flex flex-row justify-start items-center">
+        <Typography
+          variant={'h2'}
+          className="font-semibold text-c-primary pb-0">
           Profile
         </Typography>
       </div>

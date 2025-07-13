@@ -1,5 +1,5 @@
 'use client';
-import AccessibilitySettings from '@/components/ui/settings/accessibility-setting';
+// import AccessibilitySettings from '@/components/ui/settings/accessibility-setting';
 import PlansSettings from '@/components/ui/settings/plans-setting';
 import ProfileSettings from '@/components/ui/settings/profile-setting';
 import SettingsSidebar from '@/components/ui/settings/settings-sidebar';
@@ -15,8 +15,8 @@ export default function SettingsPage() {
         return <ProfileSettings />;
       case 'theme':
         return <ThemeSettings />;
-      case 'accessibility':
-        return <AccessibilitySettings />;
+      // case 'accessibility':
+      //   return <AccessibilitySettings />;
       case 'plans':
         return <PlansSettings />;
       default:
@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-screen p-6">
-      <div className="flex max-w-6xl mx-auto bg-c-surface rounded-xl shadow-xl p-0 gap-6 mt-20">
+      <div className="flex flex-col max-w-6xl mx-auto bg-c-surface rounded-xl shadow-xl p-0 gap-6 mt-20 md:flex-row">
         <SettingsSidebar />
         <section className="flex-1">{renderSection()}</section>
       </div>
