@@ -389,7 +389,6 @@ export default function Page() {
           <AppCheckBox id="2" text="Turrn me on.." variant={'primary'} />
           <AppCheckBox id="3" text="Turrn me on.." variant={'secondary'} />
         </div>
-
         <Drawer
           onClose={async visible => {
             setShowDrawer(visible);
