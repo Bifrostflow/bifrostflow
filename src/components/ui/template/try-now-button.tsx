@@ -44,7 +44,7 @@ function TryNowButton({
 
   return (
     <Button
-      variant={'secondary'}
+      variant={'default'}
       className="w-28"
       disabled={creatingProject}
       onClick={

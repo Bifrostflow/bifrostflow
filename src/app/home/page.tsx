@@ -8,7 +8,7 @@ export default async function Page() {
   await createUser();
 
   return (
-    <div className="pt-20 mx-36 bg-c-background">
+    <div className="pt-20 mx-4 md:mx-10 lg:mx-10 xl:mx-36 bg-c-background">
       <InspireMe />
       <div className="flex flex-col pt-10 gap-20">
         <MyProjects />

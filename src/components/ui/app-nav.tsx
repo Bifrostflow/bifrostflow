@@ -49,12 +49,13 @@ function AppNav({
             <UserButton userProfileUrl="/home/settings/profile" />
           </SignedIn>
           <Button
-            variant={'link'}
+            size={'icon'}
+            variant={'outline'}
             onClick={() => {
               setShowMenuItems(!showMenuItems);
             }}
-            className="flex md:hidden">
-            <Menu className="h-[48px] w-[48px] g-red-800" />
+            className="flex md:hidden ml-2 bg-transparent border-0">
+            <Menu className="" />
           </Button>
         </div>
       </div>

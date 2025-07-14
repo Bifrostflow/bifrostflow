@@ -10,7 +10,7 @@ const InspireMe = () => {
     <>
       <Button
         variant={'secondary'}
-        className="fixed right-36"
+        className="fixed right-5 md:right-10 lg:right-10 xl:right-36"
         onClick={() => {
           setShowInspireModal(true);
         }}>
