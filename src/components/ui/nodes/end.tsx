@@ -84,7 +84,7 @@ const EndNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
           <div className="flex-row flex justify-start items-center gap-1 ">
             <Typography
               variant={'h4'}
-              className="dark:text-zinc-400 text-zinc-500 group-hover:text-orange-600 text-[14px]">
+              className="dark:text-zinc-400 text-zinc-500 dark:group-hover:text-orange-600 group-hover:text-orange-600 text-[14px]">
               {nodeData?.name}
             </Typography>
           </div>

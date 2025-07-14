@@ -66,8 +66,10 @@ const ActionNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
         play();
       }}
       className={cn(
-        'group shadow-sm active:shadow-lg shadow-gray-500/80 dark:shadow-gray-950  dark:bg-zinc-800 active:bg-zinc-200 bg-zinc-100 p-2 rounded-lg max-w-3xs min-w-3xs border-1dark:border-zinc-500 border-green-600 dark:hover:border-green-600 hover:border-green-500 transition-all duration-100 ease-linear',
-        isLoading ? 'dark:border-green-600 border-green-500' : '',
+        'group shadow-sm active:shadow-lg shadow-gray-500/80 dark:shadow-gray-950  dark:bg-zinc-800 active:bg-zinc-200 bg-zinc-100 p-2 rounded-lg max-w-3xs min-w-3xs border-1 dark:border-zinc-500 border-green-600 dark:hover:border-green-600 hover:border-green-500 transition-all duration-100 ease-linear',
+        isLoading
+          ? 'dark:border-green-600 border-green-500  animate-pulse'
+          : '',
       )}>
       <CustomHandle
         connectionCount={1}
