@@ -1,52 +1,106 @@
+'use client';
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { Input } from '../input';
 import { Button } from '../button';
-import { Label } from '../label';
 import { updateFlowKeys } from '@/_backend/private/projects/updateFlowKeys';
 import { useFlow } from '@/context/flow-context';
-import { toast } from 'sonner';
+
+import { Typography } from '../typography';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import z from 'zod';
+import { showToast } from '../toast';
 
 export type APIData = Record<string, string>;
 export type RequiredKeysType = Record<string, boolean>;
 
 interface ISideDrawer {
-  open: boolean;
   onClose: () => void;
   apiDataFields: RequiredKeysType;
   onKeysSaved: (data: APIData) => void;
 }
 
+const getDefaultValues = (
+  apiDataFields: RequiredKeysType,
+
+  defaultData: Record<string, string>,
+) => {
+  const defaultValues: Record<string, string> = {};
+  Object.entries(apiDataFields).forEach(([key]) => {
+    defaultValues[key] = defaultData[key] || '';
+  });
+
+  return defaultValues;
+};
+
 export default function EnterKeys({
-  open,
   onClose,
   apiDataFields,
   onKeysSaved,
 }: ISideDrawer) {
-  const { slug, apiKeys, setAPIKeys } = useFlow();
-  const [isOpen, setIsOpen] = useState(open);
+  const [requiredAPIInputKeys, setRequiredAPIInputKeys] =
+    useState<RequiredKeysType>(apiDataFields);
+
+  const fieldSchema = Object.entries(apiDataFields).reduce((acc, [key]) => {
+    acc[key] = z.string().min(2, {
+      message: `Please enter valid ${key} key`,
+    });
+    return acc;
+  }, {} as Record<string, z.ZodTypeAny>);
+
+  // Final Zod object schema
+  const FormSchema = z.object(fieldSchema);
+  const { slug, apiKeys, setAPIKeys, setShowKeyInputArea } = useFlow();
+
+  useEffect(() => {
+    if (
+      Object.keys(apiDataFields).length === 0 &&
+      Object.keys(apiKeys).length > 0
+    ) {
+      // use must coming from setting
+      const newObject: RequiredKeysType = {};
+      Object.keys(apiKeys).map(key => {
+        newObject[key] = true;
+      });
+      setRequiredAPIInputKeys(newObject);
+    } else {
+      setRequiredAPIInputKeys(apiDataFields);
+    }
+  }, [apiDataFields, apiKeys]);
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    values: getDefaultValues(requiredAPIInputKeys, apiKeys),
+    defaultValues: getDefaultValues(requiredAPIInputKeys, apiKeys),
+  });
+
   const [APIKeyValues, setAPIKeyValues] = useState<APIData>(apiKeys);
   const [errors, setError] = useState<APIData>({});
   const [updating, setUpdating] = useState(false);
   const [deletingKey, setDeletingKey] = useState<string>();
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
 
   const onCloseHandler = () => {
     onClose();
-    setIsOpen(false);
   };
 
   const validateRequiredKeys = () => {
     let fieldCounter = 0;
+    const formValues = form.getValues();
     const newErrors = { ...errors };
-    for (let i = 0; i < Object.keys(apiDataFields).length; i++) {
-      const key = Object.keys(apiDataFields)[i];
-      const found = Object.keys(APIKeyValues).find(
-        apiKeyLabel => apiKeyLabel === key,
-      );
-      if (found) {
+
+    for (let i = 0; i < Object.keys(formValues).length; i++) {
+      const key = Object.keys(formValues)[i];
+      const hasValue = !!formValues[key];
+      if (hasValue) {
         fieldCounter++;
         delete newErrors[key];
       } else {
@@ -54,24 +108,31 @@ export default function EnterKeys({
       }
     }
     setError(newErrors);
-    return fieldCounter === Object.keys(apiDataFields).length;
+    return fieldCounter === Object.keys(formValues).length;
   };
 
   const onSaveHandler = async (keys: APIData) => {
     if (!validateRequiredKeys()) return;
+    form.getValues();
     setUpdating(true);
     try {
       const response = await updateFlowKeys({
         apiKeys: JSON.stringify(keys),
         flow_id: slug,
       });
-      toast(response?.message);
       if (response?.isSuccess) {
+        showToast({ description: response.message, type: 'success' });
+
         onKeysSaved(keys);
         setAPIKeys(keys);
+      } else {
+        showToast({
+          description: 'Failed to update keys. Please try again.',
+          type: 'error',
+        });
       }
     } catch (error) {
-      toast(`FAILED: ${error}`);
+      showToast({ description: `FAILED: ${error}`, type: 'error' });
       console.log(error);
     } finally {
       setUpdating(false);
@@ -86,57 +147,115 @@ export default function EnterKeys({
     setDeletingKey('');
   };
   return (
-    <div
-      className={`fixed top-0 right-0 h-full w-[300px] bg-zinc-800 shadow-lg transform transition-transform duration-300 z-50 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
-      <div className="p-4 flex justify-between items-center">
-        <h2 className="text-lg font-semibold bg-gradient-to-tl from-blue-400 to-blue-500 bg-clip-text text-transparent">
-          Enter Required Keys
-        </h2>
-        <button
-          onClick={onCloseHandler}
-          className="text-zinc-200 hover:text-zinc-100 bg-gradient-to-br from-red-500 to-indigo-800 p-2 rounded-full">
+    <div className={'p-4 w-2xl'}>
+      <div className="py-2 flex justify-between items-center">
+        <Typography className="font-semibold" variant={'h2'}>
+          Manage Keys
+        </Typography>
+        <Button onClick={onCloseHandler} size={'icon'}>
           <X />
-        </button>
+        </Button>
       </div>
-      <div className="h-[0.5px] bg-gradient-to-r from-blue-400 to-blue-500" />
-      <p>Delete keys</p>
-      {Object.keys(apiKeys).map(key => {
-        return (
-          <Button
-            onClick={() => deleteKeyHandler(key)}
-            key={key}
-            disabled={!!deletingKey}>
-            {deletingKey === key ? 'Deleting ' : ''}
-            {key}
-          </Button>
-        );
-      })}
-
-      <p>Edit keys</p>
-      {Object.keys(apiDataFields).map(key => {
-        return (
-          <div key={key}>
-            <Label>ENter Key {key}</Label>
-            <Input
-              type="password"
-              placeholder={key}
-              value={APIKeyValues[key] ?? ''}
-              onChange={e => {
-                setAPIKeyValues({
-                  ...APIKeyValues,
-                  [key]: e.target.value,
-                });
-              }}
-            />
-            <p className="text-red-700">{errors[key] || ''}</p>
+      {!!Object.keys(apiKeys).length && (
+        <div className="mb-4 flex flex-col gap-2">
+          <Typography variant={'h4'}>Delete keys</Typography>
+          <div className="flex flex-row gap-2">
+            {Object.keys(apiKeys).map(key => {
+              return (
+                <Button
+                  type="button"
+                  className="capitalize"
+                  onClick={e => {
+                    e.preventDefault();
+                    deleteKeyHandler(key);
+                  }}
+                  key={key}
+                  variant={'outline_destructive'}
+                  disabled={!!deletingKey}>
+                  {deletingKey === key ? 'Deleting ' : ''}
+                  {key} <X />
+                </Button>
+              );
+            })}
           </div>
-        );
-      })}
-      <Button onClick={() => onSaveHandler(APIKeyValues)} disabled={updating}>
-        {updating ? 'Saving' : 'Save'} Keys
-      </Button>
+        </div>
+      )}
+
+      {Object.keys(requiredAPIInputKeys).length > 0 ? (
+        <>
+          <Typography variant={'h4'}>Add keys</Typography>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(() => {
+                onSaveHandler(form.getValues()).finally(() => {
+                  setShowKeyInputArea(false);
+                });
+              })}
+              className="w-full space-y-6 py-4">
+              {Object.keys(requiredAPIInputKeys).map(key => {
+                return (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name={key}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="capitalize">{key}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter key here..."
+                              {...field}
+                              defaultValue={field.value || ''}
+                              type="password"
+                            />
+                          </FormControl>
+                          <FormMessage>{errors[key]}</FormMessage>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                );
+              })}
+
+              <div className="flex flex-row gap-2">
+                <Button
+                  onClick={e => {
+                    e.preventDefault();
+                    form.reset();
+                    onCloseHandler();
+                  }}
+                  variant={'outline_destructive'}>
+                  Close
+                </Button>
+                <Button type="submit" disabled={updating}>
+                  {updating && <Loader2 className="animate-spin" />}
+                  Submit
+                </Button>
+              </div>
+            </form>
+          </Form>
+          <Typography variant={'blockquote'} className="text-lg">
+            &quot;Privacy is a myth — and so is security. But still, all we can
+            really do today is trust... and press Submit.&quot;
+            <br />
+            <span className="font-bold">-Sam Chandraberg</span>
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Typography variant={'p'} className="text-xl italic text-c-secondary">
+            No keys needed for this flow, you&squot;re all set for now!
+          </Typography>
+          <Typography variant={'blockquote'} className="text-lg">
+            &quot;Sometimes, the most powerful tools need no keys.
+            <br />
+            Just intention... and a click.&quot;
+            <br />
+            <span className="font-bold">- Flow Engine</span>
+          </Typography>
+        </>
+      )}
     </div>
   );
 }

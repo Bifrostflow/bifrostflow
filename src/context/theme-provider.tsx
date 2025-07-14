@@ -8,11 +8,11 @@ export default function ThemeProvider({
   children: React.ReactNode;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [_theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    const currentTheme = saved === 'dark' ? 'dark' : 'light';
+    const saved = localStorage.getItem('theme') || 'dark';
+    const currentTheme = saved === 'light' ? 'light' : 'dark';
     setTheme(currentTheme);
     document.body.classList.toggle('dark', currentTheme === 'dark');
   }, []);

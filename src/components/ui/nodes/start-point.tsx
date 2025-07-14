@@ -1,31 +1,53 @@
 import React, { memo } from 'react';
 import { NodeProps } from '@xyflow/react';
-import { PlusIcon } from 'lucide-react';
+import { Typography } from '../typography';
+import { DynamicIcon } from 'lucide-react/dynamic';
+import { motion } from 'framer-motion';
+import { useHapticSound } from '@/hooks/useHapticSound';
+import { useFlow } from '@/context/flow-context';
 
-const SPNode: React.FC<NodeProps & { onPress: () => void }> = ({ onPress }) => {
+const StartPointNodeComp: React.FC<NodeProps> = ({}) => {
+  const { setToolDrawerOpen } = useFlow();
+
+  const play = useHapticSound('/node-drag.wav', 0.1);
+  //   emerald
   return (
-    <div
-      onClick={onPress}
-      className={`
-                        bg-gradient-to-br from-emerald-500 to-blue-700
-                        hover:from-cyan-700
-                        hover:to-blue-700
-                        active:from-cyan-600
-                        active:to-blue-600
-                        text-white
-                        rounded-full
-                        px-3 py-1
-                        shadow-lg
-                        border-0 
-                        active:scale-[1.03]
-                        transition-all duration-100 ease-[cubic-bezier(0.34, 1.56, 0.64, 1)]
-  `}>
-      <div className="text-xs font-medium text-blue-100 flex justify-between items-center">
-        Start
-        <PlusIcon className="h-[12px] w-[12px] ml-1 text-white" />
+    <motion.div
+      onClick={() => {
+        setToolDrawerOpen(true);
+      }}
+      drag
+      dragListener={true} // default true
+      dragMomentum={false}
+      dragElastic={0}
+      dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
+      onDragEnd={() => {
+        play();
+      }}
+      className="group      
+      shadow-sm 
+      active:shadow-lg 
+      shadow-gray-500/80 
+    dark:shadow-gray-950 
+      py-2 
+      px-4
+      bg-gradient-to-r
+      from-c-primary to-c-primary-variant
+  rounded-full
+">
+      <div className="flex-row flex justify-start items-center gap-1">
+        <DynamicIcon
+          name={'plus'}
+          className="text-c-on-primary"
+          size={22}
+          fill="var(--chart-2)"
+        />
+        <Typography variant={'h4'} className="text-c-on-primary text-[14px]">
+          Start
+        </Typography>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
-export const StartPointNode = memo(SPNode);
+export const StartPointNode = memo(StartPointNodeComp);

@@ -38,7 +38,7 @@ const animateVariants: Record<
 };
 
 const positionClasses: Record<DrawerPositionType, string> = {
-  bottom: 'fixed bottom-0 left-0 w-full',
+  bottom: 'fixed bottom-0 left-auto w-full',
   top: 'fixed top-0 left-0 w-full',
   left: 'fixed top-0 left-0 h-full',
   right: 'fixed top-0 right-0 h-full',
@@ -87,12 +87,12 @@ function Drawer({
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="sync">
       {visible && (
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/10 z-40"
+            className="fixed inset-0 bg-black/30 z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -105,13 +105,18 @@ function Drawer({
             initial={initialVariants[position]}
             animate={animateVariants[position]}
             exit={initialVariants[position]}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{
+              type: 'spring',
+              stiffness: 400,
+              damping: 50,
+              duration: 0.3,
+            }}
             drag={dragAxis[position]}
             dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
             dragElastic={0.2} // magnetic effect
             onDragEnd={handleDragEnd}
             className={cn(
-              'dark:bg-zinc-700 bg-white shadow-xl rounded-xl p-4 z-50 transition-all duration-100 ease-in',
+              'dark:bg-zinc-700 bg-white shadow-xl rounded-xl p-4 z-50 transition-all duration-20 ease-in',
               positionClasses[position],
               width ? width : 'w-fit',
               height ? height : 'h-fit',

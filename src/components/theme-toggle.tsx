@@ -1,3 +1,4 @@
+'use client';
 import { useThemeToggle } from '@/hooks/theme-toggle';
 
 export default function ThemeToggle() {
