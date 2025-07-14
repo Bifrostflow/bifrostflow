@@ -5,7 +5,6 @@ import { Typography } from '@/components/ui/typography';
 import { Badge } from '@/components/ui/badge';
 import BuyNow from '@/components/ui/template/buy-now';
 import MarkFavourite from '@/components/ui/template/mark-favourite';
-import GoBack from '@/components/ui/template/go-back';
 
 export default async function Flow({
   params,
@@ -87,7 +86,6 @@ export default async function Flow({
               </>
             )}
             <div className="flex flex-row gap-2 mt-3">
-              <GoBack />
               <BuyNow product={template.data} />
             </div>
           </div>

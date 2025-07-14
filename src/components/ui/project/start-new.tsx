@@ -42,6 +42,8 @@ const StartNew = ({
         api_keys: '',
         snap_path: '',
       });
+      console.log(response);
+
       if (response?.data) {
         window.location.href = `/flow/${response.data[0].id}?show=edit`;
       } else {
@@ -53,6 +55,11 @@ const StartNew = ({
         });
       }
     } catch (error) {
+      showToast({
+        title: 'Create app failed',
+        description: `Something went wrong ${error}`,
+        type: 'error',
+      });
       console.log('Error creating project:', error);
     } finally {
       setCreating(false);
@@ -74,6 +81,7 @@ const StartNew = ({
         className="group-hover/card:text-c-secondary/80">
         Start New
       </Typography>
+
       <Typography
         variant={'blockquote'}
         className="group-hover/card:text-c-secondary/80">

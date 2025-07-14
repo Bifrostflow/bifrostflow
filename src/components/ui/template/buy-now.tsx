@@ -39,11 +39,11 @@ const BuyNow = ({
         currency: 'INR',
         receipt: receipt,
       });
-      showToast({
-        description: response?.message,
-        type: response?.isSuccess ? 'success' : 'error',
-      });
       if (!response?.isSuccess) {
+        showToast({
+          description: response?.message,
+          type: response?.isSuccess ? 'success' : 'error',
+        });
         return;
       }
       console.log(response?.data);
@@ -96,6 +96,7 @@ const BuyNow = ({
             type: 'error',
           });
         } finally {
+          setMakingPayment(false);
         }
       },
       theme: {
@@ -105,7 +106,6 @@ const BuyNow = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
-    setMakingPayment(false);
   };
   if (isPurchased || product.price === 0) {
     return <TryNowButton template={product} />;
@@ -119,8 +119,7 @@ const BuyNow = ({
       disabled={makingPayment}
       variant={'secondary'}
       className="w-28">
-      {makingPayment && <Loader2 className="animate-spin" />} Buy Now{' '}
-      {product.price || 0}$
+      {makingPayment && <Loader2 className="animate-spin" />} Buy Now
     </Button>
   );
 };

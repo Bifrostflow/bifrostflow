@@ -21,7 +21,7 @@ function TryNowButton({
     setcreatingProject(true);
     try {
       const response = await tryTemplate(template.id);
-      if (response?.data) {
+      if (response?.isSuccess && response.data) {
         router.replace(`/flow/${response?.data[0]?.id}`);
       } else {
         showToast({

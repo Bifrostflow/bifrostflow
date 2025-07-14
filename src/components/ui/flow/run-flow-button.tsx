@@ -8,7 +8,7 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { updateFlowGraph } from '@/_backend/private/projects/updateNodes';
 
@@ -43,6 +43,7 @@ export const RunButton = () => {
     setToolDrawerOpen,
     setChunkResponse,
   } = useFlow();
+  const [continueRunAfterKeySave, setContinueRunAfterKeySave] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const [updatingNodes, setUpdatingNodes] = useState(false);
   useHotkeys('ctrl+r', () => {
@@ -52,9 +53,16 @@ export const RunButton = () => {
   useHotkeys('esc', () => {
     setShowKeyInputArea(false);
   });
+  useEffect(() => {
+    if (continueRunAfterKeySave && !showKeyInputArea) {
+      runPressHandler();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [continueRunAfterKeySave, showKeyInputArea]);
 
   const validateRequiredKeys = () => {
     const { requiredKeys } = checkIfAPIKeyRequired();
+
     let fieldCounter = 0;
     for (let i = 0; i < Object.keys(requiredKeys).length; i++) {
       const key = Object.keys(requiredKeys)[i];
@@ -76,7 +84,9 @@ export const RunButton = () => {
     } else {
       if (!validateRequiredKeys()) {
         setShowKeyInputArea(true);
+        setContinueRunAfterKeySave(() => true);
       } else {
+        setContinueRunAfterKeySave(false);
         const imageString = await getImage();
         runFlow(imageString || fallback);
       }
@@ -187,6 +197,9 @@ export const RunButton = () => {
           onKeysSaved={resData => {
             setShowKeyInputArea(false);
             setAPIKeys(resData);
+            if (continueRunAfterKeySave) {
+              runPressHandler();
+            }
           }}
         />
       </Drawer>
