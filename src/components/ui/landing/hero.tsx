@@ -10,44 +10,6 @@ import { IconBrandTwitter } from '@tabler/icons-react';
 import { Typography } from '../typography';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 
-const blurVariants = {
-  animate: (i: number) => ({
-    filter: ['blur(5px)', 'blur(2px)', 'blur(5px)'],
-    width: ['70px', '75px', '70px'],
-    opacity: [0.5, 1, 0.5],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: 'easeIn',
-      delay: i * 1.5, // staggers each by 1s
-    },
-  }),
-};
-
-function BlurredBars() {
-  return (
-    <>
-      {[0, 1, 2].map(i => (
-        <motion.div
-          key={i}
-          custom={i}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          variants={blurVariants}
-          animate="animate"
-          className={`absolute rotate-30 h-[150vh] w-[70px] ${
-            i === 0
-              ? 'left-20 bg-c-secondary'
-              : i === 1
-              ? 'left-55 bg-c-primary'
-              : 'left-90 bg-c-secondary-variant'
-          }`}
-        />
-      ))}
-    </>
-  );
-}
-
 function Hero() {
   return (
     <div className="relative flex flex-col h-fit w-full items-center justify-center bg-white dark:bg-black">
