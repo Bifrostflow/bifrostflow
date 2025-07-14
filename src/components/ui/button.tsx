@@ -38,6 +38,7 @@ const buttonVariants = cva(
           'border-1 border-destructive text-destructive bg-destructive/10 shadow-xs hover:bg-destructive/30',
         secondary:
           'bg-gradient-to-br from-c-secondary to-c-secondary-variant text-c-on-secondary shadow-xs hover:bg-c-secondary-variant',
+        gold: 'bg-gradient-to-b dark:from-[#b69121] dark:via-[#b69121] dark:to-[#805b10] from-[#c9a227] via-[#edc531] to-[#c9a227] text-[#050505] font-medium shadow-xs hover:bg-c-secondary-variant',
         ghost:
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline shadow-none',

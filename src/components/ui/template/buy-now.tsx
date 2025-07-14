@@ -39,11 +39,11 @@ const BuyNow = ({
         currency: 'INR',
         receipt: receipt,
       });
-      showToast({
-        description: response?.message,
-        type: response?.isSuccess ? 'success' : 'error',
-      });
       if (!response?.isSuccess) {
+        showToast({
+          description: response?.message,
+          type: response?.isSuccess ? 'success' : 'error',
+        });
         return;
       }
       console.log(response?.data);
@@ -107,6 +107,8 @@ const BuyNow = ({
     rzp.open();
     setMakingPayment(false);
   };
+  console.log(isPurchased, product.price);
+
   if (isPurchased || product.price === 0) {
     return <TryNowButton template={product} />;
   }

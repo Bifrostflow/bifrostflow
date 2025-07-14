@@ -4,7 +4,7 @@ export function useThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme as 'light' | 'dark');
     document.body.classList.toggle('dark', savedTheme === 'dark');
   }, []);

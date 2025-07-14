@@ -24,8 +24,6 @@ import {
   IconTopologyStar3,
   IconWorldCode,
 } from '@tabler/icons-react';
-import ColourfulText from '../colourful-text';
-import { SparklesCore } from '../sparkles';
 
 const features = [
   {
@@ -80,39 +78,10 @@ const features = [
 
 export default function Features() {
   return (
-    <div
-      id="features"
-      className={cn(
-        'transition-all w-full relative flex h-[100vh] flex-col items-center justify-start bg-zinc-950 text-white overflow-hidden',
-      )}>
-      <div className="relative flex flex-row font-bold mb-10 text-zinc-800 mt-50 z-2">
-        <ColourfulText
-          colors={[
-            'oklch(74.6% 0.16 232.661)',
-            'oklch(70.7% 0.165 254.624)',
-            'oklch(70.7% 0.165 254.624)',
-            'oklch(74.6% 0.16 232.661)',
-            'oklch(78.9% 0.154 211.53)',
-            'oklch(78.9% 0.154 211.53)',
-            'oklch(70.7% 0.165 254.624)',
-          ]}
-          text="WHAT FLOWS IN BIFROST"
-        />
-        <SparklesCore
-          background="transparent"
-          minSize={0.5}
-          maxSize={1.5}
-          particleDensity={500}
-          className="w-full h-[20px] absolute -bottom-2"
-          particleColor="#00d3f2"
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  relative z-10 py-10 max-w-7xl mx-auto">
-        {features.map((feature, index) => (
-          <Feature key={feature.title} {...feature} index={index} />
-        ))}
-      </div>
-      {/* <WavyBackground className="max-w-4xl mx-auto pb-40 bg-transparent"></WavyBackground> */}
+    <div className="w-full md:w-3xl lg:w-4xl grid grid-cols-2 mt-10 md:grid-cols-2 lg:grid-cols-3 xl:w-6xl 2xl:w-7xl xl:grid-cols-4  relative z-10 py-10 pb-20 xl:max-w-7xl mx-auto">
+      {features.map((feature, index) => (
+        <Feature key={feature.title} {...feature} index={index} />
+      ))}
     </div>
   );
 }
