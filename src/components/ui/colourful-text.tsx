@@ -39,7 +39,7 @@ export default function ColourfulText({
         duration: 1,
         delay: index * 0.05,
       }}
-      className="lg:text-7xl md:text-6xl sm:text-5xl inline-block whitespace-pre font-sans tracking-tight  ">
+      className="lg:text-7xl md:text-6xl text-4xl sm:text-5xl inline-block whitespace-pre font-sans tracking-tight">
       {char}
     </motion.span>
   ));
