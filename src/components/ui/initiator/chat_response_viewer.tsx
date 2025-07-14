@@ -9,6 +9,7 @@ import { ChunkResponse } from '@/_backend/runFlow';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import MetaResponsePreview from '../flow/meta-response-preview';
+import { ExternalLink } from 'lucide-react';
 const ChatResponseViewer = () => {
   const { chunkResponse, loaderUIText, runningFlow, setChunkResponse } =
     useFlow();
@@ -22,6 +23,13 @@ const ChatResponseViewer = () => {
       chunkResponse.messages.role !== 'system'
     ) {
       console.log('-->HERE Too', { chunkResponse });
+      if (chunkResponse.links_to_open?.type === 'create_tweet') {
+        window.open(
+          chunkResponse.links_to_open.url,
+          '_blank',
+          'noopener,noreferrer',
+        );
+      }
       setChunkMessageList(prev => [...prev, chunkResponse]);
     }
     return () => {
@@ -52,6 +60,7 @@ const ChatResponseViewer = () => {
           },
           meta: undefined,
           type: 'server',
+          links_to_open: undefined,
         },
       ]);
     }
@@ -124,12 +133,28 @@ const ChatResponseViewer = () => {
                             selectedMetaToShow === key ? '' : key,
                           );
                         }}
-                        size={'lg'}
+                        size={'sm'}
                         className="capitalize"
                         variant={'outline_secondary'}>
                         Full response
                         <DynamicIcon size={28} name={'settings'} />
                       </Button>
+                      {!!chunk.links_to_open?.url ? (
+                        <Button
+                          onClick={() => {
+                            window.open(
+                              chunk.links_to_open?.url,
+                              '_blank',
+                              'noopener,noreferrer',
+                            );
+                          }}
+                          size={'sm'}
+                          className="capitalize"
+                          variant={'secondary'}>
+                          {chunk.links_to_open?.label}
+                          <ExternalLink size={28} name={'settings'} />
+                        </Button>
+                      ) : null}
                     </div>
                   )}
                   <AnimatePresence>

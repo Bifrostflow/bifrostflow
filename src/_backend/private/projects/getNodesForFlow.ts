@@ -66,7 +66,7 @@ export const getDocsForFlow = async (
     const res = await fetch(endpoint, {
       method: 'GET',
       next: {
-        revalidate: 60,
+        revalidate: 10,
       },
       headers: {
         Authorization: `Bearer ${token}`,
@@ -87,10 +87,14 @@ export const getDocsForFlow = async (
   }
 };
 
+interface OpenDocResponse {
+  url: string;
+}
+
 export const openDocForFlow = async (
   flow_id: string,
   name: string,
-): Promise<APIResponse<IFlowDocument[]>> => {
+): Promise<APIResponse<OpenDocResponse>> => {
   const endpoint = `${url}/open-doc?flow_id=${flow_id}&name=${name}`;
   try {
     const { getToken } = await auth();
@@ -111,6 +115,7 @@ export const openDocForFlow = async (
     }
 
     const json = await res.json();
+
     console.log('RESPONSE: ', json);
 
     return json;

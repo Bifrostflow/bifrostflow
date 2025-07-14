@@ -55,10 +55,18 @@ export type LLMMessageType = {
   content: string;
 };
 
+export interface LinkToOpen {
+  label: string;
+  url: string;
+  type: string;
+  node_id: string;
+}
+
 export interface ChunkResponse {
   messages: LLMMessageType;
   meta?: Meta;
   type: null | string;
+  links_to_open?: LinkToOpen;
 }
 export interface ChunkResponseData {
   node_data: ChunkNodeData;

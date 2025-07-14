@@ -65,6 +65,11 @@ const DocumentItem = ({
   const openDoc = () => {
     setOpening(true);
     openDocForFlow(slug, item.name)
+      .then(res => {
+        if (res.data?.url) {
+          window.open(res.data?.url, '_blank', 'noopener,noreferrer');
+        }
+      })
       .catch(e => {
         showToast({ description: 'Something went wrong: ' + e, type: 'error' });
       })
