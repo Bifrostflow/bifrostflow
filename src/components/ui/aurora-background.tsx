@@ -14,23 +14,23 @@ export const AuroraBackground = ({
   ...props
 }: AuroraBackgroundProps) => {
   return (
-    <main>
+    <main className="w-full">
       <div
         className={cn(
-          'transition-all relative flex h-[100vh] flex-col items-center justify-start bg-[#1b53e000] text-white overflow-hidden',
+          'transition-all relative flex h-full flex-col items-center justify-start bg-[#1b53e000] text-white overflow-hidden',
           className,
         )}
         {...props}>
         <div
-          className="absolute inset-0 overflow-hidden animate-heartbeat-gradient"
+          className="z-2 absolute inset-0 overflow-hidden animate-heartbeat-gradient"
           style={
             {
               '--aurora': `repeating-linear-gradient(
                 120deg,
-                #00FFFF 0%,
-                #008FFF 10%,
-                #00BFFF 20%,
-                #008FFF 30%,
+                #00FFFF 10%,
+                #008FFF 20%,
+                #00BFFF 30%,
+                #008FFF 40%,
                 #008FFF 50%,
                 #00BFFF 60%,
                 #00FFFF 70%
@@ -51,7 +51,7 @@ export const AuroraBackground = ({
               `pointer-events-none absolute -inset-[10px]
               [background-size:300%,_200%]
               [background-position:50%_50%,50%_50%]
-              opacity-60 blur-[20px] invert filter will-change-transform
+              opacity-60 blur-[20px]  will-change-transform
               after:absolute after:inset-0
               after:[background-image:var(--white-gradient),var(--aurora)]
               after:[background-size:200%,_100%]

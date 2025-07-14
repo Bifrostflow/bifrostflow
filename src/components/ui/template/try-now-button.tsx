@@ -41,19 +41,20 @@ function TryNowButton({
       setcreatingProject(false);
     }
   };
-
+  const onClickHandler = () => {
+    console.log('UI ROLE', UIRole);
+    if (UIRole === 'card') {
+      router.push(`/templates/${template.id}`);
+    } else {
+      onTryNowHandler();
+    }
+  };
   return (
     <Button
       variant={'default'}
       className="w-28"
       disabled={creatingProject}
-      onClick={
-        UIRole === 'card'
-          ? () => {
-              router.push(`/templates/${template.id}`);
-            }
-          : onTryNowHandler
-      }>
+      onClick={onClickHandler}>
       {creatingProject && <Loader2 className="animate-spin" />}
       Try Now
     </Button>

@@ -37,7 +37,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background w-screen sm:w-full`}>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background w-screen sm:w-full dark`}>
         <ThemeProvider>
           <ClerkProviderWrapper>
             <ReduxProvider>{children}</ReduxProvider>

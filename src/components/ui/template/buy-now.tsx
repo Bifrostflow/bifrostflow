@@ -107,6 +107,8 @@ const BuyNow = ({
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
   };
+  console.log(isPurchased, product.price);
+
   if (isPurchased || product.price === 0) {
     return <TryNowButton template={product} />;
   }
