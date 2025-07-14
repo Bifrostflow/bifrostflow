@@ -67,6 +67,7 @@ const ActionNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
       }}
       className={cn(
         'group shadow-sm active:shadow-lg shadow-gray-500/80 dark:shadow-gray-950  dark:bg-zinc-800 active:bg-zinc-200 bg-zinc-100 p-2 rounded-lg max-w-3xs min-w-3xs border-1dark:border-zinc-500 border-green-600 dark:hover:border-green-600 hover:border-green-500 transition-all duration-100 ease-linear',
+        isLoading ? 'dark:border-green-600 border-green-500' : '',
       )}>
       <CustomHandle
         connectionCount={1}
@@ -91,14 +92,19 @@ const ActionNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
                   name={isLoading ? 'loader-2' : typeToIcon(nodeData?.category)}
                   className={cn(
                     'dark:group-hover:text-green-600 group-hover:text-green-600 text-zinc-500 dark:text-zinc-400',
-                    isLoading ? 'animate-spin' : '',
+                    isLoading
+                      ? 'animate-spin dark:text-green-600 text-green-600'
+                      : '',
                   )}
                   size={16}
                 />
               )}
               <Typography
                 variant={'h4'}
-                className="text-zinc-500 dark:text-zinc-400 dark:group-hover:text-green-600 group-hover:text-green-600 text-[14px]">
+                className={cn(
+                  'text-zinc-500 dark:text-zinc-400 dark:group-hover:text-green-600 group-hover:text-green-600 text-[14px]',
+                  isLoading ? 'dark:text-green-600 text-green-600' : '',
+                )}>
                 {nodeData?.name}
               </Typography>
             </div>
@@ -112,7 +118,10 @@ const ActionNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
           </div>
           <Typography
             variant={'p'}
-            className="text-[8px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words font-medium tracking-normal truncate overflow-hidden text-ellipsis w-3xs pr-4 dark:group-hover:text-green-600 group-hover:text-green-700 transition-all duration-100 ease-linear">
+            className={cn(
+              'text-[8px] text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words font-medium tracking-normal truncate overflow-hidden text-ellipsis w-3xs pr-4 dark:group-hover:text-green-600 group-hover:text-green-700 transition-all duration-100 ease-linear',
+              isLoading ? 'dark:text-green-600 text-green-700' : '',
+            )}>
             {nodeData?.description}
           </Typography>
           {nodeData?.gpt_model && (

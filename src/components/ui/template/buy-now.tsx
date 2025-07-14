@@ -96,6 +96,7 @@ const BuyNow = ({
             type: 'error',
           });
         } finally {
+          setMakingPayment(false);
         }
       },
       theme: {
@@ -105,7 +106,6 @@ const BuyNow = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
-    setMakingPayment(false);
   };
   console.log(isPurchased, product.price);
 
@@ -121,8 +121,7 @@ const BuyNow = ({
       disabled={makingPayment}
       variant={'secondary'}
       className="w-28">
-      {makingPayment && <Loader2 className="animate-spin" />} Buy Now{' '}
-      {product.price || 0}$
+      {makingPayment && <Loader2 className="animate-spin" />} Buy Now
     </Button>
   );
 };

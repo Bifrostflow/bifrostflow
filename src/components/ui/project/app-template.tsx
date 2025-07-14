@@ -9,6 +9,7 @@ import moment from 'moment';
 import { Typography } from '../typography';
 import { Button } from '../button';
 import BuyNow from '../template/buy-now';
+import { cn } from '@/lib/utils';
 
 type Props = {
   item: FlowTemplate;
@@ -49,6 +50,15 @@ function AppTemplate({ item }: Props) {
           <Typography variant={'p'} className="text-c-background-text/90">
             {item.description?.substring(0, 60)}
             {(item.description?.length || 0) > 60 ? '...' : ''}
+          </Typography>
+          <Typography
+            className={cn(
+              'font-semibold',
+              !!item.price
+                ? 'text-shadow-c-surface-text-muted'
+                : 'text-c-secondary',
+            )}>
+            Price: {!!item.price ? `$${item.price}` : 'Free'}
           </Typography>
           <div className="flex flex-row justify-between items-center mt-2">
             <Link href={`/templates/${item.id}`}>
