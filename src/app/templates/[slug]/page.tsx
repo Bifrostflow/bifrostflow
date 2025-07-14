@@ -4,7 +4,6 @@ import { getTemplateById } from '@/_backend/private/projects/getTemplates';
 import { Typography } from '@/components/ui/typography';
 import { Badge } from '@/components/ui/badge';
 import BuyNow from '@/components/ui/template/buy-now';
-import TryNowButton from '@/components/ui/template/try-now-button';
 import MarkFavourite from '@/components/ui/template/mark-favourite';
 import GoBack from '@/components/ui/template/go-back';
 
@@ -55,40 +54,41 @@ export default async function Flow({
           </div>
           <div className="w-full border-b-1 border-b-c-border my-5"></div>
           <div id="pricing-area" className="flex flex-col w-2xs">
-            <Typography className="text-c-background-text" variant={'h2'}>
-              Checkout
-            </Typography>
-            <div className="w-2xs flex flex-row justify-between items-center my-2">
-              <Typography
-                className="mb-2 text-c-background-text"
-                variant={'h3'}>
-                Price:
-              </Typography>
-              <Typography
-                className={
-                  price ? 'mb-2 text-c-primary' : 'mb-2 text-c-secondary'
-                }
-                variant={'h4'}>
-                {price ? `$${price}` : 'Free'}
-              </Typography>
-            </div>
-            {!!price && (
-              <div className="w-2xs flex flex-row justify-between items-center my-2 pt-3 border-t-1 border-t-c-border">
-                <Typography className="mb-2 text-c-secondary" variant={'h3'}>
-                  Total:
+            {!template.data.is_purchased && !!price && (
+              <>
+                <Typography className="text-c-background-text" variant={'h2'}>
+                  Checkout
                 </Typography>
-                <Typography className={'mb-2 text-c-secondary'} variant={'h4'}>
-                  {`$${price}`}
-                </Typography>
-              </div>
+                <div className="w-2xs flex flex-row justify-between items-center my-2">
+                  <Typography
+                    className="mb-2 text-c-background-text"
+                    variant={'h3'}>
+                    Price:
+                  </Typography>
+                  <Typography
+                    className={
+                      price ? 'mb-2 text-c-primary' : 'mb-2 text-c-secondary'
+                    }
+                    variant={'h4'}>
+                    {price ? `$${price}` : 'Free'}
+                  </Typography>
+                </div>
+
+                <div className="w-2xs flex flex-row justify-between items-center my-2 pt-3 border-t-1 border-t-c-border">
+                  <Typography className="mb-2 text-c-secondary" variant={'h3'}>
+                    Total:
+                  </Typography>
+                  <Typography
+                    className={'mb-2 text-c-secondary'}
+                    variant={'h4'}>
+                    {`$${price}`}
+                  </Typography>
+                </div>
+              </>
             )}
             <div className="flex flex-row gap-2 mt-3">
               <GoBack />
-              {price ? (
-                <BuyNow price={price} />
-              ) : (
-                <TryNowButton template={template.data} />
-              )}
+              <BuyNow product={template.data} />
             </div>
           </div>
         </div>

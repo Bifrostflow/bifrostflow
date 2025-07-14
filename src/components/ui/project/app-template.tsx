@@ -8,6 +8,7 @@ import Image from 'next/image';
 import moment from 'moment';
 import { Typography } from '../typography';
 import { Button } from '../button';
+import BuyNow from '../template/buy-now';
 
 type Props = {
   item: FlowTemplate;
@@ -49,27 +50,17 @@ function AppTemplate({ item }: Props) {
             {item.description?.substring(0, 60)}
             {(item.description?.length || 0) > 60 ? '...' : ''}
           </Typography>
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row justify-between items-center mt-2">
             <Link href={`/templates/${item.id}`}>
-              <Button variant={'default'} className="mt-2">
+              <Button variant={'default'} className="">
                 View Template
               </Button>
             </Link>
-            <Button variant={'secondary'} className="mt-2">
-              Buy Now {item.price || 0}$
-            </Button>
+            <BuyNow product={item} UIRole="card" />
           </div>
         </div>
       </div>
     </motion.div>
-    // <Link href={`/templates/${item.id}`}>
-    //   <Card className="w-[300px] h-[300px] flex justify-center items-center m-2 p-2 ">
-    //     <CardTitle>{item.name}</CardTitle>
-    //     <CardDescription>
-    //       {item.description.substring(0, 100)}...
-    //     </CardDescription>
-    //   </Card>
-    // </Link>
   );
 }
 
