@@ -9,12 +9,13 @@ import { useFlow } from '@/context/flow-context';
 import { RunButton } from './run-flow-button';
 import SaveFlowButton from './save-flow-button';
 import Drawer from '../drawer';
-import { File, KeySquare } from 'lucide-react';
+import { Bug, File, KeySquare } from 'lucide-react';
 import { Label } from '../label';
 import { useHotkeys } from 'react-hotkeys-hook';
 import EditFlow from './edit-flow';
 
 import FlowDocuments from './flow-documents';
+import { showToast } from '../toast';
 
 const FlowNav = () => {
   const {
@@ -111,18 +112,29 @@ const FlowNav = () => {
         position="right"
         className="top-[110px] left-auto right-[10px] sm:top-[80px] sm:left-auto sm:right-[10px]"
         onClose={setShowMore}>
-        <div className="flex flex-wrap gap-3 justify-start items-center">
+        <div className="flex flex-wrap gap-3 justify-evenly items-center h-full">
           <motion.div
             onClick={onKeyInputAreaPressHandler}
-            className="flex flex-col justify-center items-center my-2 gap-2">
+            className="flex flex-col justify-center items-center my-2 gap-2 border-1 rounded-lg p-2 py-3 w-[32%] text-center hover:border-c-border transition-all duration-100 ease-in active:scale-[0.96] hover:text-c-secondary">
             <KeySquare size={32} />
-            <Label className="text-xs">Manage Keys</Label>
+            <Label className="text-xs">Keys</Label>
           </motion.div>
           <motion.div
             onClick={onShowDocPressHandler}
-            className="flex flex-col justify-center items-center my-2 gap-2">
+            className="flex flex-col justify-center items-center my-2 gap-2 border-1 rounded-lg p-2 py-3 w-[32%] text-center hover:border-c-border transition-all duration-100 ease-in active:scale-[0.96] hover:text-c-secondary">
             <File size={32} />
             <Label className="text-xs">Flow Docs</Label>
+          </motion.div>
+          <motion.div
+            onClick={() => {
+              showToast({
+                description:
+                  'Glad you are interedted in making our app better, this feature is in development phase, will notify you once shipped.',
+              });
+            }}
+            className="flex flex-col justify-center items-center my-2 gap-2 border-1 rounded-lg p-2 py-3 w-[32%] text-center hover:border-c-border transition-all duration-100 ease-in active:scale-[0.96] hover:text-c-secondary">
+            <Bug size={32} />
+            <Label className="text-xs">Report Bug</Label>
           </motion.div>
         </div>
       </Drawer>
