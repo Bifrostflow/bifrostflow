@@ -11,7 +11,16 @@ export type SystemToolType =
   | 'write_mail_and_send'
   | 'write_code'
   | 'route_query'
-  | string;
+  | 'on_prompt'
+  | 'on_start'
+  | 'conditional_routing'
+  | 'end'
+  | 'code_documentation'
+  | 'doc_to_pdf'
+  | 'tavily_search'
+  | 'script_writer'
+  | 'google_trend'
+  | 'on_speech';
 
 export type ToolCategory =
   | 'conditional'

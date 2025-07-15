@@ -111,7 +111,7 @@ const EndNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
         </div>
       </div>
       <CustomHandle
-        connectionCount={1}
+        connectionCount={2}
         style={{
           backgroundColor:
             theme == 'dark'

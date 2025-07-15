@@ -8,6 +8,7 @@ import {
   EdgeProps,
   MiniMap,
   Node,
+  NodeProps,
   ReactFlow,
   reconnectEdge,
 } from '@xyflow/react';
@@ -41,8 +42,9 @@ import {
   AnimatedSVGEdgeGenerate,
 } from './AnimtedSVGEdge';
 import { ToolCategory } from '@/_backend/getSystemTools';
+import { RecordAudioNode } from '../nodes/speech-start';
 
-export type InitiatorType = 'on_prompt' | 'on_start';
+export type InitiatorType = 'on_prompt' | 'on_start' | 'on_speech';
 
 type CustomEdgeType =
   | 'animated-svg'

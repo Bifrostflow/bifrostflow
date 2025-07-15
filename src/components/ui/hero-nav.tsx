@@ -41,17 +41,19 @@ export function HeroNav() {
           <NavbarLogo />
           <div className="flex items-center gap-4 flex-row justify-end">
             <NavItems items={navItems} />
-            <SignedOut>
-              <SignInButton
-                forceRedirectUrl={'/home'}
-                mode="modal"
-                signUpFallbackRedirectUrl={'/home'}>
-                <Button variant="outline">{'Sign In'}</Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton userProfileUrl="/home/settings/profile" />
-            </SignedIn>
+            <div className="relative z-10">
+              <SignedOut>
+                <SignInButton
+                  forceRedirectUrl={'/home'}
+                  mode="modal"
+                  signUpFallbackRedirectUrl={'/home'}>
+                  <Button variant="outline">{'Sign In'}</Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <UserButton userProfileUrl="/home/settings/profile" />
+              </SignedIn>
+            </div>
           </div>
         </NavBody>
 
@@ -78,7 +80,7 @@ export function HeroNav() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
-            <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-col gap-4 relative z-10 ">
               <SignedOut>
                 <SignInButton
                   forceRedirectUrl={'/home'}

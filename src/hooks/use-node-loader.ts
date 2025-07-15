@@ -54,7 +54,7 @@ export const useNodeViewport = () => {
         for (let i = 0; i < currentNodeInProcess.next_nodes.length; i++) {
           const target = currentNodeInProcess.next_nodes[i];
           const edgeID = `xy-edge__${source}-${target}`;
-          const category: ToolCategory = currentNodeData.data
+          const category: ToolCategory = currentNodeData?.data
             ? (currentNodeData.data.category as ToolCategory)
             : 'initiate';
           setEdges(eds => {

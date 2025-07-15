@@ -72,7 +72,11 @@ type FlowContextType = {
   setFlowName: (value: string) => void;
   showMore: boolean;
   setShowMore: (value: boolean) => void;
+  uploadingAudio: boolean;
+  setUploadingAudio: (value: boolean) => void;
   currentNodeInProcess: ChunkNodeData | undefined;
+  audioData: Blob | null;
+  setAudioData: (data: Blob) => void;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
@@ -102,6 +106,7 @@ export const FlowProvider = ({
   const [initiatorType, setInitiatorType] = useState<
     InitiatorType | undefined
   >();
+  const [uploadingAudio, setUploadingAudio] = useState(false);
   const [APIKeys, setAPIKeys] = useState<APIData>(apiKeys);
   const [showKeyInputArea, setShowKeyInputArea] = useState(false);
   const [showActionPanel, setShowActionPanel] = useState(false);
@@ -121,6 +126,7 @@ export const FlowProvider = ({
   const [showMore, setShowMore] = useState(false);
   const [currentNodeInProcess, setCurrentNodeInProcess] =
     useState<ChunkNodeData>();
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   // noded and edges
   useEffect(() => {
     const sanitizedNodes = defaultNodes.map(node => mapNodesDataToNodes(node));
@@ -307,6 +313,10 @@ export const FlowProvider = ({
   return (
     <FlowContext.Provider
       value={{
+        setUploadingAudio,
+        uploadingAudio,
+        audioData: audioBlob,
+        setAudioData: setAudioBlob,
         setShowFlowDocs,
         showFlowDocs,
         currentNodeInProcess: currentNodeInProcess,

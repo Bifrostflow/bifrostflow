@@ -22,6 +22,7 @@ import { showToast } from '../toast';
 import { Button } from '../button';
 import { X } from 'lucide-react';
 import ChatResponseViewer from '../initiator/chat_response_viewer';
+import { uploadAudio } from '@/_backend/private/projects/uploadAudio';
 
 export const RunButton = () => {
   const [showChatResponseView, setShowChatResponseView] = useState(false);
@@ -42,7 +43,11 @@ export const RunButton = () => {
     setShowMore,
     setToolDrawerOpen,
     setChunkResponse,
+    audioData,
+    setUploadingAudio,
   } = useFlow();
+  console.log({ initiatorTypeValue });
+
   const [continueRunAfterKeySave, setContinueRunAfterKeySave] = useState(false);
   const { getEdges, getNodes } = useReactFlow();
   const [updatingNodes, setUpdatingNodes] = useState(false);
@@ -137,12 +142,56 @@ export const RunButton = () => {
     return { isKeyRequire: Object.keys(requiredKeys).length > 0, requiredKeys };
   };
 
-  const handleInitiatorRunner = () => {
+  const handleInitiatorRunner = async () => {
     if (initiatorTypeValue === 'on_prompt') {
       setActionPanelVisible(true);
       setShowEditDrawer(false);
       setShowMore(false);
       setToolDrawerOpen(false);
+    } else if (initiatorTypeValue === 'on_speech') {
+      if (audioData) {
+        setUploadingAudio(true);
+        try {
+          const audioResponse = await uploadAudio(audioData, slug);
+          console.log({ audioResponse });
+
+          if (!audioResponse?.isSuccess) {
+            showToast({
+              description: audioResponse?.message,
+              type: 'error',
+            });
+            return;
+          }
+          if (!audioResponse.data?.text) {
+            showToast({
+              description:
+                'Sorry for the inconvenience, can you please speak again?',
+              type: 'error',
+            });
+            return;
+          }
+          setActionPanelVisible(false);
+          setShowChatResponseView(true);
+          runFlowHandler({
+            edges: getEdges(),
+            message: audioResponse.data?.text,
+          });
+        } catch (error) {
+          showToast({
+            description: `${error}`,
+            type: 'error',
+          });
+        } finally {
+          setUploadingAudio(false);
+        }
+      } else {
+        showToast({
+          title: 'No Audio!',
+          description:
+            'Sorry for the inconvenience, can you please speak again?',
+          type: 'success',
+        });
+      }
     } else if (initiatorTypeValue === 'on_start') {
       setActionPanelVisible(false);
       setShowChatResponseView(true);
