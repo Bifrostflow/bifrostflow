@@ -74,7 +74,7 @@ const EndNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
        ease-linear">
       {nodeData?.category && (
         <DynamicIcon
-          name={typeToIcon(nodeData?.category)}
+          name={typeToIcon(nodeData.type)}
           className="text-orange-600"
           size={22}
         />

@@ -91,7 +91,7 @@ const ActionNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
             <div className="flex-row flex justify-start items-center gap-1 ">
               {nodeData?.category && (
                 <DynamicIcon
-                  name={isLoading ? 'loader-2' : typeToIcon(nodeData?.category)}
+                  name={isLoading ? 'loader-2' : typeToIcon(nodeData.type)}
                   className={cn(
                     'dark:group-hover:text-green-600 group-hover:text-green-600 text-zinc-500 dark:text-zinc-400',
                     isLoading

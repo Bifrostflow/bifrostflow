@@ -71,6 +71,7 @@ const ChatResponseViewer = () => {
       {!!chunkMessageList.length &&
         chunkMessageList.map((chunk, i) => {
           const key = `${i}_${chunk.messages.content}`;
+          const isLast = runningFlow && chunkMessageList.length - 1 === i;
           return (
             <motion.div
               key={`${i}_${chunk.messages.content}`}
@@ -109,7 +110,11 @@ const ChatResponseViewer = () => {
                   {chunk?.meta?.type === 'evaluate_code' ? (
                     <CodeEvaluateResponse response={chunk} />
                   ) : chunk.type === 'server' ? (
-                    <div className="bg-background border-1 border-c-primary rounded-full shadow-md px-2 py-0 w-full max-w-md text-xs text-c-background-text">
+                    <div
+                      className={cn(
+                        'bg-background border-1 border-c-primary rounded-full shadow-md px-2 py-0 w-full max-w-md text-xs text-c-background-text',
+                        isLast ? 'animate-pulse' : '',
+                      )}>
                       <Typography variant={'p'}>
                         {chunk.messages.content}
                       </Typography>

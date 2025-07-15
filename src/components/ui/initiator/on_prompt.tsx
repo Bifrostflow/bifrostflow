@@ -1,7 +1,6 @@
 'use client';
 import { Loader2, Send, X } from 'lucide-react';
 import { useState } from 'react';
-import { Edge } from '@xyflow/react';
 import { Textarea } from '../textarea';
 
 import { useFlow } from '@/context/flow-context';
@@ -10,11 +9,10 @@ import { Button } from '../button';
 import ChatResponseViewer from './chat_response_viewer';
 
 type Props = {
-  edges: Edge[];
   onClose: () => void;
 };
 
-export const OnPrompt = ({ edges, onClose }: Props) => {
+export const OnPrompt = ({ onClose }: Props) => {
   const { runFlowHandler, runningFlow, setChunkResponse } = useFlow();
   const [message, setMessage] = useState('');
 
@@ -46,7 +44,7 @@ export const OnPrompt = ({ edges, onClose }: Props) => {
         <Button
           disabled={runningFlow || !message}
           onClick={() => {
-            runFlowHandler({ edges, message });
+            runFlowHandler({ message });
           }}>
           Send
           {runningFlow ? (

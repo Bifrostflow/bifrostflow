@@ -74,16 +74,15 @@ type FlowContextType = {
   setShowMore: (value: boolean) => void;
   uploadingAudio: boolean;
   setUploadingAudio: (value: boolean) => void;
+  setRunningFlow: (value: boolean) => void;
   currentNodeInProcess: ChunkNodeData | undefined;
-  audioData: Blob | null;
-  setAudioData: (data: Blob) => void;
+  setUILoaderText: Dispatch<SetStateAction<string[]>>;
 };
 
 const FlowContext = createContext<FlowContextType | undefined>(undefined);
 
 interface FlowBody {
   message: string;
-  edges: Edge[];
 }
 
 export const FlowProvider = ({
@@ -126,7 +125,7 @@ export const FlowProvider = ({
   const [showMore, setShowMore] = useState(false);
   const [currentNodeInProcess, setCurrentNodeInProcess] =
     useState<ChunkNodeData>();
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+
   // noded and edges
   useEffect(() => {
     const sanitizedNodes = defaultNodes.map(node => mapNodesDataToNodes(node));
@@ -205,10 +204,10 @@ export const FlowProvider = ({
     return newNode;
   };
 
-  const runFlowHandler = async ({ edges, message }: FlowBody) => {
+  const runFlowHandler = async ({ message }: FlowBody) => {
     if (runningFlow) return;
     setRunningFlow(() => true);
-    setUILoaderText(prev => [...prev, 'Preparing Flow.']);
+    setUILoaderText(prev => [...prev, 'Let me prepare myself.']);
     setChunkResponse(undefined);
     try {
       const res = await fetch('/api/run-flow', {
@@ -226,7 +225,10 @@ export const FlowProvider = ({
       const decoder = new TextDecoder();
       let buffer = '';
       const responseArray: ChunkResponse[] = [];
-      setUILoaderText(prev => [...prev, 'Sending query.']);
+      setUILoaderText(prev => [
+        ...prev,
+        "I've shared your query with the relevant decision-makers.",
+      ]);
       print(UILoaderText);
       await new Promise(resolve => setTimeout(resolve, 300));
       while (true) {
@@ -313,10 +315,9 @@ export const FlowProvider = ({
   return (
     <FlowContext.Provider
       value={{
+        setRunningFlow,
         setUploadingAudio,
         uploadingAudio,
-        audioData: audioBlob,
-        setAudioData: setAudioBlob,
         setShowFlowDocs,
         showFlowDocs,
         currentNodeInProcess: currentNodeInProcess,
@@ -364,6 +365,7 @@ export const FlowProvider = ({
         setFlowName,
         showMore,
         setShowMore,
+        setUILoaderText,
       }}>
       {children}
     </FlowContext.Provider>

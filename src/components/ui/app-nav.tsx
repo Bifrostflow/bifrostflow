@@ -22,7 +22,7 @@ function AppNav({
     <>
       <div
         className={cn(
-          'z-100 h-[64px] w-[100%] px-5 sm:px-10 md:px-10 lg:px-10 xl:px-36 2xl:36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20',
+          'z-100 h-[64px] w-[100%] px-5 sm:px-10 md:px-10 lg:px-10 xl:px-36 2xl:36 py-1 dark:bg-zinc-800 bg-c-surface flex flex-row justify-between items-center shadow-md dark:shadow-zinc-900 shadow-c-background-text-muted/20 rounded-0',
           fixed ? 'fixed' : 'relative',
         )}>
         <div className="flex flex-row justify-start items-center gap-4">

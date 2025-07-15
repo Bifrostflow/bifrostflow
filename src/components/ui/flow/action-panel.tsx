@@ -1,16 +1,15 @@
-import { OnPrompt } from './initiator/on_prompt';
+import { OnPrompt } from '../initiator/on_prompt';
 import { useFlow } from '@/context/flow-context';
-import { useReactFlow } from '@xyflow/react';
-import Drawer from './drawer';
+import Drawer from '../drawer';
+import { OnSpeech } from '../initiator/on-speech';
 
-export const DraggablePanel = () => {
+export const ActionPanel = () => {
   const {
     actionPanelVisible,
     setActionPanelVisible,
     initiatorTypeValue,
     setChunkResponse,
   } = useFlow();
-  const { getEdges } = useReactFlow();
   const onCloseHandler = () => {
     setActionPanelVisible(false);
     setChunkResponse(undefined);
@@ -20,9 +19,12 @@ export const DraggablePanel = () => {
       visible={actionPanelVisible}
       onClose={onCloseHandler}
       position="bottom"
-      className="bottom-10 right-20 left-auto w-3xl max-w-3xl">
+      className="bottom-10 right-20 left-auto w-3xl max-w-3xl p-0 px-4 pt-4">
       {initiatorTypeValue === 'on_prompt' && (
-        <OnPrompt onClose={onCloseHandler} edges={getEdges()} />
+        <OnPrompt onClose={onCloseHandler} />
+      )}
+      {initiatorTypeValue === 'on_speech' && (
+        <OnSpeech onClose={onCloseHandler} />
       )}
     </Drawer>
   );

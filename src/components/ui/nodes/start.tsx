@@ -1,12 +1,12 @@
 import React, { memo, ReactNode, useEffect, useState } from 'react';
 import { NodeProps, Position, useReactFlow } from '@xyflow/react';
-import { SystemTool } from '@/_backend/getSystemTools';
+import { SystemTool, SystemToolType } from '@/_backend/getSystemTools';
 import CustomHandle from '../handles/custom-handle';
 import { Typography } from '../typography';
 import { Button } from '../button';
 import { X } from 'lucide-react';
-import { DynamicIcon } from 'lucide-react/dynamic';
-import { typeToIcon } from '../system-tool-item';
+import { DynamicIcon, IconName } from 'lucide-react/dynamic';
+
 import { useThemeToggle } from '@/hooks/theme-toggle';
 import { motion } from 'framer-motion';
 
@@ -15,6 +15,18 @@ import { useFlow } from '@/context/flow-context';
 import { useNodeLoader } from '@/hooks/use-node-loader';
 import { cn } from '@/lib/utils';
 type UnionType = SystemTool & { delete: ReactNode };
+
+export const typeToIconInitiate = (type: SystemToolType): IconName => {
+  switch (type) {
+    case 'on_speech':
+      return 'mic';
+    case 'on_prompt':
+      return 'message-square';
+    case 'on_start':
+    default:
+      return 'play';
+  }
+};
 
 const InitiateNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
   const { setToolDrawerOpen } = useFlow();
@@ -65,7 +77,7 @@ const InitiateNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
 
       p-2 
       rounded-xl 
-      max-w-[180px] 
+      max-w-fit
       min-w-[180px] 
 
       border-1
@@ -82,10 +94,8 @@ const InitiateNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
        ease-linear">
       {nodeData?.category && (
         <DynamicIcon
-          name={isLoading ? 'loader-2' : typeToIcon(nodeData?.category)}
-          fill="var(--c-secondary"
+          name={isLoading ? 'loader-2' : typeToIconInitiate(nodeData?.type)}
           className={cn('text-emerald-600  ', isLoading ? 'animate-spin' : '')}
-          size={16}
         />
       )}
       <div className="flex justify-between items-center ">
@@ -111,7 +121,7 @@ const InitiateNodeComp: React.FC<NodeProps> = ({ data, isConnectable }) => {
           </Typography>
           {nodeData?.gpt_model && (
             <Typography
-              className="text-[10px] group-hover:text-emerald-500 dark:text-zinc-400 text-zinc-500 capitalize font-semibold mt-1"
+              className="text-[10px] group-hover:text-emerald-500 dark:group-hover:text-emerald-600 dark:text-zinc-400 text-zinc-500 capitalize font-semibold mt-1"
               variant={'p'}>
               {nodeData?.llm.replaceAll('-', ' ')} :{' '}
               <span className="uppercase">{nodeData?.gpt_model}</span>

@@ -1,5 +1,9 @@
 'use client';
-import { ToolCategory, SystemTool } from '@/_backend/getSystemTools';
+import {
+  ToolCategory,
+  SystemTool,
+  SystemToolType,
+} from '@/_backend/getSystemTools';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { DynamicIcon, IconName } from 'lucide-react/dynamic';
@@ -13,18 +17,41 @@ type SystemToolItemProps = {
   node: SystemTool;
 };
 
-export const typeToIcon = (category: ToolCategory): IconName => {
-  switch (category) {
-    case 'action':
-      return 'pickaxe';
-    case 'close':
-      return 'circle-power';
-    case 'conditional':
-      return 'signpost-big';
-    case 'generate':
-      return 'cog';
-    case 'initiate':
+export const typeToIcon = (type: SystemToolType): IconName => {
+  switch (type) {
+    case 'evaluate_code':
+    case 'code_documentation':
+      return 'file-sliders';
+    case 'write_code':
+      return 'code';
+    case 'write_message':
+      return 'keyboard';
+    case 'doc_to_pdf':
+      return 'file';
+    case 'script_writer':
+      return 'scroll-text';
+    case 'tavily_search':
+      return 'search';
+    case 'google_trend':
+      return 'rss';
+    case 'google_trend':
+      return 'rss';
+    case 'write_mail_and_send':
+      return 'send';
+    case 'conditional_routing':
+    case 'classify_message':
+    case 'route_query':
+    case 'start':
+      return 'split';
+    case 'on_speech':
+      return 'mic';
+    case 'on_prompt':
+      return 'message-square';
+    case 'start':
+    case 'on_start':
       return 'play';
+    case 'end':
+      return 'power';
     default:
       return 'wrench';
   }
@@ -96,7 +123,7 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
       )}>
       <div className="flex flex-row gap-3 justify-start items-start">
         <DynamicIcon
-          name={typeToIcon(node.category)}
+          name={typeToIcon(node.type)}
           size={40}
           className={iconClass}
         />

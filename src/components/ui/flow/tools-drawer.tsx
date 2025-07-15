@@ -4,12 +4,12 @@ import {
   SystemTool,
 } from '@/_backend/getSystemTools';
 import { useEffect, useState } from 'react';
-import { SystemToolItem } from './system-tool-item';
+import { SystemToolItem } from '../system-tool-item';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { useFlow } from '@/context/flow-context';
-import { Typography } from './typography';
-import { Button } from './button';
+import { Typography } from '../typography';
+import { Button } from '../button';
 
 const nodesClassification: ToolCategory[] = [
   'initiate',
@@ -52,7 +52,7 @@ const typeToSelectedRngActiveColor = (category: ToolCategory) => {
   }
 };
 
-export default function SideDrawer() {
+export default function ToolsDrawer() {
   const [systemNodes, setSystemNodes] = useState<SystemTool[]>();
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | null>(
