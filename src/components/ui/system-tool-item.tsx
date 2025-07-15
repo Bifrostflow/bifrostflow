@@ -34,8 +34,8 @@ export const typeToIcon = (type: SystemToolType): IconName => {
       return 'search';
     case 'google_trend':
       return 'rss';
-    case 'google_trend':
-      return 'rss';
+    case 'create_tweet':
+      return 'twitter';
     case 'write_mail_and_send':
       return 'send';
     case 'conditional_routing':

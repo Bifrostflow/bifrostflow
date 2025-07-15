@@ -20,6 +20,7 @@ export type SystemToolType =
   | 'tavily_search'
   | 'script_writer'
   | 'google_trend'
+  | 'create_tweet'
   | 'on_speech';
 
 export type ToolCategory =

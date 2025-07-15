@@ -17,7 +17,7 @@ export const OnPrompt = ({ onClose }: Props) => {
   const [message, setMessage] = useState('');
 
   return (
-    <div className="w-full max-w-5xl flex-col justify-center items-center">
+    <div className="w-full max-w-5xl flex-col justify-center items-center pb-3">
       <div className="flex justify-end mb-3">
         <Button
           size={'icon'}
