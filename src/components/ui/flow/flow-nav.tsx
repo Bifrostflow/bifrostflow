@@ -129,7 +129,7 @@ const FlowNav = () => {
             onClick={() => {
               showToast({
                 description:
-                  'Glad you are interedted in making our app better, this feature is in development phase, will notify you once shipped.',
+                  'Glad you are interested in making our app better, this feature is in development phase, will notify you once shipped.',
               });
             }}
             className="flex flex-col justify-center items-center my-2 gap-2 border-1 rounded-lg p-2 py-3 w-[32%] text-center hover:border-c-border transition-all duration-100 ease-in active:scale-[0.96] hover:text-c-secondary">
