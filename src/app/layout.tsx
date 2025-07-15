@@ -5,6 +5,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { ClerkProviderWrapper } from '@/components/clerk-provider';
 import { ReduxProvider } from '@/redux/redux-provider';
 import ThemeProvider from '@/context/theme-provider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 import Script from 'next/script';
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -43,6 +45,8 @@ export default function RootLayout({
             <ReduxProvider>{children}</ReduxProvider>
           </ClerkProviderWrapper>
           <Toaster />
+          <SpeedInsights />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
