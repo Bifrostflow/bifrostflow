@@ -79,7 +79,7 @@ export default function ProfileSettings() {
               console.log(values);
               submitHandler(values);
             })}
-            className="w-[400px] space-y-6 p-6 rounded-lg ">
+            className="w-full space-y-6 p-6 rounded-lg ">
             <FormField
               control={form.control}
               name="first_name"

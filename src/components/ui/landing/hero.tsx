@@ -9,6 +9,7 @@ import Pricing from './pricing';
 import { IconBrandTwitter } from '@tabler/icons-react';
 import { Typography } from '../typography';
 import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import Image from 'next/image';
 
 function Hero() {
   return (
@@ -91,6 +92,50 @@ function Hero() {
               </Link>
             </SignedIn>
           </motion.div>
+        </div>
+        <div className="my-4 ">
+          <div className="flex flex-row">
+            <div className="relative mx-auto overflow-hidden px-4 ">
+              <p className="relative z-20 mx-auto mt-2 mb-4 max-w-5xl text-center text-base text-neutral-500 md:mt-4 md:text-lg dark:text-neutral-400">
+                Build by peoples who used
+              </p>
+              <div className="mx-auto flex flex-row w-fit gap-10 items-center justify-center px-4 flex-wrap">
+                <Image
+                  title="Google"
+                  alt="Google"
+                  loading="lazy"
+                  width={120}
+                  height={120}
+                  decoding="async"
+                  className="mx-auto aspect-square shrink-0 object-contain grayscale h-4 md:h-10"
+                  src="/google.png"
+                  style={{ color: 'transparent' }}
+                />
+                <Image
+                  title="Microsoft"
+                  alt="Microsoft"
+                  loading="lazy"
+                  width={120}
+                  height={120}
+                  decoding="async"
+                  className="mx-auto aspect-square shrink-0 object-contain grayscale h-8 md:h-12"
+                  src="/microsoft.png"
+                  style={{ color: 'transparent' }}
+                />
+                <Image
+                  title="Zomato"
+                  alt="Zomato"
+                  loading="lazy"
+                  width={120}
+                  height={120}
+                  decoding="async"
+                  className="mx-auto aspect-square shrink-0 object-contain grayscale h-4 md:h-10"
+                  src="/zomato.png"
+                  style={{ color: 'transparent' }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="relative flex mt-50 flex-row font-bold text-transparent z-2">
           <span className="">

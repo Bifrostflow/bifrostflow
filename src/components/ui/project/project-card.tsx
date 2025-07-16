@@ -20,7 +20,7 @@ function ProjectCard({ item }: Props) {
     <motion.div
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
-      className="relative h-80 p-4 rounded-2xl min-w-2xs max-w-2xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-border/90 hover:border-c-secondary">
+      className="relative h-80 2xl:h-80 p-4 rounded-2xl w-2xs overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-border/90 hover:border-c-secondary">
       <Link
         href={`/flow/${item.id}`}
         className="block h-full w-full relative z-10">

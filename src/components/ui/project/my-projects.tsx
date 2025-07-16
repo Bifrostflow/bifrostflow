@@ -24,7 +24,10 @@ const MyProjects = async () => {
           {current_project_count} of {project_limit} flows used
         </Typography>
       </div>
-      <div className={cn('flex flex-col lg:flex-row gap-4 my-4 ')}>
+      <div
+        className={cn(
+          'flex flex-col lg:flex-row gap-4 lg:gap-6 my-1 2xl:gap-10 2xl:my-4 ',
+        )}>
         <div className="flex flex-col">
           <StartNew
             current_project_count={current_project_count}

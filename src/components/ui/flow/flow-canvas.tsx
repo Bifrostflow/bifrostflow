@@ -41,6 +41,7 @@ import {
 } from './AnimtedSVGEdge';
 import { ToolCategory } from '@/_backend/getSystemTools';
 import ToolsDrawer from '@/components/ui/flow/tools-drawer';
+import { Typography } from '../typography';
 
 export type InitiatorType = 'on_prompt' | 'on_start' | 'on_speech';
 
@@ -139,7 +140,13 @@ export default function FlowCanvas() {
 
   return (
     <div className="flex h-screen">
-      <div className="flex-1">
+      <div className="flex flex-col flex-1 justify-center items-center md:hidden text-center">
+        <Typography variant={'h3'}>Thanks for visiting!</Typography>
+        <Typography>
+          Use bigger device or explore mobile supported Features.
+        </Typography>
+      </div>
+      <div className="flex-1 hidden md:flex">
         <ReactFlow
           defaultViewport={{ x: 250, y: 250, zoom: 1.2 }}
           edgeTypes={edgeTypes}
@@ -216,7 +223,7 @@ export default function FlowCanvas() {
         </ReactFlow>
         <ActionPanel />
       </div>
-      <div className="absolute right-0 top-18 z-9 group p-2 bg-c-primary ">
+      <div className="hidden md:flex fixed right-0 top-20 md:top-18 z-9 group p-2 bg-c-primary ">
         <Button
           className="bg-transparent shadow-0"
           variant={'outline'}
@@ -229,7 +236,7 @@ export default function FlowCanvas() {
 
       <Drawer
         height={'h-full'}
-        className="top-[110px] left-auto right-[0px] sm:top-[64px] sm:left-auto sm:right-[0px] bg-c-surface w-[550px] max-h-full scroll-auto px-2 rounded-none  border-l-4 border-zinc-300 dark:border-zinc-500"
+        className="top-16 md:top-[110px] left-auto right-[0px] sm:top-[64px] sm:left-auto sm:right-[0px] bg-c-surface w-full md:w-md 2xl:w-[550px] max-h-full scroll-auto px-2 rounded-none  border-l-4 border-zinc-300 dark:border-zinc-500"
         position="right"
         visible={toolDrawerOpen}
         onClose={() => {

@@ -118,17 +118,46 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={cn(
-        'border-2 border-transparent rounded-xl p-3  shadow-md bg-zinc-200/80 dark:bg-c-background/60 group transition-all duration-100 ease-in-out bg-gradient-to-r from-zinc-200/40 via-zinc-50 to-zinc-200 dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-900',
+        `
+        border-2 
+        border-transparent
+        rounded-lg 
+        2xl:rounded-xl 
+        lg:py-2
+        p-1
+        2xl:p-2
+        shadow-md 
+        bg-zinc-200/80 
+        dark:bg-c-background/60 
+        group 
+        transition-all 
+        duration-100 
+        ease-in-out 
+        bg-gradient-to-r 
+        from-zinc-200/40 
+        via-zinc-50 
+        to-zinc-200 
+        dark:from-zinc-800 
+        dark:via-zinc-800 
+        dark:to-zinc-900
+        `,
         typeToHoverColor(node.category),
       )}>
-      <div className="flex flex-row gap-3 justify-start items-start">
+      <div className="flex flex-row gap-1 2xl:gap-3 justify-start items-start">
         <DynamicIcon
           name={typeToIcon(node.type)}
-          size={40}
-          className={iconClass}
+          // size={40}
+          className={cn(
+            `
+            2xl:h-[32px] 2xl:w-[32px]
+            xl:h-[28px] xl:w-[28px]
+            lg:h-[26px] lg:w-[26px]
+            `,
+            iconClass,
+          )}
         />
         <div className="flex flex-col gap-1 flex-7 justify-center items-start ">
-          <div className="flex flex-col gap-1 items-start text-left  w-full ">
+          <div className="flex flex-col 2xl:gap-1 items-start text-left  w-full ">
             <div className="flex flex-row justify-between items-center w-full">
               <Typography
                 variant={'h4'}
@@ -149,18 +178,18 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
             </div>
             <Typography
               variant={'p'}
-              className="text-sm text-c-background-text-muted">
+              className="2xl:text-sm text-xs text-c-background-text-muted">
               {node.description}
             </Typography>
           </div>
           <div className="flex flex-row justify-start items-center gap-1">
             {node.llm && (
-              <Typography className="capitalize font-bold text-c-primary text-xs">
+              <Typography className="capitalize font-bold text-c-primary text-[10px] 2xl:text-xs">
                 LLM: {node.llm}
               </Typography>
             )}
             {node.gpt_model && (
-              <Typography className="capitalize font-bold text-c-primary text-xs">
+              <Typography className="capitalize font-bold text-c-primary text-[10px] 2xl:text-xs">
                 {node.gpt_model}
               </Typography>
             )}
@@ -168,7 +197,7 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
 
           <Button
             className={cn(
-              'transition-all duration-100 ease-in-out my-2',
+              'transition-all duration-100 ease-in-out my-1 2xl:my-2',
               'bg-gradient-to-r dark:from-zinc-600 dark:to-zinc-700   from-zinc-500 to-zinc-600',
               `${typeToButtonBGColor(node.category)}`,
             )}
@@ -185,7 +214,7 @@ export const SystemToolItem = ({ onAddNode, node }: SystemToolItemProps) => {
               className="flex flex-row justify-between items-center my-2">
               <div className="flex flex-row-justify-start-items-center gap-2">
                 <AppTooltip
-                  tip={node.require_key ? 'Key required' : 'No key rerquired'}>
+                  tip={node.require_key ? 'Key required' : 'No key required'}>
                   <DynamicIcon
                     name="key"
                     className={

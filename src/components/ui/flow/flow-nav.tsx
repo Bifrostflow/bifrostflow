@@ -79,7 +79,7 @@ const FlowNav = () => {
         logoHeading={flowName}
         renderItems={() => {
           return (
-            <motion.div className="flex flex-row justify-between items-center gap-4 font-semibold text-[10px] text-c-surface-text-muted transition-all duration-100 ease-in">
+            <motion.div className="flex-row justify-between items-center gap-4 font-semibold text-[10px] text-c-surface-text-muted transition-all duration-100 ease-in hidden md:flex">
               <RunButton />
               <SaveFlowButton />
 

@@ -75,7 +75,7 @@ const StartNew = ({
       onClick={createProjectHandler}
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
-      className="relative h-50 md:h-70 p-2 md:p-4 rounded-xl md:rounded-2xl min-w-[200px] max-w-[200px] md:min-w-3xs md:max-w-3xs w-full overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-secondary mr-10 justify-around items-center flex flex-col text-left">
+      className="relative h-50 md:h-70 p-2 md:p-4 rounded-xl md:rounded-2xl w-3xs overflow-hidden shadow-lg bg-c-surface hover:bg-c-surface/90 group border-1 border-c-secondary justify-around items-center flex flex-col text-left">
       <Typography
         variant={'h2'}
         className="group-hover/card:text-c-secondary/80">

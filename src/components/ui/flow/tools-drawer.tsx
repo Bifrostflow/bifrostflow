@@ -81,7 +81,7 @@ export default function ToolsDrawer() {
   });
 
   return (
-    <div className="max-h-full h-full p-4 ">
+    <div className="max-h-full h-full py-0 px-1 xl:p-4">
       <div className="py-4 flex justify-between items-center ">
         <Typography variant={'h3'} className="text-c-background-text">
           Select Tools
@@ -135,7 +135,7 @@ export default function ToolsDrawer() {
         )}
       </div>
 
-      <div className="flex h-[80vh] flex-col gap-3 overflow-y-scroll pb-4  scrollbar-thumb-rounded-md scrollbar-track-rounded-md scrollbar-thumb-blue-500 dark:scrollbar-track-gray-200">
+      <div className="flex h-[80vh] flex-col gap-3 overflow-y-scroll pb-[5vh]  scrollbar-thumb-rounded-md scrollbar-track-rounded-md scrollbar-thumb-blue-500 dark:scrollbar-track-gray-200">
         {!loading &&
           filteredNodes?.map(node =>
             node.type === 'classify_message' ? null : (
