@@ -236,7 +236,7 @@ export default function FlowCanvas() {
 
       <Drawer
         height={'h-full'}
-        className="top-16 md:top-[110px] left-auto right-[0px] sm:top-[64px] sm:left-auto sm:right-[0px] bg-c-surface w-full md:w-md 2xl:w-[550px] max-h-full scroll-auto px-2 rounded-none  border-l-4 border-zinc-300 dark:border-zinc-500"
+        className="top-16 md:top-12 left-auto right-[0px] sm:top-[64px] sm:left-auto sm:right-[0px] bg-c-surface w-full md:w-md 2xl:w-[550px] max-h-full scroll-auto px-2 rounded-none  border-l-4 border-zinc-300 dark:border-zinc-500"
         position="right"
         visible={toolDrawerOpen}
         onClose={() => {
