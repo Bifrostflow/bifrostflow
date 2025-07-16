@@ -96,7 +96,7 @@ function Hero() {
         <div className="my-4 ">
           <div className="flex flex-row">
             <div className="relative mx-auto overflow-hidden px-4 ">
-              <p className="relative z-20 mx-auto mt-2 mb-4 max-w-5xl text-center text-base text-neutral-500 md:mt-4 md:text-lg dark:text-neutral-400">
+              <p className="relative z-20 mx-auto mt-2 mb-4 max-w-5xl text-center text-base text-neutral-600 md:mt-4 md:text-lg dark:text-neutral-300">
                 Build by peoples who used
               </p>
               <div className="mx-auto flex flex-row w-fit gap-10 items-center justify-center px-4 flex-wrap">
@@ -112,14 +112,14 @@ function Hero() {
                   style={{ color: 'transparent' }}
                 />
                 <Image
-                  title="Microsoft"
-                  alt="Microsoft"
+                  title="Apple"
+                  alt="Apple"
                   loading="lazy"
                   width={120}
                   height={120}
                   decoding="async"
-                  className="mx-auto aspect-square shrink-0 object-contain grayscale h-8 md:h-12"
-                  src="/microsoft.png"
+                  className="opacity-50 mb-2 mx-auto aspect-square shrink-0 object-contain grayscale h-4 md:h-10"
+                  src="/apple.png"
                   style={{ color: 'transparent' }}
                 />
                 <Image
