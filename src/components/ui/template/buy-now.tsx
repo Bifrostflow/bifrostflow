@@ -111,19 +111,19 @@ const BuyNow = ({
 
   if (isPurchased || product.price === 0) {
     return <TryNowButton template={product} />;
-  }
-  if (UIRole === 'card') {
+  } else if (UIRole === 'card') {
     return <TryNowButton template={product} UIRole="card" />;
+  } else {
+    return (
+      <Button
+        onClick={onPaymentHandler}
+        disabled={makingPayment}
+        variant={'secondary'}
+        className="w-28">
+        {makingPayment && <Loader2 className="animate-spin" />} Buy Now
+      </Button>
+    );
   }
-  return (
-    <Button
-      onClick={onPaymentHandler}
-      disabled={makingPayment}
-      variant={'secondary'}
-      className="w-28">
-      {makingPayment && <Loader2 className="animate-spin" />} Buy Now
-    </Button>
-  );
 };
 
 export default BuyNow;

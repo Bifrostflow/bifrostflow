@@ -15,10 +15,10 @@ function TryNowButton({
   template: FlowTemplate;
   UIRole?: 'page' | 'card';
 }) {
-  const [creatingProject, setcreatingProject] = useState(false);
+  const [creatingProject, setCreatingProject] = useState(false);
   const router = useRouter();
   const onTryNowHandler = async () => {
-    setcreatingProject(true);
+    setCreatingProject(true);
     try {
       const response = await tryTemplate(template.id);
       if (response?.isSuccess && response.data) {
@@ -38,7 +38,7 @@ function TryNowButton({
 
       print(error);
     } finally {
-      setcreatingProject(false);
+      setCreatingProject(false);
     }
   };
   const onClickHandler = () => {
