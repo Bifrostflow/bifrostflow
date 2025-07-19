@@ -5,7 +5,6 @@ import { auth } from '@clerk/nextjs/server';
 import { APIResponse } from '@/_backend/models/response';
 
 interface CreateOrder {
-  amount: number;
   currency: string;
   receipt: string;
 }
@@ -32,15 +31,28 @@ export const createOrder = async (
         'Content-Type': 'application/json',
       },
     });
+    console.log(res);
     if (!res.ok) {
-      throw new Error('Failed to create order');
+      console.log('RESP:::', res);
+      return {
+        data: await res.json(),
+        isSuccess: false,
+        error: '',
+        message: 'failed response',
+      };
     }
 
     const json: APIResponse<CreateOrderResponse> = await res.json();
     return json;
   } catch (error) {
+    console.log('ERROR: ', error);
     console.error('Error creating order', error);
-    return null;
+    return {
+      data: null,
+      error: null,
+      isSuccess: false,
+      message: 'Something gone wrong...' + error,
+    };
   }
 };
 
