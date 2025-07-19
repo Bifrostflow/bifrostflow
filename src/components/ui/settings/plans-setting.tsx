@@ -1,3 +1,5 @@
+'use client';
+import CancelPlan from '../plans/cancel-plan';
 import { Typography } from '../typography';
 
 export default function PlansSettings() {
@@ -10,7 +12,9 @@ export default function PlansSettings() {
           Plans
         </Typography>
       </div>
-      <div className="bg-c-primary-variant/10 rounded-xl p-4"></div>
+      <div className="bg-c-primary-variant/10 rounded-xl p-4">
+        <CancelPlan />
+      </div>
     </div>
   );
 }

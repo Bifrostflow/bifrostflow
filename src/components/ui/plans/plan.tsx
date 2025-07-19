@@ -1,14 +1,15 @@
 'use client';
 import React from 'react';
 import { Plan } from '../landing/pricing';
-import { Button } from '../button';
 import { CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useClerk } from '@clerk/nextjs';
 import { Typography } from '../typography';
+import StartPlanButton from './start_plan_button';
 
 export const PlanItem = ({ plan }: { plan: Plan }) => {
   const { user } = useClerk();
+  const currentPlan = user?.publicMetadata.plan;
   return (
     <div
       key={plan.name}
@@ -30,27 +31,17 @@ export const PlanItem = ({ plan }: { plan: Plan }) => {
                 </span>
               </p>
             </div>
-            <div>
-              {user?.publicMetadata.plan === plan.name ? (
-                <div className="flex flex-row justify-center items-center bg-gradient-to-bl from-c-secondary to-c-secondary-variant px-2 py-1 rounded-full">
+            <div className="bg-red-400 p-2">
+              {currentPlan === plan.name ? (
+                <div className="z-90 relative mt-8 px-3.5 py-2.5 transition duration-200  sm:mt-10 flex flex-row justify-center items-center bg-gradient-to-bl from-c-secondary to-c-secondary-variant rounded-full">
                   <Typography className="text-sm">Current</Typography>
                 </div>
               ) : (
-                <Button
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  variant={plan.button}
-                  onClick={() => {}}
-                  aria-describedby={`plan-${plan.name}`}
-                  className="z-90 relative mt-8 px-3.5 py-2.5 transition duration-200  sm:mt-10">
-                  {user?.username && !(user?.publicMetadata.plan === plan.name)
-                    ? 'Upgrade'
-                    : 'Get Started'}
-                </Button>
+                <StartPlanButton plan={plan} />
               )}
             </div>
           </div>
-          <p className="mt-6 w-fit  text-sm leading-7 text-neutral-600 dark:text-neutral-300">
+          <p className="mt-6 w-fit text-sm leading-7 text-neutral-600 dark:text-neutral-300">
             {plan.mini_description}
           </p>
         </div>

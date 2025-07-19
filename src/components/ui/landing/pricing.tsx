@@ -2,8 +2,10 @@ import { cn } from '@/lib/utils';
 import { Typography } from '../typography';
 import PlanItem from '../plans/plan';
 
+export type PlanType = 'mortal' | 'demigod' | 'deity';
+
 export interface Plan {
-  name: 'mortal' | 'demigod' | 'deity';
+  name: PlanType;
   number_of_projects: number;
   amount: number; // DOLLAR
   marketplace_access: boolean;
