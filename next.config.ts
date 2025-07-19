@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
       new URL('img.clerk.com'),
       new URL('https://aceternity.com'),
     ],
-    domains: ['img.clerk.com', 'https://aceternity.com/'],
   },
 };
 
