@@ -31,7 +31,7 @@ export const PlanItem = ({ plan }: { plan: Plan }) => {
                 </span>
               </p>
             </div>
-            <div className="bg-red-400 p-2">
+            <div className="">
               {currentPlan === plan.name ? (
                 <div className="z-90 relative mt-8 px-3.5 py-2.5 transition duration-200  sm:mt-10 flex flex-row justify-center items-center bg-gradient-to-bl from-c-secondary to-c-secondary-variant rounded-full">
                   <Typography className="text-sm">Current</Typography>
