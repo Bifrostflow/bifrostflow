@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { FlowTemplate } from '@/_backend/private/projects/getTemplates';
 import TryNowButton from './try-now-button';
+import print from '@/lib/print';
 
 const dollerToPaise = (amountDlr: number) => {
   const dlrToRupee = amountDlr * 86;
@@ -35,10 +36,11 @@ const BuyNow = ({
     console.log(receipt, receipt.length);
     try {
       const response = await createOrder({
-        amount: dollerToPaise(product.price || 0),
         currency: 'INR',
         receipt: receipt,
       });
+      console.log({ response });
+
       if (!response?.isSuccess) {
         showToast({
           description: response?.message,
@@ -48,27 +50,28 @@ const BuyNow = ({
       }
       console.log(response?.data);
       if (response?.data) {
-        handleOrderCreatyionResponse({
+        handleOrderCreationResponse({
           key_id: response?.data?.key_id,
           order_id: response?.data?.order_id,
           receipt_id: response.data.receipt_id,
         });
       }
     } catch (error) {
+      print('E:: ', error);
       showToast({ description: `${error}`, type: 'error' });
     } finally {
       setMakingPayment(false);
     }
   };
 
-  const handleOrderCreatyionResponse = (order: CreateOrderResponse) => {
+  const handleOrderCreationResponse = (order: CreateOrderResponse) => {
     setMakingPayment(true);
     const options = {
       key: order.key_id,
       amount: dollerToPaise(product.price || 0),
       currency: 'INR',
       name: product.name,
-      description: `Paymemnt for ${product.name}`,
+      description: `Payment for ${product.name}`,
       order_id: order.order_id,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handler: async function (rz_response: any) {
