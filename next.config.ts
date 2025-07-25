@@ -6,8 +6,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       new URL('img.clerk.com'),
       new URL('https://aceternity.com'),
+      new URL('img.clerk.com'),
     ],
-    domains: ['img.clerk.com', 'https://aceternity.com/'],
+    domains: ['img.clerk.com', 'https://aceternity.com', 'img.clerk.com'],
   },
 };
 

@@ -7,9 +7,12 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import NavThemeToggle from '../nav-theme-toggle';
+import { useClerk } from '@clerk/nextjs';
 
-const HomeNav = () => {
+const HomeNavProject = () => {
   const pathname = usePathname();
+  const { user } = useClerk();
+  const currentPlan = user?.publicMetadata.plan;
 
   return (
     <>
@@ -55,16 +58,20 @@ const HomeNav = () => {
                 />
               </Link>
               <NavThemeToggle />
-              <Button
-                className="
+              {currentPlan === 'mortal' && (
+                <Button
+                  className="
               relative inline-block font-semibold overflow-hidden group 
               text-black bg-gradient-to-b from-[#FFD700] via-[#FFC107] to-[#FF8C00]">
-                <span className="absolute inset-0 bg-gradient-to-r from-yellow-100 via-white to-yellow-100 opacity-10 blur-xl animate-pulse"></span>
-                <span className="flex sm:hidden relative z-10">Become Pro</span>
-                <span className="hidden sm:flex relative z-10">
-                  Upgrade To Pro
-                </span>
-              </Button>
+                  <span className="absolute inset-0 bg-gradient-to-r from-yellow-100 via-white to-yellow-100 opacity-10 blur-xl animate-pulse"></span>
+                  <span className="flex sm:hidden relative z-10">
+                    Become Pro
+                  </span>
+                  <span className="hidden sm:flex relative z-10">
+                    Upgrade To Pro
+                  </span>
+                </Button>
+              )}
             </motion.div>
           );
         }}
@@ -73,4 +80,4 @@ const HomeNav = () => {
   );
 };
 
-export default HomeNav;
+export default HomeNavProject;
