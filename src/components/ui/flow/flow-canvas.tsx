@@ -151,6 +151,7 @@ export default function FlowCanvas() {
           defaultViewport={{ x: 250, y: 250, zoom: 1.2 }}
           edgeTypes={edgeTypes}
           colorMode={theme}
+          defaultEdgeOptions={{ animated: true, deletable: true }}
           onReconnect={onReconnect}
           onReconnectStart={onReconnectStart}
           onReconnectEnd={onReconnectEnd}
